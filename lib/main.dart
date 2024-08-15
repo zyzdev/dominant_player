@@ -33,7 +33,12 @@ class _MyAppState extends ConsumerState {
       home: Scaffold(
         appBar: AppBar(title: const Text('Example')),
         body: Row(
-          children: [spy, _daySensitivitySpace],
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            spy,
+            _daySensitivitySpace,
+            _nightSensitivitySpace,
+          ],
         ),
       ),
     );
@@ -169,11 +174,93 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget get _daySensitivitySpace {
+    Widget content = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        title('日盤靈敏度空間', leftLine: false, bottomLine: false),
+        sensitivitySpace(
+            direction: Direction.long15,
+            bg: winColor.withOpacity(0.2),
+            sensitivitySpace: _state.daySensitivitySpace15,
+            maxHighOnChange: _mainNotifier.daySensitivitySpaceLongHigh15,
+            maxLowOnChange: _mainNotifier.daySensitivitySpaceLongLow15),
+        sensitivitySpace(
+            direction: Direction.long30,
+            bg: winColor.withOpacity(0.2),
+            sensitivitySpace: _state.daySensitivitySpace30,
+            maxHighOnChange: _mainNotifier.daySensitivitySpaceLongHigh30,
+            maxLowOnChange: _mainNotifier.daySensitivitySpaceLongLow30),
+        sensitivitySpace(
+            direction: Direction.short15,
+            bg: loseColor.withOpacity(0.2),
+            sensitivitySpace: _state.daySensitivitySpace15,
+            maxHighOnChange: _mainNotifier.daySensitivitySpaceShortHigh15,
+            maxLowOnChange: _mainNotifier.daySensitivitySpaceShortLow15),
+        sensitivitySpace(
+            direction: Direction.short30,
+            bg: loseColor.withOpacity(0.2),
+            sensitivitySpace: _state.daySensitivitySpace30,
+            maxHighOnChange: _mainNotifier.daySensitivitySpaceShortHigh30,
+            maxLowOnChange: _mainNotifier.daySensitivitySpaceShortLow30)
+      ],
+    );
+    return ColoredBox(
+      color: Colors.yellow,
+      child: content,
+    );
+  }
+
+  Widget get _nightSensitivitySpace {
+    Widget content = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        title('夜盤靈敏度空間', leftLine: false, bottomLine: false),
+        sensitivitySpace(
+            direction: Direction.long15,
+            bg: winColor.withOpacity(0.2),
+            sensitivitySpace: _state.nightSensitivitySpace15,
+            maxHighOnChange: _mainNotifier.nightSensitivitySpaceLongHigh15,
+            maxLowOnChange: _mainNotifier.nightSensitivitySpaceLongLow15),
+        sensitivitySpace(
+            direction: Direction.long30,
+            bg: winColor.withOpacity(0.2),
+            sensitivitySpace: _state.nightSensitivitySpace30,
+            maxHighOnChange: _mainNotifier.nightSensitivitySpaceLongHigh30,
+            maxLowOnChange: _mainNotifier.nightSensitivitySpaceLongLow30),
+        sensitivitySpace(
+            direction: Direction.short15,
+            bg: loseColor.withOpacity(0.2),
+            sensitivitySpace: _state.nightSensitivitySpace15,
+            maxHighOnChange: _mainNotifier.nightSensitivitySpaceShortHigh15,
+            maxLowOnChange: _mainNotifier.nightSensitivitySpaceShortLow15),
+        sensitivitySpace(
+            direction: Direction.short30,
+            bg: loseColor.withOpacity(0.2),
+            sensitivitySpace: _state.nightSensitivitySpace30,
+            maxHighOnChange: _mainNotifier.nightSensitivitySpaceShortHigh30,
+            maxLowOnChange: _mainNotifier.nightSensitivitySpaceShortLow30)
+      ],
+    );
+    return ColoredBox(
+      color: Colors.yellow,
+      child: content,
+    );
+  }
+
+  Widget sensitivitySpace({
+    required Direction direction,
+    required Color bg,
+    required SensitivitySpace sensitivitySpace,
+    required ValueChanged<String> maxHighOnChange,
+    required ValueChanged<String> maxLowOnChange,
+  }) {
     Widget hAndL({
       required int high,
       required int low,
-      required ValueChanged<String> maxLongHighOnChange,
-      required ValueChanged<String> maxLongLowOnChange,
+      required ValueChanged<String> maxHighOnChange,
+      required ValueChanged<String> maxLowOnChange,
     }) =>
         Column(
           children: [
@@ -181,52 +268,121 @@ class _MyAppState extends ConsumerState {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 title('高點', rightLine: true),
-                textField(high, maxLongHighOnChange)
+                textField(high, maxHighOnChange)
               ],
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 title('低點', rightLine: true),
-                textField(low, maxLongLowOnChange)
+                textField(low, maxLowOnChange)
               ],
             ),
           ],
         );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        title('日盤靈敏度空間', leftLine: false, bottomLine: false),
-        Row(
+    // 攻擊、中關、防守
+    Widget amd({
+      required int attack,
+      required int middle,
+      required int defense,
+    }) =>
+        Column(
           children: [
-            title('15分多方最大邏輯',
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [title('攻擊', rightLine: true), info(attack)],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [title('中關', rightLine: true), info(middle)],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [title('防守', rightLine: true), info(defense)],
+            ),
+          ],
+        );
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade300, width: 1)),
+      child: ColoredBox(
+        color: bg,
+        child: Row(
+          children: [
+            title(direction.typeName,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 line: false),
             hAndL(
-              high: _state.daySensitivitySpace15.maxLongLow,
-              low: _state.daySensitivitySpace15.maxLongLow,
-              maxLongHighOnChange: _mainNotifier.daySensitivitySpaceLongHigh15,
-              maxLongLowOnChange: _mainNotifier.daySensitivitySpaceLongLow15,
-            )
+              high: direction.isLong
+                  ? sensitivitySpace.maxLongHigh
+                  : sensitivitySpace.maxShortHigh,
+              low: direction.isLong
+                  ? sensitivitySpace.maxLongLow
+                  : sensitivitySpace.maxShortLow,
+              maxHighOnChange: maxHighOnChange,
+              maxLowOnChange: maxLowOnChange,
+            ),
+            amd(
+                attack: direction.isLong
+                    ? sensitivitySpace.maxLongAttack
+                    : sensitivitySpace.maxShortAttack,
+                middle: direction.isLong
+                    ? sensitivitySpace.maxLongMiddle
+                    : sensitivitySpace.maxShortMiddle,
+                defense: direction.isLong
+                    ? sensitivitySpace.maxLongDefense
+                    : sensitivitySpace.maxShortDefense)
           ],
-        )
-      ],
+        ),
+      ),
     );
   }
 
   Widget textField(dynamic init, ValueChanged<String> onChanged) {
+    final controller = TextEditingController(text: init?.toString() ?? '');
+    controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: controller.text.length));
     return Container(
       width: infoW,
       height: textH,
       alignment: Alignment.bottomCenter,
       child: TextField(
-        controller: TextEditingController(text: init?.toString() ?? ''),
+        controller: controller,
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
         style: infoST,
         onChanged: onChanged,
       ),
     );
+  }
+}
+
+enum Direction {
+  long15,
+  long30,
+  short15,
+  short30,
+}
+
+extension DirectionName on Direction {
+  bool get isLong => this == Direction.long15 || this == Direction.long30;
+
+  String get typeName {
+    switch (this) {
+      case Direction.long15:
+        return '15分多方最大邏輯';
+        break;
+      case Direction.long30:
+        return '30分多方最大邏輯';
+        break;
+      case Direction.short15:
+        return '15分空方最大邏輯';
+        break;
+      case Direction.short30:
+        return '30分空方最大邏輯';
+        break;
+    }
   }
 }

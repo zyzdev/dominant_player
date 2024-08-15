@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-const double titleW = 150;
-const double infoW = 150;
+const double titleW = 80;
+const double infoW = 80;
 const double textH = 50;
 
 const double defFontSize = 18;
