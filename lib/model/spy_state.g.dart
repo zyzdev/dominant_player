@@ -7,9 +7,11 @@ part of 'spy_state.dart';
 // **************************************************************************
 
 abstract class _$SpyStateCWProxy {
-  SpyState high(int high);
+  SpyState current(int? current);
 
-  SpyState low(int low);
+  SpyState high(int? high);
+
+  SpyState low(int? low);
 
   SpyState daySensitivitySpace15(SensitivitySpace daySensitivitySpace15);
 
@@ -26,6 +28,7 @@ abstract class _$SpyStateCWProxy {
   /// SpyState(...).copyWith(id: 12, name: "My name")
   /// ````
   SpyState call({
+    int? current,
     int? high,
     int? low,
     SensitivitySpace? daySensitivitySpace15,
@@ -42,10 +45,13 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
   final SpyState _value;
 
   @override
-  SpyState high(int high) => this(high: high);
+  SpyState current(int? current) => this(current: current);
 
   @override
-  SpyState low(int low) => this(low: low);
+  SpyState high(int? high) => this(high: high);
+
+  @override
+  SpyState low(int? low) => this(low: low);
 
   @override
   SpyState daySensitivitySpace15(SensitivitySpace daySensitivitySpace15) =>
@@ -72,6 +78,7 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
   /// SpyState(...).copyWith(id: 12, name: "My name")
   /// ````
   SpyState call({
+    Object? current = const $CopyWithPlaceholder(),
     Object? high = const $CopyWithPlaceholder(),
     Object? low = const $CopyWithPlaceholder(),
     Object? daySensitivitySpace15 = const $CopyWithPlaceholder(),
@@ -80,14 +87,18 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
     Object? nightSensitivitySpace30 = const $CopyWithPlaceholder(),
   }) {
     return SpyState(
-      high: high == const $CopyWithPlaceholder() || high == null
+      current: current == const $CopyWithPlaceholder()
+          ? _value.current
+          // ignore: cast_nullable_to_non_nullable
+          : current as int?,
+      high: high == const $CopyWithPlaceholder()
           ? _value.high
           // ignore: cast_nullable_to_non_nullable
-          : high as int,
-      low: low == const $CopyWithPlaceholder() || low == null
+          : high as int?,
+      low: low == const $CopyWithPlaceholder()
           ? _value.low
           // ignore: cast_nullable_to_non_nullable
-          : low as int,
+          : low as int?,
       daySensitivitySpace15:
           daySensitivitySpace15 == const $CopyWithPlaceholder() ||
                   daySensitivitySpace15 == null
@@ -123,13 +134,13 @@ extension $SpyStateCopyWith on SpyState {
 }
 
 abstract class _$SensitivitySpaceCWProxy {
-  SensitivitySpace maxLongHigh(int maxLongHigh);
+  SensitivitySpace longHigh(int? longHigh);
 
-  SensitivitySpace maxLongLow(int maxLongLow);
+  SensitivitySpace longLow(int? longLow);
 
-  SensitivitySpace maxShortHigh(int maxShortHigh);
+  SensitivitySpace shortHigh(int? shortHigh);
 
-  SensitivitySpace maxShortLow(int maxShortLow);
+  SensitivitySpace shortLow(int? shortLow);
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `SensitivitySpace(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -138,10 +149,10 @@ abstract class _$SensitivitySpaceCWProxy {
   /// SensitivitySpace(...).copyWith(id: 12, name: "My name")
   /// ````
   SensitivitySpace call({
-    int? maxLongHigh,
-    int? maxLongLow,
-    int? maxShortHigh,
-    int? maxShortLow,
+    int? longHigh,
+    int? longLow,
+    int? shortHigh,
+    int? shortLow,
   });
 }
 
@@ -152,19 +163,16 @@ class _$SensitivitySpaceCWProxyImpl implements _$SensitivitySpaceCWProxy {
   final SensitivitySpace _value;
 
   @override
-  SensitivitySpace maxLongHigh(int maxLongHigh) =>
-      this(maxLongHigh: maxLongHigh);
+  SensitivitySpace longHigh(int? longHigh) => this(longHigh: longHigh);
 
   @override
-  SensitivitySpace maxLongLow(int maxLongLow) => this(maxLongLow: maxLongLow);
+  SensitivitySpace longLow(int? longLow) => this(longLow: longLow);
 
   @override
-  SensitivitySpace maxShortHigh(int maxShortHigh) =>
-      this(maxShortHigh: maxShortHigh);
+  SensitivitySpace shortHigh(int? shortHigh) => this(shortHigh: shortHigh);
 
   @override
-  SensitivitySpace maxShortLow(int maxShortLow) =>
-      this(maxShortLow: maxShortLow);
+  SensitivitySpace shortLow(int? shortLow) => this(shortLow: shortLow);
 
   @override
 
@@ -175,32 +183,28 @@ class _$SensitivitySpaceCWProxyImpl implements _$SensitivitySpaceCWProxy {
   /// SensitivitySpace(...).copyWith(id: 12, name: "My name")
   /// ````
   SensitivitySpace call({
-    Object? maxLongHigh = const $CopyWithPlaceholder(),
-    Object? maxLongLow = const $CopyWithPlaceholder(),
-    Object? maxShortHigh = const $CopyWithPlaceholder(),
-    Object? maxShortLow = const $CopyWithPlaceholder(),
+    Object? longHigh = const $CopyWithPlaceholder(),
+    Object? longLow = const $CopyWithPlaceholder(),
+    Object? shortHigh = const $CopyWithPlaceholder(),
+    Object? shortLow = const $CopyWithPlaceholder(),
   }) {
     return SensitivitySpace(
-      maxLongHigh:
-          maxLongHigh == const $CopyWithPlaceholder() || maxLongHigh == null
-              ? _value.maxLongHigh
-              // ignore: cast_nullable_to_non_nullable
-              : maxLongHigh as int,
-      maxLongLow:
-          maxLongLow == const $CopyWithPlaceholder() || maxLongLow == null
-              ? _value.maxLongLow
-              // ignore: cast_nullable_to_non_nullable
-              : maxLongLow as int,
-      maxShortHigh:
-          maxShortHigh == const $CopyWithPlaceholder() || maxShortHigh == null
-              ? _value.maxShortHigh
-              // ignore: cast_nullable_to_non_nullable
-              : maxShortHigh as int,
-      maxShortLow:
-          maxShortLow == const $CopyWithPlaceholder() || maxShortLow == null
-              ? _value.maxShortLow
-              // ignore: cast_nullable_to_non_nullable
-              : maxShortLow as int,
+      longHigh: longHigh == const $CopyWithPlaceholder()
+          ? _value.longHigh
+          // ignore: cast_nullable_to_non_nullable
+          : longHigh as int?,
+      longLow: longLow == const $CopyWithPlaceholder()
+          ? _value.longLow
+          // ignore: cast_nullable_to_non_nullable
+          : longLow as int?,
+      shortHigh: shortHigh == const $CopyWithPlaceholder()
+          ? _value.shortHigh
+          // ignore: cast_nullable_to_non_nullable
+          : shortHigh as int?,
+      shortLow: shortLow == const $CopyWithPlaceholder()
+          ? _value.shortLow
+          // ignore: cast_nullable_to_non_nullable
+          : shortLow as int?,
     );
   }
 }
@@ -216,8 +220,9 @@ extension $SensitivitySpaceCopyWith on SensitivitySpace {
 // **************************************************************************
 
 SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
-      high: (json['high'] as num?)?.toInt() ?? 0,
-      low: (json['low'] as num?)?.toInt() ?? 0,
+      current: (json['current'] as num?)?.toInt(),
+      high: (json['high'] as num?)?.toInt(),
+      low: (json['low'] as num?)?.toInt(),
       daySensitivitySpace15: SensitivitySpace.fromJson(
           json['daySensitivitySpace15'] as Map<String, dynamic>),
       daySensitivitySpace30: SensitivitySpace.fromJson(
@@ -229,6 +234,7 @@ SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
     );
 
 Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
+      'current': instance.current,
       'high': instance.high,
       'low': instance.low,
       'daySensitivitySpace15': instance.daySensitivitySpace15.toJson(),
@@ -239,16 +245,16 @@ Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
 
 SensitivitySpace _$SensitivitySpaceFromJson(Map<String, dynamic> json) =>
     SensitivitySpace(
-      maxLongHigh: (json['maxLongHigh'] as num?)?.toInt() ?? 0,
-      maxLongLow: (json['maxLongLow'] as num?)?.toInt() ?? 0,
-      maxShortHigh: (json['maxShortHigh'] as num?)?.toInt() ?? 0,
-      maxShortLow: (json['maxShortLow'] as num?)?.toInt() ?? 0,
+      longHigh: (json['longHigh'] as num?)?.toInt(),
+      longLow: (json['longLow'] as num?)?.toInt(),
+      shortHigh: (json['shortHigh'] as num?)?.toInt(),
+      shortLow: (json['shortLow'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$SensitivitySpaceToJson(SensitivitySpace instance) =>
     <String, dynamic>{
-      'maxLongHigh': instance.maxLongHigh,
-      'maxLongLow': instance.maxLongLow,
-      'maxShortHigh': instance.maxShortHigh,
-      'maxShortLow': instance.maxShortLow,
+      'longHigh': instance.longHigh,
+      'longLow': instance.longLow,
+      'shortHigh': instance.shortHigh,
+      'shortLow': instance.shortLow,
     };

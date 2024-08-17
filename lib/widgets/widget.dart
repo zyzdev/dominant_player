@@ -81,7 +81,7 @@ Widget info(
     ),
     alignment: Alignment.center,
     child: Text(
-      text.toString(),
+      text?.toString() ?? '',
       style: ts.copyWith(
         color: color,
         fontWeight: bold ? FontWeight.bold : FontWeight.normal,

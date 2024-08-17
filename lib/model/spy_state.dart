@@ -21,8 +21,9 @@ part 'spy_state.g.dart';
 @CopyWith()
 class SpyState {
   SpyState({
-    this.high = 0,
-    this.low = 0,
+    this.current,
+    this.high,
+    this.low ,
     required this.daySensitivitySpace15,
     required this.daySensitivitySpace30,
     required this.nightSensitivitySpace15,
@@ -38,49 +39,63 @@ class SpyState {
     );
   }
 
-  String get today => DateFormat('yyyy/M/dd').format(DateTime.now());
+  String get today => DateFormat('M/dd').format(DateTime.now());
+
+  /// 目前點數
+  final int? current;
 
   /// 高點
-  final int high;
+  final int? high;
 
   /// 低點
-  final int low;
-
-  /// 中關
-  late final int D = (high + low).round();
+  final int? low;
 
   /// 點差
-  late final int dis = high - low;
+  int? get range => high != null && low != null ? high! - low! : null;
 
   /// 點差/4
-  late final int disDiv4 = (dis / 4).round();
+  double? get rangeDiv4 => range != null ? range! / 4 : null;
 
   /// 超漲
-  late final int superPress = high - disDiv4 + dis;
+  num? get superPress => high != null && rangeDiv4 != null && range != null
+      ? high! - rangeDiv4! + range!
+      : null;
 
   /// 壓二
-  late final int press2 = superPress - disDiv4;
+  num? get absolutePress =>
+      superPress != null && rangeDiv4 != null ? superPress! - rangeDiv4! : null;
 
   /// 壓一
-  late final int press1 = press2 - disDiv4;
+  num? get nestPress => absolutePress != null && rangeDiv4 != null
+      ? absolutePress! - rangeDiv4!
+      : null;
 
   /// 撐一
-  late final int support1 = support2 + disDiv4;
+  double? get nestSupport => absoluteSupport != null && rangeDiv4 != null
+      ? absoluteSupport! + rangeDiv4!
+      : null;
 
   /// 撐二
-  late final int support2 = superSupport + disDiv4;
+  double? get absoluteSupport => supperSupport != null && rangeDiv4 != null
+      ? supperSupport! + rangeDiv4!
+      : null;
 
   /// 超跌
-  late final int superSupport = low + disDiv4 - dis;
+  double? get supperSupport => low != null && rangeDiv4 != null && range != null
+      ? low! + rangeDiv4! - range!
+      : null;
 
   /// 高成本區
-  late final int hCost = high - disDiv4;
+  double? get highCost =>
+      high != null && rangeDiv4 != null ? high! - rangeDiv4! : null;
 
   /// 中成本區
-  late final int mCost = ((high + low) / 2).round();
+  double? get middleCost =>
+      high != null && low != null ? (high! + low!) / 2 : null;
 
   /// 低成本區
-  late final int lCost = low + disDiv4;
+  double? get lowCost =>
+      low != null && rangeDiv4 != null ? low! + rangeDiv4! : null;
 
   /// 日盤靈敏度空間
   /// 15分K靈敏度空間
@@ -106,45 +121,47 @@ class SpyState {
 @JsonSerializable(explicitToJson: true)
 @CopyWith()
 class SensitivitySpace {
-  SensitivitySpace({
-    this.maxLongHigh = 0,
-    this.maxLongLow = 0,
-    this.maxShortHigh = 0,
-    this.maxShortLow = 0,
-  });
+  SensitivitySpace(
+      {this.longHigh, this.longLow, this.shortHigh, this.shortLow});
+
+  factory SensitivitySpace.init() => SensitivitySpace(
+      longHigh: null, longLow: null, shortHigh: null, shortLow: null);
 
   /// 空間偏移量
   static const int _spaceOffset = 20;
 
   /// 最大多方邏輯高點
-  final int maxLongHigh;
+  final int? longHigh;
 
   /// 最大多方邏輯低點
-  final int maxLongLow;
+  final int? longLow;
 
   /// 分K最大多方邏輯中關
-  int get maxLongMiddle => ((maxLongHigh + maxLongLow) / 2).round();
+  double? get longMiddle =>
+      longHigh != null && longLow != null ? (longHigh! + longLow!) / 2 : null;
 
   /// 分K最大多方邏輯攻擊點
-  int get maxLongAttack => maxLongHigh + _spaceOffset;
+  int? get longAttack => longHigh != null ? longHigh! + _spaceOffset : null;
 
   /// 分K最大多方邏輯防守點
-  int get maxLongDefense => maxLongLow - _spaceOffset;
+  int? get longDefense => longLow != null ? longLow! - _spaceOffset : null;
 
   /// 分K最大空方邏輯高點
-  final int maxShortHigh;
+  final int? shortHigh;
 
   /// 分K最大空方邏輯低點
-  final int maxShortLow;
+  final int? shortLow;
 
   /// 分K最大空方邏輯中關
-  int get maxShortMiddle => ((maxShortHigh + maxShortLow) / 2).round();
+  double? get shortMiddle => shortHigh != null && shortLow != null
+      ? (shortHigh! + shortLow!) / 2
+      : null;
 
   /// 分K最大空方邏輯攻擊點
-  int get maxShortAttack => maxShortLow - _spaceOffset;
+  int? get maxShortAttack => shortLow != null ? shortLow! - _spaceOffset : null;
 
   /// 分K最大空方邏輯防守點
-  int get maxShortDefense => maxShortHigh + _spaceOffset;
+  int? get shortDefense => shortHigh != null ? shortHigh! + _spaceOffset : null;
 
   factory SensitivitySpace.fromJson(Map<String, dynamic> json) =>
       _$SensitivitySpaceFromJson(json);

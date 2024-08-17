@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const double titleW = 80;
 const double infoW = 80;
-const double textH = 50;
+const double textH = 40;
 
 const double defFontSize = 18;
 const TextStyle titleST = TextStyle(fontWeight: FontWeight.bold, fontSize: defFontSize);
