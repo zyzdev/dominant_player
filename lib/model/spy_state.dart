@@ -1,4 +1,5 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:dominant_player/model/key_value.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -23,11 +24,12 @@ class SpyState {
   SpyState({
     this.current,
     this.high,
-    this.low ,
+    this.low,
     required this.daySensitivitySpace15,
     required this.daySensitivitySpace30,
     required this.nightSensitivitySpace15,
     required this.nightSensitivitySpace30,
+    required this.considerKeyValue,
   });
 
   factory SpyState.init() {
@@ -36,6 +38,10 @@ class SpyState {
       daySensitivitySpace30: SensitivitySpace(),
       nightSensitivitySpace15: SensitivitySpace(),
       nightSensitivitySpace30: SensitivitySpace(),
+      considerKeyValue: Map.fromIterable(
+        KeyValue.values,
+        value: (element) => true,
+      ),
     );
   }
 
@@ -76,12 +82,12 @@ class SpyState {
       : null;
 
   /// 撐二
-  double? get absoluteSupport => supperSupport != null && rangeDiv4 != null
-      ? supperSupport! + rangeDiv4!
+  double? get absoluteSupport => superSupport != null && rangeDiv4 != null
+      ? superSupport! + rangeDiv4!
       : null;
 
   /// 超跌
-  double? get supperSupport => low != null && rangeDiv4 != null && range != null
+  double? get superSupport => low != null && rangeDiv4 != null && range != null
       ? low! + rangeDiv4! - range!
       : null;
 
@@ -110,6 +116,8 @@ class SpyState {
 
   /// 30分K靈敏度空間
   final SensitivitySpace nightSensitivitySpace30;
+
+  final Map<KeyValue, bool> considerKeyValue;
 
   factory SpyState.fromJson(Map<String, dynamic> json) =>
       _$SpyStateFromJson(json);
@@ -158,7 +166,7 @@ class SensitivitySpace {
       : null;
 
   /// 分K最大空方邏輯攻擊點
-  int? get maxShortAttack => shortLow != null ? shortLow! - _spaceOffset : null;
+  int? get shortAttack => shortLow != null ? shortLow! - _spaceOffset : null;
 
   /// 分K最大空方邏輯防守點
   int? get shortDefense => shortHigh != null ? shortHigh! + _spaceOffset : null;

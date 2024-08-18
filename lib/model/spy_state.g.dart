@@ -21,6 +21,8 @@ abstract class _$SpyStateCWProxy {
 
   SpyState nightSensitivitySpace30(SensitivitySpace nightSensitivitySpace30);
 
+  SpyState considerKeyValue(Map<KeyValue, bool> considerKeyValue);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `SpyState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -35,6 +37,7 @@ abstract class _$SpyStateCWProxy {
     SensitivitySpace? daySensitivitySpace30,
     SensitivitySpace? nightSensitivitySpace15,
     SensitivitySpace? nightSensitivitySpace30,
+    Map<KeyValue, bool>? considerKeyValue,
   });
 }
 
@@ -70,6 +73,10 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
       this(nightSensitivitySpace30: nightSensitivitySpace30);
 
   @override
+  SpyState considerKeyValue(Map<KeyValue, bool> considerKeyValue) =>
+      this(considerKeyValue: considerKeyValue);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `SpyState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -85,6 +92,7 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
     Object? daySensitivitySpace30 = const $CopyWithPlaceholder(),
     Object? nightSensitivitySpace15 = const $CopyWithPlaceholder(),
     Object? nightSensitivitySpace30 = const $CopyWithPlaceholder(),
+    Object? considerKeyValue = const $CopyWithPlaceholder(),
   }) {
     return SpyState(
       current: current == const $CopyWithPlaceholder()
@@ -123,6 +131,11 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
               ? _value.nightSensitivitySpace30
               // ignore: cast_nullable_to_non_nullable
               : nightSensitivitySpace30 as SensitivitySpace,
+      considerKeyValue: considerKeyValue == const $CopyWithPlaceholder() ||
+              considerKeyValue == null
+          ? _value.considerKeyValue
+          // ignore: cast_nullable_to_non_nullable
+          : considerKeyValue as Map<KeyValue, bool>,
     );
   }
 }
@@ -231,6 +244,9 @@ SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
           json['nightSensitivitySpace15'] as Map<String, dynamic>),
       nightSensitivitySpace30: SensitivitySpace.fromJson(
           json['nightSensitivitySpace30'] as Map<String, dynamic>),
+      considerKeyValue: (json['considerKeyValue'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry($enumDecode(_$KeyValueEnumMap, k), e as bool),
+      ),
     );
 
 Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
@@ -241,7 +257,50 @@ Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
       'daySensitivitySpace30': instance.daySensitivitySpace30.toJson(),
       'nightSensitivitySpace15': instance.nightSensitivitySpace15.toJson(),
       'nightSensitivitySpace30': instance.nightSensitivitySpace30.toJson(),
+      'considerKeyValue': instance.considerKeyValue
+          .map((k, e) => MapEntry(_$KeyValueEnumMap[k]!, e)),
     };
+
+const _$KeyValueEnumMap = {
+  KeyValue.current: 'current',
+  KeyValue.high: 'high',
+  KeyValue.low: 'low',
+  KeyValue.range: 'range',
+  KeyValue.rangeDiv4: 'rangeDiv4',
+  KeyValue.highCost: 'highCost',
+  KeyValue.middleCost: 'middleCost',
+  KeyValue.lowCost: 'lowCost',
+  KeyValue.superPress: 'superPress',
+  KeyValue.absolutePress: 'absolutePress',
+  KeyValue.nestPress: 'nestPress',
+  KeyValue.nestSupport: 'nestSupport',
+  KeyValue.absoluteSupport: 'absoluteSupport',
+  KeyValue.superSupport: 'superSupport',
+  KeyValue.dayLongAttack15: 'dayLongAttack15',
+  KeyValue.dayLongMiddle15: 'dayLongMiddle15',
+  KeyValue.dayLongDefense15: 'dayLongDefense15',
+  KeyValue.dayShortAttack15: 'dayShortAttack15',
+  KeyValue.dayShortMiddle15: 'dayShortMiddle15',
+  KeyValue.dayShortDefense15: 'dayShortDefense15',
+  KeyValue.dayLongAttack30: 'dayLongAttack30',
+  KeyValue.dayLongMiddle30: 'dayLongMiddle30',
+  KeyValue.dayLongDefense30: 'dayLongDefense30',
+  KeyValue.dayShortAttack30: 'dayShortAttack30',
+  KeyValue.dayShortMiddle30: 'dayShortMiddle30',
+  KeyValue.dayShortDefense30: 'dayShortDefense30',
+  KeyValue.nightLongAttack15: 'nightLongAttack15',
+  KeyValue.nightLongMiddle15: 'nightLongMiddle15',
+  KeyValue.nightLongDefense15: 'nightLongDefense15',
+  KeyValue.nightShortAttack15: 'nightShortAttack15',
+  KeyValue.nightShortMiddle15: 'nightShortMiddle15',
+  KeyValue.nightShortDefense15: 'nightShortDefense15',
+  KeyValue.nightLongAttack30: 'nightLongAttack30',
+  KeyValue.nightLongMiddle30: 'nightLongMiddle30',
+  KeyValue.nightLongDefense30: 'nightLongDefense30',
+  KeyValue.nightShortAttack30: 'nightShortAttack30',
+  KeyValue.nightShortMiddle30: 'nightShortMiddle30',
+  KeyValue.nightShortDefense30: 'nightShortDefense30',
+};
 
 SensitivitySpace _$SensitivitySpaceFromJson(Map<String, dynamic> json) =>
     SensitivitySpace(

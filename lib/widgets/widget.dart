@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dominant_player/widgets/style.dart';
 
 Widget title(
-  String text, {
+  dynamic text, {
   bool topLine = true,
   bool bottomLine = true,
   bool leftLine = true,
@@ -14,7 +14,7 @@ Widget title(
   EdgeInsets padding = EdgeInsets.zero,
 }) {
   Widget content = Container(
-    constraints: const BoxConstraints(minWidth: titleW, maxHeight: textH),
+    constraints: BoxConstraints(minWidth: titleW, minHeight: textH),
     padding: padding,
     decoration: BoxDecoration(
       color: bg,
@@ -35,7 +35,7 @@ Widget title(
     ),
     alignment: Alignment.center,
     child: Text(
-      text,
+      text?.toString() ?? '',
       style: titleST.copyWith(color: color),
       textAlign: TextAlign.center,
     ),
@@ -54,30 +54,37 @@ Widget info(
   bool leftLine = true,
   bool rightLine = false,
   bool topLine = false,
-  double width = infoW,
+  bool bottomLine = true,
+  double? width,
   bool bold = false,
   Color? color,
+  bool line = true,
   String? toolTip,
 }) {
   double fontSize = defFontSize;
   TextStyle ts = infoST;
-  while (_overFlow(width - 16, text.toString(), ts)) {
-    ts = ts.copyWith(fontSize: fontSize--);
+  if (width != null) {
+    while (_overFlow(width - 16, text.toString(), ts)) {
+      ts = ts.copyWith(fontSize: fontSize--);
+    }
   }
   Widget content = Container(
-    constraints: const BoxConstraints(minWidth: infoW, maxHeight: textH),
+    constraints: BoxConstraints(minWidth: width ?? infoW, minHeight: textH),
     decoration: BoxDecoration(
       border: Border(
-          top: topLine
-              ? BorderSide(color: Colors.grey.shade300, width: 1)
-              : BorderSide.none,
-          bottom: BorderSide(color: Colors.grey.shade300, width: 1),
-          left: leftLine
-              ? BorderSide(color: Colors.grey.shade300, width: 1)
-              : BorderSide.none,
-          right: rightLine
-              ? BorderSide(color: Colors.grey.shade300, width: 1)
-              : BorderSide.none),
+        bottom: bottomLine && line
+            ? BorderSide(color: Colors.grey.shade300, width: 1)
+            : BorderSide.none,
+        top: topLine && line
+            ? BorderSide(color: Colors.grey.shade300, width: 1)
+            : BorderSide.none,
+        left: leftLine && line
+            ? BorderSide(color: Colors.grey.shade300, width: 1)
+            : BorderSide.none,
+        right: rightLine && line
+            ? BorderSide(color: Colors.grey.shade300, width: 1)
+            : BorderSide.none,
+      ),
     ),
     alignment: Alignment.center,
     child: Text(
