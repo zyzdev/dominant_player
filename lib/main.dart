@@ -108,10 +108,23 @@ class _MyAppState extends ConsumerState {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                      border: Border.all(
-                    color: Colors.grey.shade300,
-                    width: 1,
-                  )),
+                      color: e.key == KeyValue.current ||
+                              e.key == KeyValue.high ||
+                              e.key == KeyValue.low ||
+                              e.key == KeyValue.range ||
+                              e.key == KeyValue.rangeDiv4
+                          ? Colors.white
+                          : e.key.bg,
+                      border: e == _mainNotifier.spyValues.last
+                          ? Border.all(color: Colors.grey.shade300, width: 1)
+                          : Border(
+                              top: BorderSide(
+                                  color: Colors.grey.shade300, width: 1),
+                              left: BorderSide(
+                                  color: Colors.grey.shade300, width: 1),
+                              right: BorderSide(
+                                  color: Colors.grey.shade300, width: 1),
+                            )),
                   child: Stack(
                     children: [
                       if (e.key != KeyValue.current &&
@@ -138,15 +151,19 @@ class _MyAppState extends ConsumerState {
                   ),
                 ),
               ),
-              textField(e.value, (value) {
-                if (e.key == KeyValue.current) {
-                  _mainNotifier.current = value;
-                } else if (e.key == KeyValue.high) {
-                  _mainNotifier.high = value;
-                } else if (e.key == KeyValue.low) {
-                  _mainNotifier.low = value;
-                }
-              }),
+              e.key == KeyValue.current ||
+                      e.key == KeyValue.high ||
+                      e.key == KeyValue.low
+                  ? textField(e.value, (value) {
+                      if (e.key == KeyValue.current) {
+                        _mainNotifier.current = value;
+                      } else if (e.key == KeyValue.high) {
+                        _mainNotifier.high = value;
+                      } else if (e.key == KeyValue.low) {
+                        _mainNotifier.low = value;
+                      }
+                    })
+                  : info(e.value),
             ],
           );
         })
@@ -299,16 +316,21 @@ class _MyAppState extends ConsumerState {
                 int index = _mainNotifier.keyValues.indexWhere(
                   (element) => element.key == e.key,
                 );
-                num valueDis =
-                    e.value - _mainNotifier.keyValues[indexOfCurrent].value;
+                num valueDis = indexOfCurrent == -1
+                    ? 0
+                    : e.value - _mainNotifier.keyValues[indexOfCurrent].value;
                 int indexDis = indexOfCurrent - index;
-                Color noticeBg = indexDis == 0
-                    ? noteColor.withOpacity(0.5)
-                    : indexDis.abs() < 4
-                        ? indexDis > 0
-                            ? winColor.withOpacity(0.4 - indexDis.abs() * 0.1)
-                            : loseColor.withOpacity(0.4 - indexDis.abs() * 0.1)
-                        : Colors.transparent;
+                Color noticeBg = indexOfCurrent == -1
+                    ? Colors.transparent
+                    : indexDis == 0
+                        ? noteColor.withOpacity(0.5)
+                        : indexDis.abs() < 4
+                            ? indexDis > 0
+                                ? winColor
+                                    .withOpacity(0.4 - indexDis.abs() * 0.1)
+                                : loseColor
+                                    .withOpacity(0.4 - indexDis.abs() * 0.1)
+                            : Colors.transparent;
 
                 Widget content = Row(
                   mainAxisSize: MainAxisSize.min,
@@ -353,7 +375,7 @@ class _MyAppState extends ConsumerState {
                               ),
                             )
                           : info(
-                              '${valueDis! > 0 ? '+' : ''}$valueDis',
+                              '${valueDis > 0 ? '+' : ''}$valueDis',
                               color: valueDis > 0
                                   ? winColor
                                   : valueDis < 0
