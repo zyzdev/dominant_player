@@ -36,6 +36,7 @@ dependencies:
   copy_with_extension:
   shared_preferences:
   json_annotation:
+  cross_scroll: ^0.0.76
 
 dev_dependencies:
   flutter_test:

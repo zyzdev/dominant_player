@@ -1,3 +1,4 @@
+import 'package:cross_scroll/cross_scroll.dart';
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/spy_state.dart';
 import 'package:dominant_player/widgets/style.dart';
@@ -37,25 +38,20 @@ class _MyAppState extends ConsumerState {
           title: const Text('絕對主力邏輯計算器'),
           backgroundColor: const Color(0xff4d2bab),
         ),
-        body: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            spy,
-            Expanded(
-                child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      _daySensitivitySpace,
-                      _nightSensitivitySpace,
-                    ],
-                  ),
-                ),
-                const Expanded(child: SizedBox.shrink())
-              ],
-            )),
-          ],
+        body: CrossScroll(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              spy,
+              Column(
+                children: [
+                  _daySensitivitySpace,
+                  _nightSensitivitySpace,
+                ],
+              ),
+              keyValueList
+            ],
+          ),
         ),
       ),
     );
@@ -72,13 +68,17 @@ class _MyAppState extends ConsumerState {
           ],
         ),
         ..._mainNotifier.spyValues.map((e) {
-          if (e.key == KeyValue.high || e.key == KeyValue.low) {
+          if (e.key == KeyValue.current ||
+              e.key == KeyValue.high ||
+              e.key == KeyValue.low) {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 title(e.key.title, color: e.key.bg, rightLine: true),
                 textField(e.value, (value) {
-                  if (e.key == KeyValue.high) {
+                  if (e.key == KeyValue.current) {
+                    _mainNotifier.current = value;
+                  } else if (e.key == KeyValue.high) {
                     _mainNotifier.high = value;
                   } else if (e.key == KeyValue.low) {
                     _mainNotifier.low = value;
@@ -175,6 +175,133 @@ class _MyAppState extends ConsumerState {
     );
     return ColoredBox(
       color: Colors.yellow,
+      child: content,
+    );
+  }
+
+  Widget get keyValueList {
+    Size textSize(String text, TextStyle style) {
+      final TextPainter textPainter = TextPainter(
+          text: TextSpan(text: text, style: style),
+          maxLines: 1,
+          textDirection: TextDirection.ltr)
+        ..layout(minWidth: 0, maxWidth: double.infinity);
+      return textPainter.size;
+    }
+
+    double maxW = 0;
+    for (MapEntry<KeyValue, num> element in _mainNotifier.keyValues) {
+      double w = textSize(element.key.title, infoST).width;
+      if (w > maxW) maxW = w;
+    }
+    maxW += 16;
+
+    int indexOfCurrent = _mainNotifier.keyValues
+        .indexWhere((element) => element.key == KeyValue.current);
+    Map<int, Color> noticeColor = {
+      2: winColor.withOpacity(0.2),
+      1: winColor.withOpacity(0.1),
+      0: noteColor.withOpacity(0.1),
+      -1: loseColor.withOpacity(0.1),
+      -2: loseColor.withOpacity(0.2),
+    };
+    Widget content = Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        title('關鍵價位列表', leftLine: false, bottomLine: false),
+        ColoredBox(
+          color: const Color(0xFFFAFAFA),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_mainNotifier.keyValues.isEmpty)
+                const Center(
+                  child: Text(
+                    '請先填入關鍵價位（現價、高點、低點、靈敏度空間高低點）',
+                    style: titleST,
+                  ),
+                ),
+              ..._mainNotifier.keyValues.map((e) {
+                int index = _mainNotifier.keyValues.indexWhere(
+                  (element) => element.key == e.key,
+                );
+                Color? noticeBg;
+                bool shouldNotice = false;
+                num? valueDis;
+                int indexDis = indexOfCurrent - index;
+                if (indexOfCurrent != -1) {
+                  shouldNotice = indexDis.abs() < 3;
+
+                  if (shouldNotice) {
+                    noticeBg = noticeColor[indexDis];
+                    valueDis =
+                        _mainNotifier.keyValues[indexOfCurrent].value - e.value;
+                  }
+                }
+
+                Widget content = Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: maxW,
+                      child: Center(
+                        child: title(e.key.title),
+                      ),
+                    ),
+                    info(e.value, topLine: true, rightLine: true),
+                    if (shouldNotice) ...[
+                      indexDis == 0
+                          ? Container(
+                              constraints: const BoxConstraints(
+                                  minWidth: infoW, minHeight: textH),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.arrow_drop_down,
+                                    color: loseColor,
+                                  ),
+                                  const Text(
+                                    '價差',
+                                    style: infoST,
+                                  ),
+                                  Icon(
+                                    Icons.arrow_drop_up,
+                                    color: winColor,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : SizedBox(
+                              width: 86,
+                              child: info(
+                                '${valueDis! > 0 ? '+' : ''}$valueDis',
+                                color: valueDis > 0
+                                    ? winColor
+                                    : valueDis < 0
+                                        ? loseColor
+                                        : Colors.transparent,
+                                topLine: true,
+                                rightLine: true,
+                              ),
+                            ),
+                    ],
+                  ],
+                );
+                return ColoredBox(
+                  color: noticeBg ?? const Color(0xFFFAFAFA),
+                  child: content,
+                );
+              }).toList()
+            ],
+          ),
+        ),
+      ],
+    );
+    return ColoredBox(
+      color: Colors.lightBlueAccent.shade100,
       child: content,
     );
   }
@@ -283,6 +410,7 @@ class _MyAppState extends ConsumerState {
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
         style: infoST,
+        textInputAction: TextInputAction.next,
         onChanged: onChanged,
       ),
     );
@@ -292,6 +420,8 @@ class _MyAppState extends ConsumerState {
 extension KeyValueBackgroundColor on KeyValue {
   Color get bg {
     switch (this) {
+      case KeyValue.current:
+        return noteColor;
       case KeyValue.high:
         return winColor;
       case KeyValue.low:

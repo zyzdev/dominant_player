@@ -24,6 +24,11 @@ class MainNotifier extends StateNotifier<SpyState> {
   static const String _statsKey = 'stats_key';
   late final SharedPreferences _prefs;
 
+  /// 設定現價
+  set current(String value) {
+    state = state.copyWith(current: int.parse(value));
+  }
+
   /// 設定前盤高點
   set high(String value) {
     state = state.copyWith(high: int.parse(value));
@@ -37,8 +42,8 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 設定日盤15分最大多方邏輯高點
   void daySensitivitySpaceLongHigh15(String value) {
     state = state.copyWith(
-        daySensitivitySpace15: state.daySensitivitySpace15
-            .copyWith(longHigh: int.parse(value)));
+        daySensitivitySpace15:
+            state.daySensitivitySpace15.copyWith(longHigh: int.parse(value)));
   }
 
   /// 設定日盤15分最大多方邏輯低點
@@ -51,8 +56,8 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 設定日盤30分最大多方邏輯高點
   void daySensitivitySpaceLongHigh30(String value) {
     state = state.copyWith(
-        daySensitivitySpace30: state.daySensitivitySpace30
-            .copyWith(longHigh: int.parse(value)));
+        daySensitivitySpace30:
+            state.daySensitivitySpace30.copyWith(longHigh: int.parse(value)));
   }
 
   /// 設定30分最大多方邏輯低點
@@ -65,57 +70,57 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 設定日盤15分最大空方邏輯高點
   void daySensitivitySpaceShortHigh15(String value) {
     state = state.copyWith(
-        daySensitivitySpace15: state.daySensitivitySpace15
-            .copyWith(shortHigh: int.parse(value)));
+        daySensitivitySpace15:
+            state.daySensitivitySpace15.copyWith(shortHigh: int.parse(value)));
   }
 
   /// 設定日盤15分最大空方邏輯低點
   void daySensitivitySpaceShortLow15(String value) {
     state = state.copyWith(
-        daySensitivitySpace15: state.daySensitivitySpace15
-            .copyWith(shortLow: int.parse(value)));
+        daySensitivitySpace15:
+            state.daySensitivitySpace15.copyWith(shortLow: int.parse(value)));
   }
 
   /// 設定日盤30分最大空方邏輯高點
   void daySensitivitySpaceShortHigh30(String value) {
     state = state.copyWith(
-        daySensitivitySpace30: state.daySensitivitySpace30
-            .copyWith(shortHigh: int.parse(value)));
+        daySensitivitySpace30:
+            state.daySensitivitySpace30.copyWith(shortHigh: int.parse(value)));
   }
 
   /// 設定日盤30分最大空方邏輯低點
   void daySensitivitySpaceShortLow30(String value) {
     state = state.copyWith(
-        daySensitivitySpace30: state.daySensitivitySpace30
-            .copyWith(shortLow: int.parse(value)));
+        daySensitivitySpace30:
+            state.daySensitivitySpace30.copyWith(shortLow: int.parse(value)));
   }
 
   /// 設定夜盤15分最大多方邏輯高點
   void nightSensitivitySpaceLongHigh15(String value) {
     state = state.copyWith(
-        nightSensitivitySpace15: state.nightSensitivitySpace15
-            .copyWith(longHigh: int.parse(value)));
+        nightSensitivitySpace15:
+            state.nightSensitivitySpace15.copyWith(longHigh: int.parse(value)));
   }
 
   /// 設定夜盤15分最大多方邏輯低點
   void nightSensitivitySpaceLongLow15(String value) {
     state = state.copyWith(
-        nightSensitivitySpace15: state.nightSensitivitySpace15
-            .copyWith(longLow: int.parse(value)));
+        nightSensitivitySpace15:
+            state.nightSensitivitySpace15.copyWith(longLow: int.parse(value)));
   }
 
   /// 設定夜盤30分最大多方邏輯高點
   void nightSensitivitySpaceLongHigh30(String value) {
     state = state.copyWith(
-        nightSensitivitySpace30: state.nightSensitivitySpace30
-            .copyWith(longHigh: int.parse(value)));
+        nightSensitivitySpace30:
+            state.nightSensitivitySpace30.copyWith(longHigh: int.parse(value)));
   }
 
   /// 設定30分最大多方邏輯低點
   void nightSensitivitySpaceLongLow30(String value) {
     state = state.copyWith(
-        nightSensitivitySpace30: state.nightSensitivitySpace30
-            .copyWith(longLow: int.parse(value)));
+        nightSensitivitySpace30:
+            state.nightSensitivitySpace30.copyWith(longLow: int.parse(value)));
   }
 
   /// 設定夜盤15分最大空方邏輯高點
@@ -128,8 +133,8 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 設定夜盤15分最大空方邏輯低點
   void nightSensitivitySpaceShortLow15(String value) {
     state = state.copyWith(
-        nightSensitivitySpace15: state.nightSensitivitySpace15
-            .copyWith(shortLow: int.parse(value)));
+        nightSensitivitySpace15:
+            state.nightSensitivitySpace15.copyWith(shortLow: int.parse(value)));
   }
 
   /// 設定夜盤30分最大空方邏輯高點
@@ -142,12 +147,13 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 設定日盤30分最大空方邏輯低點
   void nightSensitivitySpaceShortLow30(String value) {
     state = state.copyWith(
-        nightSensitivitySpace30: state.nightSensitivitySpace30
-            .copyWith(shortLow: int.parse(value)));
+        nightSensitivitySpace30:
+            state.nightSensitivitySpace30.copyWith(shortLow: int.parse(value)));
   }
 
   List<MapEntry<KeyValue, num?>> get spyValues {
     List<MapEntry<KeyValue, num?>> keyValues = [
+      MapEntry(KeyValue.current, state.current),
       MapEntry(KeyValue.high, state.high),
       MapEntry(KeyValue.low, state.low),
       MapEntry(KeyValue.range, state.range),
@@ -202,10 +208,12 @@ class MainNotifier extends StateNotifier<SpyState> {
           state.nightSensitivitySpace15.shortMiddle),
       MapEntry(KeyValue.nightShortDefense15,
           state.nightSensitivitySpace15.shortDefense),
-    ].
+    ]
+        .
         // 找出數值不為空值的
-    where((element) => element.value != null).toList()
-        as List<MapEntry<KeyValue, num>>;
+        where((element) => element.value != null)
+        .map((e) => MapEntry(e.key, e.value!))
+        .toList();
 
     // 用數值大小排序
     keyValues.sort(

@@ -43,7 +43,7 @@ extension KeyValueName on KeyValue {
   String get title {
     switch (this) {
       case KeyValue.current:
-        return '當前';
+        return '現價';
       case KeyValue.high:
         return '高點';
       case KeyValue.low:
