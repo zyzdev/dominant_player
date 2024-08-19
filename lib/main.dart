@@ -41,7 +41,7 @@ class _MyAppState extends ConsumerState {
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical, // 垂直滾動
           child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal, // 水平滾動
+            scrollDirection: Axis.horizontal, //
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -62,112 +62,111 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget get spy {
-    return Column(
+    Widget content = Column(
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  border: Border.all(
-                color: Colors.grey.shade300,
-                width: 1,
-              )),
-              child: Stack(
-                children: [
-                  Positioned(
-                      top: 0,
-                      bottom: 0,
-                      left: 0,
-                      child: Opacity(
-                        opacity: 0,
-                        child: _checkbox(null),
-                      )),
-                  Row(
-                    children: [
-                      const SizedBox(width: 16),
-                      title('日期', line: false)
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            info(_state.today),
-          ],
-        ),
-        ..._mainNotifier.spyValues.map((e) {
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+        title('SPY', line: false),
+        ColoredBox(
+          color: const Color(0xFFFAFAFA),
+          child: Column(
             children: [
-              GestureDetector(
-                onTap: () {
-                  if (_state.considerKeyValue[e.key] != null) {
-                    _mainNotifier.considerKeyValue(
-                        e.key, !_state.considerKeyValue[e.key]!);
-                  }
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: e.key == KeyValue.current ||
-                              e.key == KeyValue.high ||
-                              e.key == KeyValue.low ||
-                              e.key == KeyValue.range ||
-                              e.key == KeyValue.rangeDiv4
-                          ? Colors.white
-                          : e.key.bg,
-                      border: e == _mainNotifier.spyValues.last
-                          ? Border.all(color: Colors.grey.shade300, width: 1)
-                          : Border(
-                              top: BorderSide(
-                                  color: Colors.grey.shade300, width: 1),
-                              left: BorderSide(
-                                  color: Colors.grey.shade300, width: 1),
-                              right: BorderSide(
-                                  color: Colors.grey.shade300, width: 1),
-                            )),
-                  child: Stack(
-                    children: [
-                      if (e.key != KeyValue.current &&
-                          e.key != KeyValue.range &&
-                          e.key != KeyValue.rangeDiv4)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                      color: Colors.grey.shade300,
+                      width: 1,
+                    )),
+                    child: Stack(
+                      children: [
                         Positioned(
                             top: 0,
                             bottom: 0,
                             left: 0,
-                            child: _checkbox(e.key)),
-                      Row(
-                        children: [
-                          const SizedBox(width: 16),
-                          title(e.key.title,
-                              color: e.key == KeyValue.current ||
-                                      e.key == KeyValue.high ||
-                                      e.key == KeyValue.low
-                                  ? e.key.bg
-                                  : null,
-                              line: false)
-                        ],
-                      )
-                    ],
+                            child: Opacity(
+                              opacity: 0,
+                              child: _checkbox(null),
+                            )),
+                        Row(
+                          children: [const SizedBox(width: 16), title('日期', line: false)],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  info(_state.today),
+                ],
               ),
-              e.key == KeyValue.current ||
-                      e.key == KeyValue.high ||
-                      e.key == KeyValue.low
-                  ? textField(e.value, (value) {
-                      if (e.key == KeyValue.current) {
-                        _mainNotifier.current = value;
-                      } else if (e.key == KeyValue.high) {
-                        _mainNotifier.high = value;
-                      } else if (e.key == KeyValue.low) {
-                        _mainNotifier.low = value;
-                      }
-                    })
-                  : info(e.value),
+              ..._mainNotifier.spyValues.map((e) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (_state.considerKeyValue[e.key] != null) {
+                          _mainNotifier.considerKeyValue(e.key, !_state.considerKeyValue[e.key]!);
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: e.key == KeyValue.current ||
+                                    e.key == KeyValue.high ||
+                                    e.key == KeyValue.low ||
+                                    e.key == KeyValue.range ||
+                                    e.key == KeyValue.rangeDiv4
+                                ? Colors.white
+                                : e.key.bg,
+                            border: e == _mainNotifier.spyValues.last
+                                ? Border.all(color: Colors.grey.shade300, width: 1)
+                                : Border(
+                                    top: BorderSide(color: Colors.grey.shade300, width: 1),
+                                    left: BorderSide(color: Colors.grey.shade300, width: 1),
+                                    right: BorderSide(color: Colors.grey.shade300, width: 1),
+                                  )),
+                        child: Stack(
+                          children: [
+                            if (e.key != KeyValue.current &&
+                                e.key != KeyValue.range &&
+                                e.key != KeyValue.rangeDiv4)
+                              Positioned(top: 0, bottom: 0, left: 0, child: _checkbox(e.key)),
+                            Row(
+                              children: [
+                                const SizedBox(width: 16),
+                                title(e.key.title,
+                                    color: e.key == KeyValue.current ||
+                                            e.key == KeyValue.high ||
+                                            e.key == KeyValue.low
+                                        ? e.key.bg
+                                        : null,
+                                    line: false)
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    e.key == KeyValue.current || e.key == KeyValue.high || e.key == KeyValue.low
+                        ? textField(e.value, (value) {
+                            if (e.key == KeyValue.current) {
+                              _mainNotifier.current = value;
+                            } else if (e.key == KeyValue.high) {
+                              _mainNotifier.high = value;
+                            } else if (e.key == KeyValue.low) {
+                              _mainNotifier.low = value;
+                            }
+                          })
+                        : info(e.value),
+                  ],
+                );
+              })
             ],
-          );
-        })
+          ),
+        )
       ],
+    );
+    return ColoredBox(
+      color: Colors.lightGreen,
+      child: content,
     );
   }
 
@@ -176,7 +175,7 @@ class _MyAppState extends ConsumerState {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        title('日盤靈敏度空間', leftLine: false, bottomLine: false),
+        title('日盤靈敏度空間', line: false),
         sensitivitySpace(
           direction: Direction.long15,
           bg: winColor.withOpacity(0.2),
@@ -231,7 +230,7 @@ class _MyAppState extends ConsumerState {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        title('夜盤靈敏度空間', leftLine: false, bottomLine: false),
+        title('夜盤靈敏度空間', line: false),
         sensitivitySpace(
           direction: Direction.long15,
           bg: winColor.withOpacity(0.2),
@@ -288,15 +287,13 @@ class _MyAppState extends ConsumerState {
     }
     maxW += 16;
 
-    int indexOfCurrent = _mainNotifier.keyValues
-        .indexWhere((element) => element.key == KeyValue.current);
-    int largeDis = indexOfCurrent;
-    int smallDis = _mainNotifier.keyValues.length - indexOfCurrent;
+    int indexOfCurrent =
+        _mainNotifier.keyValues.indexWhere((element) => element.key == KeyValue.current);
     Widget content = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        title('關鍵價位列表', leftLine: false, bottomLine: false),
+        title('關鍵價位列表', line: false),
         ColoredBox(
           color: const Color(0xFFFAFAFA),
           child: Column(
@@ -305,8 +302,7 @@ class _MyAppState extends ConsumerState {
             children: [
               if (_mainNotifier.keyValues.isEmpty)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
                     '請先輸入關鍵價位（現價、高點、低點、靈敏度空間高低點）',
                     style: titleST,
@@ -326,10 +322,8 @@ class _MyAppState extends ConsumerState {
                         ? noteColor.withOpacity(0.5)
                         : indexDis.abs() < 4
                             ? indexDis > 0
-                                ? winColor
-                                    .withOpacity(0.4 - indexDis.abs() * 0.1)
-                                : loseColor
-                                    .withOpacity(0.4 - indexDis.abs() * 0.1)
+                                ? winColor.withOpacity(0.4 - indexDis.abs() * 0.1)
+                                : loseColor.withOpacity(0.4 - indexDis.abs() * 0.1)
                             : Colors.transparent;
 
                 Widget content = Row(
@@ -426,17 +420,11 @@ class _MyAppState extends ConsumerState {
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                title('高點', rightLine: true),
-                textField(high, highOnChange)
-              ],
+              children: [title('高點', rightLine: true), textField(high, highOnChange)],
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                title('低點', rightLine: true),
-                textField(low, lowOnChange)
-              ],
+              children: [title('低點', rightLine: true), textField(low, lowOnChange)],
             ),
           ],
         );
@@ -459,8 +447,8 @@ class _MyAppState extends ConsumerState {
             GestureDetector(
               onTap: () {
                 if (_state.considerKeyValue[attackKeyValue] != null) {
-                  _mainNotifier.considerKeyValue(attackKeyValue,
-                      !_state.considerKeyValue[attackKeyValue]!);
+                  _mainNotifier.considerKeyValue(
+                      attackKeyValue, !_state.considerKeyValue[attackKeyValue]!);
                 }
               },
               child: Container(
@@ -471,16 +459,9 @@ class _MyAppState extends ConsumerState {
                 )),
                 child: Stack(
                   children: [
-                    Positioned(
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        child: _checkbox(attackKeyValue)),
+                    Positioned(top: 0, bottom: 0, left: 0, child: _checkbox(attackKeyValue)),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('攻擊', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('攻擊', line: false)],
                     )
                   ],
                 ),
@@ -495,8 +476,8 @@ class _MyAppState extends ConsumerState {
             GestureDetector(
               onTap: () {
                 if (_state.considerKeyValue[middleKeyValue] != null) {
-                  _mainNotifier.considerKeyValue(middleKeyValue,
-                      !_state.considerKeyValue[middleKeyValue]!);
+                  _mainNotifier.considerKeyValue(
+                      middleKeyValue, !_state.considerKeyValue[middleKeyValue]!);
                 }
               },
               child: Container(
@@ -507,16 +488,9 @@ class _MyAppState extends ConsumerState {
                 )),
                 child: Stack(
                   children: [
-                    Positioned(
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        child: _checkbox(middleKeyValue)),
+                    Positioned(top: 0, bottom: 0, left: 0, child: _checkbox(middleKeyValue)),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('中關', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('中關', line: false)],
                     )
                   ],
                 ),
@@ -531,8 +505,8 @@ class _MyAppState extends ConsumerState {
             GestureDetector(
               onTap: () {
                 if (_state.considerKeyValue[defenseKeyValue] != null) {
-                  _mainNotifier.considerKeyValue(defenseKeyValue,
-                      !_state.considerKeyValue[defenseKeyValue]!);
+                  _mainNotifier.considerKeyValue(
+                      defenseKeyValue, !_state.considerKeyValue[defenseKeyValue]!);
                 }
               },
               child: Container(
@@ -543,16 +517,9 @@ class _MyAppState extends ConsumerState {
                 )),
                 child: Stack(
                   children: [
-                    Positioned(
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        child: _checkbox(defenseKeyValue)),
+                    Positioned(top: 0, bottom: 0, left: 0, child: _checkbox(defenseKeyValue)),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('防守', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('防守', line: false)],
                     )
                   ],
                 ),
@@ -583,29 +550,21 @@ class _MyAppState extends ConsumerState {
         child: Row(
           children: [
             title(direction.typeName,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                line: false),
+                padding: const EdgeInsets.symmetric(horizontal: 8), line: false),
             hAndL(
-              high: direction.isLong
-                  ? sensitivitySpace.longHigh
-                  : sensitivitySpace.shortHigh,
-              low: direction.isLong
-                  ? sensitivitySpace.longLow
-                  : sensitivitySpace.shortLow,
+              high: direction.isLong ? sensitivitySpace.longHigh : sensitivitySpace.shortHigh,
+              low: direction.isLong ? sensitivitySpace.longLow : sensitivitySpace.shortLow,
               highOnChange: highOnChange,
               lowOnChange: lowOnChange,
             ),
             amd(
                 long: direction.isLong,
-                attack: direction.isLong
-                    ? sensitivitySpace.longAttack
-                    : sensitivitySpace.shortAttack,
-                middle: direction.isLong
-                    ? sensitivitySpace.longMiddle
-                    : sensitivitySpace.shortMiddle,
-                defense: direction.isLong
-                    ? sensitivitySpace.longDefense
-                    : sensitivitySpace.shortDefense,
+                attack:
+                    direction.isLong ? sensitivitySpace.longAttack : sensitivitySpace.shortAttack,
+                middle:
+                    direction.isLong ? sensitivitySpace.longMiddle : sensitivitySpace.shortMiddle,
+                defense:
+                    direction.isLong ? sensitivitySpace.longDefense : sensitivitySpace.shortDefense,
                 attackKeyValue: attackKeyValue,
                 middleKeyValue: middleKeyValue,
                 defenseKeyValue: defenseKeyValue,
@@ -616,11 +575,9 @@ class _MyAppState extends ConsumerState {
     );
   }
 
-  Widget textField(dynamic init, ValueChanged<String> onChanged,
-      [String? hint = '請輸入']) {
+  Widget textField(dynamic init, ValueChanged<String> onChanged, [String? hint = '請輸入']) {
     final controller = TextEditingController(text: init?.toString() ?? '');
-    controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: controller.text.length));
+    controller.selection = TextSelection.fromPosition(TextPosition(offset: controller.text.length));
     return Container(
       constraints: BoxConstraints(maxWidth: infoW, maxHeight: textH),
       alignment: Alignment.bottomCenter,
@@ -633,8 +590,7 @@ class _MyAppState extends ConsumerState {
         decoration: InputDecoration(
             hintText: hint,
             hintStyle: infoST.copyWith(
-                fontSize: max(1, infoST.fontSize! - 4),
-                color: Colors.grey.withOpacity(0.75))),
+                fontSize: max(1, infoST.fontSize! - 4), color: Colors.grey.withOpacity(0.75))),
         onChanged: onChanged,
       ),
     );
@@ -647,8 +603,7 @@ class _MyAppState extends ConsumerState {
         color: Colors.grey,
         width: 1,
       ),
-      value:
-          keyValue != null ? _state.considerKeyValue[keyValue] ?? true : false,
+      value: keyValue != null ? _state.considerKeyValue[keyValue] ?? true : false,
       onChanged: (bool? enable) {
         if (keyValue == null) return;
         if (enable == null) return;
@@ -660,9 +615,7 @@ class _MyAppState extends ConsumerState {
 
   Size textSize(String text, TextStyle style) {
     final TextPainter textPainter = TextPainter(
-        text: TextSpan(text: text, style: style),
-        maxLines: 1,
-        textDirection: TextDirection.ltr)
+        text: TextSpan(text: text, style: style), maxLines: 1, textDirection: TextDirection.ltr)
       ..layout(minWidth: 0, maxWidth: double.infinity);
     return textPainter.size;
   }
