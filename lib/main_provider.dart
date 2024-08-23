@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 
@@ -14,6 +15,7 @@ class MainNotifier extends StateNotifier<SpyState> {
   MainNotifier() : super(SpyState.init()) {
     SharedPreferences.getInstance().then((value) {
       _prefs = value;
+
       String? json = _prefs.getString(_statsKey);
       if (json != null) {
         state = SpyState.fromJson(jsonDecode(json));
@@ -24,9 +26,17 @@ class MainNotifier extends StateNotifier<SpyState> {
   static const String _statsKey = 'stats_key';
   late final SharedPreferences _prefs;
 
+
+
+  num? _current;
+  Timer? _currentDebouncing;
   /// 設定現價
   set current(String value) {
-    state = state.copyWith(current: int.tryParse(value));
+    _current = int.tryParse(value);
+    _currentDebouncing?.cancel();
+    _currentDebouncing = Timer(const Duration(milliseconds: 300), () {
+      state = state.copyWith(current: int.tryParse(value));
+    });
   }
 
   /// 設定前盤高點
@@ -39,8 +49,14 @@ class MainNotifier extends StateNotifier<SpyState> {
     state = state.copyWith(low: int.tryParse(value));
   }
 
+  /// 日盤靈敏度空間，是否展開
+  void daySensitivitySpaceExpend(bool expend) {
+    state = state.copyWith(daySensitivitySpaceExpend: expend);
+  }
+
   /// 設定日盤15分最大多方邏輯高點
   void daySensitivitySpaceLongHigh15(String value) {
+    print(value);
     state = state.copyWith(
         daySensitivitySpace15: state.daySensitivitySpace15
             .copyWith(longHigh: int.tryParse(value)));
@@ -93,6 +109,11 @@ class MainNotifier extends StateNotifier<SpyState> {
     state = state.copyWith(
         daySensitivitySpace30: state.daySensitivitySpace30
             .copyWith(shortLow: int.tryParse(value)));
+  }
+
+  /// 夜盤靈敏度空間，是否展開
+  void nightSensitivitySpaceExpend(bool expend) {
+    state = state.copyWith(nightSensitivitySpaceExpend: expend);
   }
 
   /// 設定夜盤15分最大多方邏輯高點
@@ -151,15 +172,88 @@ class MainNotifier extends StateNotifier<SpyState> {
             .copyWith(shortLow: int.tryParse(value)));
   }
 
-  void considerKeyValue(KeyValue keyValue, bool consider) {
+  /// 是否考慮此關鍵價位
+  void considerKeyValue(String valueTitle, bool consider) {
     final considerKeyValue = state.considerKeyValue;
-    considerKeyValue[keyValue] = consider;
+    considerKeyValue[valueTitle] = consider;
     state = state.copyWith(considerKeyValue: considerKeyValue);
+  }
+
+  /// 自定義靈敏度空間，是否展開
+  void customizeSensitivitySpaceExpend(bool expend) {
+    state = state.copyWith(customizeSensitivitySpaceExpend: expend);
+  }
+
+  void setCustomizeSensitivitySpaceHigh(
+      CustomizeSensitivitySpace customizeSensitivitySpace, String value) {
+    final data = state.customizeSensitivitySpaces;
+    int index = data.indexOf(customizeSensitivitySpace);
+    data[index] = customizeSensitivitySpace.copyWith(high: int.tryParse(value));
+    state = state.copyWith(customizeSensitivitySpaces: data);
+  }
+
+  void setCustomizeSensitivitySpaceLow(
+      CustomizeSensitivitySpace customizeSensitivitySpace, String value) {
+    final data = state.customizeSensitivitySpaces;
+    int index = data.indexOf(customizeSensitivitySpace);
+    data[index] = customizeSensitivitySpace.copyWith(low: int.tryParse(value));
+
+    state = state.copyWith(customizeSensitivitySpaces: data);
+  }
+
+  void setCustomizeSensitivitySpaceTitle(
+      CustomizeSensitivitySpace customizeSensitivitySpace, String title) {
+    final data = state.customizeSensitivitySpaces;
+    int index = data.indexOf(customizeSensitivitySpace);
+    data[index] = customizeSensitivitySpace.copyWith(title: title);
+
+    state = state.copyWith(customizeSensitivitySpaces: data);
+  }
+
+  void setCustomizeSensitivitySpaceDirection(
+      CustomizeSensitivitySpace customizeSensitivitySpace,
+      Direction direction) {
+    final data = state.customizeSensitivitySpaces;
+    int index = data.indexOf(customizeSensitivitySpace);
+    data[index] = customizeSensitivitySpace.copyWith(direction: direction);
+
+    state = state.copyWith(customizeSensitivitySpaces: data);
+  }
+
+  bool isCustomizeSensitivitySpaceTitleDuplicate(String title,
+      [CustomizeSensitivitySpace? except]) {
+    List<String> allTitle = List.from(KeyValue.values.map((e) => e.title));
+    allTitle.addAll(state.customizeSensitivitySpaces
+        .where((element) => element != except)
+        .map((e) => e.title)
+        .toList());
+    return allTitle.indexWhere((element) => element == title) != -1;
+  }
+
+  void addCustomizeSensitivitySpace() {
+    const String defTitle = '自定義靈敏度空間';
+    String title = defTitle;
+    int cnt = 0;
+
+    while (isCustomizeSensitivitySpaceTitleDuplicate(title)) {
+      cnt++;
+      title = '$defTitle$cnt';
+    }
+    final data = state.customizeSensitivitySpaces;
+    data.add(CustomizeSensitivitySpace(
+        title: title, direction: Direction.customizeLong));
+    state = state.copyWith(customizeSensitivitySpaces: data);
+  }
+
+  void removeCustomizeSensitivitySpace(
+      CustomizeSensitivitySpace customizeSensitivitySpace) {
+    final data = state.customizeSensitivitySpaces;
+    data.remove(customizeSensitivitySpace);
+    state = state.copyWith(customizeSensitivitySpaces: data);
   }
 
   List<MapEntry<KeyValue, num?>> get spyValues {
     List<MapEntry<KeyValue, num?>> keyValues = [
-      MapEntry(KeyValue.current, state.current),
       MapEntry(KeyValue.high, state.high),
       MapEntry(KeyValue.low, state.low),
       MapEntry(KeyValue.range, state.range),
@@ -177,8 +271,8 @@ class MainNotifier extends StateNotifier<SpyState> {
     return keyValues;
   }
 
-  List<MapEntry<KeyValue, num>> get keyValues {
-    List<MapEntry<KeyValue, num>> keyValues = [
+  List<MapEntry<String, num>> get keyValues {
+    List<MapEntry<String, num>> keyValues = [
       MapEntry(KeyValue.current, state.current),
       MapEntry(KeyValue.high, state.high),
       MapEntry(KeyValue.low, state.low),
@@ -244,10 +338,20 @@ class MainNotifier extends StateNotifier<SpyState> {
         // 找出數值不為空值的
         where((element) => element.value != null)
         // 找出有考慮的
-        .where((element) => state.considerKeyValue[element.key] ?? false)
-        .map((e) => MapEntry(e.key, e.value!))
+        .where((element) => state.considerKeyValue[element.key.title] ?? false)
+        .map((e) => MapEntry(e.key.title, e.value!))
         .toList();
-
+    // 加入自定義靈敏度空間
+    keyValues.addAll(state.customizeSensitivitySpaces
+        .expand((element) => [
+              if (element.attack != null)
+                MapEntry(element.attackKeyTitle, element.attack!),
+              if (element.middle != null)
+                MapEntry(element.middleKeyTitle, element.middle!),
+              if (element.defense != null)
+                MapEntry(element.defenseKeyTitle, element.defense!),
+            ]) // 找出有考慮的
+        .where((element) => state.considerKeyValue[element.key] ?? false));
     // 用數值大小排序
     keyValues.sort(
       (a, b) {
@@ -258,7 +362,22 @@ class MainNotifier extends StateNotifier<SpyState> {
                 : 0;
       },
     );
+    // 如果現價為空，加到第一個
+    if(keyValues.indexWhere((element) => element.key == KeyValue.current.title) == -1){
+      keyValues.insert(0, MapEntry(KeyValue.current.title, -1));
+    }
     return keyValues;
+  }
+
+  bool isSensitivitySpaceTitleDuplicate(String title) {
+    bool duplicate = false;
+    for (MapEntry<String, num> element in keyValues) {
+      if (title.trim() == element.key) {
+        duplicate = true;
+        break;
+      }
+    }
+    return duplicate;
   }
 
   @override

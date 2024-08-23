@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dominant_player/widgets/style.dart';
+import 'package:flutter/rendering.dart';
 
 Widget title(
   dynamic text, {
@@ -129,4 +130,49 @@ bool _overFlow(double width, String text, TextStyle ts) {
       text: TextSpan(text: text, style: ts), textDirection: TextDirection.rtl)
     ..layout();
   return tp.width > width;
+}
+
+
+
+typedef OnWidgetSizeChange = void Function(Size size);
+
+class MeasureSizeRenderObject extends RenderProxyBox {
+  Size? oldSize;
+  OnWidgetSizeChange onChange;
+
+  MeasureSizeRenderObject(this.onChange);
+
+  @override
+  void performLayout() {
+    super.performLayout();
+
+    Size newSize = child!.size;
+    if (oldSize == newSize) return;
+
+    oldSize = newSize;
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      onChange(newSize);
+    });
+  }
+}
+
+class MeasureSize extends SingleChildRenderObjectWidget {
+  final OnWidgetSizeChange onChange;
+
+  const MeasureSize({
+    Key? key,
+    required this.onChange,
+    required Widget child,
+  }) : super(key: key, child: child);
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return MeasureSizeRenderObject(onChange);
+  }
+
+  @override
+  void updateRenderObject(
+      BuildContext context, covariant MeasureSizeRenderObject renderObject) {
+    renderObject.onChange = onChange;
+  }
 }
