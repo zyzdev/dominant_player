@@ -2,8 +2,7 @@ import 'dart:math';
 
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/spy_state.dart';
-import 'package:dominant_player/widgets/style.dart';
-import 'package:dominant_player/widgets/widget.dart';
+import 'package:dominant_player/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -50,34 +49,8 @@ class _MyAppState extends ConsumerState {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _spy,
-              ValueListenableBuilder(
-                valueListenable: _sensitivitySpaceWidth,
-                builder: (context, width, child) {
-                  Widget content = Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _daySensitivitySpace,
-                      _nightSensitivitySpace,
-                      _customizeSensitivitySpace
-                    ],
-                  );
-                  if (width == 0) {
-                    return MeasureSize(
-                      child: content,
-                      onChange: (size) {
-                        if (size.width > width) {
-                          _sensitivitySpaceWidth.value = size.width * 1.1;
-                        }
-                      },
-                    );
-                  }
-                  return Container(
-                    constraints: BoxConstraints(minWidth: width),
-                    child: content,
-                  );
-                },
-              ),
-              _keyValueList
+              _sensitivitySpace,
+              _keyValueList,
             ],
           ),
         ),
@@ -86,12 +59,23 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget get _spy {
+    // 計算數值最大寬度
+    double valueMaxWidth = _mainNotifier.spyValues.map((e) => e.value).fold(
+          infoW,
+          (previousValue, element) {
+            double width = textSize(element.toString(), titleST).width;
+            if (previousValue < width) return width;
+            return previousValue;
+          },
+        ) +
+        16;
     Widget content = Column(
       children: [
         title('SPY', line: false),
         ColoredBox(
           color: const Color(0xFFFAFAFA),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -121,12 +105,11 @@ class _MyAppState extends ConsumerState {
                       ],
                     ),
                   ),
-                  info(_state.today),
+                  info(_state.today, width: valueMaxWidth),
                 ],
               ),
               ..._mainNotifier.spyValues.map((e) {
                 return Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -146,14 +129,14 @@ class _MyAppState extends ConsumerState {
                                 : e.key.bg,
                             border: e == _mainNotifier.spyValues.last
                                 ? Border.all(
-                                    color: Colors.grey.shade400, width: 1)
+                                    color: Colors.grey.shade300, width: 1)
                                 : Border(
                                     top: BorderSide(
-                                        color: Colors.grey.shade400, width: 1),
+                                        color: Colors.grey.shade300, width: 1),
                                     left: BorderSide(
-                                        color: Colors.grey.shade400, width: 1),
+                                        color: Colors.grey.shade300, width: 1),
                                     right: BorderSide(
-                                        color: Colors.grey.shade400, width: 1),
+                                        color: Colors.grey.shade300, width: 1),
                                   )),
                         child: Stack(
                           children: [
@@ -183,6 +166,7 @@ class _MyAppState extends ConsumerState {
                             e.key == KeyValue.high ||
                             e.key == KeyValue.low
                         ? textField(
+                            width: valueMaxWidth,
                             init: e.value,
                             onChanged: (value) {
                               if (e.key == KeyValue.high) {
@@ -190,8 +174,15 @@ class _MyAppState extends ConsumerState {
                               } else if (e.key == KeyValue.low) {
                                 _mainNotifier.low = value;
                               }
-                            })
-                        : info(e.value),
+                            },
+                          )
+                        : info(
+                            e.value,
+                            width: valueMaxWidth,
+                            leftLine: false,
+                            rightLine: false,
+                            topLine: false,
+                          ),
                   ],
                 );
               })
@@ -206,7 +197,60 @@ class _MyAppState extends ConsumerState {
     );
   }
 
-  Widget get _daySensitivitySpace {
+  Widget get _sensitivitySpace {
+    // 計算名稱最大寬度
+    double maxTitleWidth = [
+          ...Direction.values.map(
+            (e) => e.typeName,
+          ),
+          ..._state.customizeSensitivitySpaces.map(
+            (e) => e.title,
+          ),
+          ..._state.customizeValues.map(
+            (e) => e.title,
+          )
+        ].fold<double>(
+          -1.0,
+          (previousValue, element) {
+            double width = textSize(element, titleST).width;
+            if (previousValue < width) return width;
+            return previousValue;
+          },
+        ) +
+        16;
+
+    return ValueListenableBuilder(
+      valueListenable: _sensitivitySpaceWidth,
+      builder: (context, width, child) {
+        Widget content = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _daySensitivitySpace(maxTitleWidth),
+            _nightSensitivitySpace(maxTitleWidth),
+            _customizeSensitivitySpace(maxTitleWidth),
+            _customizeValues(maxTitleWidth),
+          ],
+        );
+
+        if (width == 0) {
+          return MeasureSize(
+            child: content,
+            onChange: (size) {
+              if (size.width > width) {
+                _sensitivitySpaceWidth.value = size.width;
+              }
+            },
+          );
+        }
+        return Container(
+          constraints: BoxConstraints(minWidth: width),
+          child: content,
+        );
+      },
+    );
+  }
+
+  Widget _daySensitivitySpace(double titleW) {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -215,6 +259,7 @@ class _MyAppState extends ConsumerState {
         child: Column(
           children: [
             sensitivitySpace(
+              titleW: titleW,
               direction: Direction.long15,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace15,
@@ -226,6 +271,7 @@ class _MyAppState extends ConsumerState {
               topLine: true,
             ),
             sensitivitySpace(
+              titleW: titleW,
               direction: Direction.long30,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace30,
@@ -236,6 +282,7 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.dayLongDefense30,
             ),
             sensitivitySpace(
+              titleW: titleW,
               direction: Direction.short15,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace15,
@@ -246,6 +293,7 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.dayShortDefense15,
             ),
             sensitivitySpace(
+              titleW: titleW,
               direction: Direction.short30,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace30,
@@ -254,6 +302,7 @@ class _MyAppState extends ConsumerState {
               attackKeyValue: KeyValue.dayShortAttack30,
               middleKeyValue: KeyValue.dayShortMiddle30,
               defenseKeyValue: KeyValue.dayShortDefense30,
+              bottomLine: false,
             )
           ],
         ),
@@ -268,7 +317,7 @@ class _MyAppState extends ConsumerState {
 
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey), color: Colors.yellow),
+          border: Border.all(color: Colors.grey), color: Colors.amberAccent),
       constraints: BoxConstraints(minWidth: _sensitivitySpaceWidth.value),
       alignment: Alignment.center,
       child: Stack(
@@ -293,7 +342,7 @@ class _MyAppState extends ConsumerState {
     );
   }
 
-  Widget get _nightSensitivitySpace {
+  Widget _nightSensitivitySpace(double titleW) {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -302,6 +351,7 @@ class _MyAppState extends ConsumerState {
         child: Column(
           children: [
             sensitivitySpace(
+              titleW: titleW,
               direction: Direction.long15,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace15,
@@ -310,8 +360,10 @@ class _MyAppState extends ConsumerState {
               attackKeyValue: KeyValue.nightLongAttack15,
               middleKeyValue: KeyValue.nightLongMiddle15,
               defenseKeyValue: KeyValue.nightLongDefense15,
+              topLine: true,
             ),
             sensitivitySpace(
+              titleW: titleW,
               direction: Direction.long30,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace30,
@@ -322,6 +374,7 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.nightLongDefense30,
             ),
             sensitivitySpace(
+              titleW: titleW,
               direction: Direction.short15,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace15,
@@ -332,6 +385,7 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.nightShortDefense15,
             ),
             sensitivitySpace(
+              titleW: titleW,
               direction: Direction.short30,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace30,
@@ -340,12 +394,14 @@ class _MyAppState extends ConsumerState {
               attackKeyValue: KeyValue.nightShortAttack30,
               middleKeyValue: KeyValue.nightShortMiddle30,
               defenseKeyValue: KeyValue.nightShortDefense30,
+              bottomLine: false,
             )
           ],
         ),
       ),
     );
 
+    // 字體顏色為標題底色的互補色
     content = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -354,7 +410,9 @@ class _MyAppState extends ConsumerState {
 
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey), color: Colors.yellow),
+        border: Border.all(color: Colors.grey),
+        color: Colors.amberAccent,
+      ),
       constraints: BoxConstraints(
         minWidth: _sensitivitySpaceWidth.value,
       ),
@@ -381,7 +439,7 @@ class _MyAppState extends ConsumerState {
     );
   }
 
-  Widget get _customizeSensitivitySpace {
+  Widget _customizeSensitivitySpace(double titleW) {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -389,23 +447,61 @@ class _MyAppState extends ConsumerState {
         height: _state.customizeSensitivitySpaceExpend ? null : 0,
         child: Column(
           children: [
+            SizedBox(width: _sensitivitySpaceWidth.value),
             ..._state.customizeSensitivitySpaces.map((e) =>
                 customizeSensitivitySpace(
+                  titleW: titleW,
                   bg: e.direction.isLong
                       ? winColor.withOpacity(0.2)
                       : loseColor.withOpacity(0.2),
                   customizeSensitivitySpace: e,
                   highOnChange: _mainNotifier.setCustomizeSensitivitySpaceHigh,
                   lowOnChange: _mainNotifier.setCustomizeSensitivitySpaceLow,
+                  topLine: _state.customizeSensitivitySpaces.first == e,
+                  bottomLine: _state.customizeSensitivitySpaces.last != e,
                 )),
             const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () {
-                _mainNotifier.addCustomizeSensitivitySpace();
-              },
-              child: const Row(
-                children: [Icon(Icons.add), Text('新增自定義')],
-              ),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  icon: Icon(
+                    Icons.add,
+                    color: winColor,
+                    size: 20,
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    side: BorderSide(width: 1.5, color: winColor),
+                  ),
+                  label: Text(
+                    '新增自定義多方邏輯',
+                    style: TextStyle(color: winColor),
+                  ),
+                  onPressed: () {
+                    _mainNotifier.addCustomizeSensitivitySpace();
+                  },
+                ),
+                const SizedBox(width: 32),
+                OutlinedButton.icon(
+                  icon: Icon(
+                    Icons.add,
+                    color: loseColor,
+                    size: 20,
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    side: BorderSide(width: 1.5, color: loseColor),
+                  ),
+                  onPressed: () {
+                    _mainNotifier
+                        .addCustomizeSensitivitySpace(Direction.customizeShort);
+                  },
+                  label: Text(
+                    '新增自定義空方邏輯',
+                    style: TextStyle(color: loseColor),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
           ],
@@ -424,7 +520,9 @@ class _MyAppState extends ConsumerState {
 
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey), color: Colors.blueGrey),
+        border: Border.all(color: Colors.grey),
+        color: Colors.grey.shade400,
+      ),
       constraints: BoxConstraints(minWidth: _sensitivitySpaceWidth.value),
       child: Stack(
         children: [
@@ -448,13 +546,174 @@ class _MyAppState extends ConsumerState {
     );
   }
 
+  Widget _customizeValues(double titleW) {
+    Widget content = AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.fastOutSlowIn,
+      child: SizedBox(
+        height: _state.customizeValuesExpend ? null : 0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(width: _sensitivitySpaceWidth.value),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: _sensitivitySpaceWidth.value),
+                  ..._state.customizeValues.map((e) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipOval(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                _confirmDialog(e.title).then((remove) {
+                                  if (remove == true) {
+                                    _mainNotifier.removeCustomizeValue(e);
+                                  }
+                                });
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Icon(
+                                  Icons.delete_forever,
+                                  size: 20,
+                                  color: Colors.redAccent,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: titleW),
+                              child: textField(
+                                  init: e.title,
+                                  onChanged: (value) {
+                                    _mainNotifier.setCustomizeValueTitle(
+                                        e, value);
+                                  },
+                                  keyboardType: TextInputType.text,
+                                  error: _mainNotifier
+                                          .isCustomizeValueTitleDuplicate(
+                                              e.title, e)
+                                      ? '名稱請不要重複！'
+                                      : null),
+                            ),
+                            _checkbox(e.title),
+                            textField(
+                              init: e.value,
+                              onChanged: (value) {
+                                _mainNotifier.setCustomizeValueValue(e, value);
+                              },
+                            )
+                          ],
+                        )
+                      ],
+                    );
+                  }).toList()
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              icon: const Icon(
+                Icons.add,
+                size: 20,
+              ),
+              onPressed: () {
+                _mainNotifier.addCustomizeValue();
+              },
+              style: OutlinedButton.styleFrom(backgroundColor: Colors.white),
+              label: const Text('新增自定義關鍵價'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+
+    content = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        title('自定義關鍵價', line: false),
+        content,
+      ],
+    );
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        color: Colors.grey.shade300,
+      ),
+      constraints: BoxConstraints(minWidth: _sensitivitySpaceWidth.value),
+      child: Stack(
+        children: [
+          SizedBox(width: _sensitivitySpaceWidth.value),
+          content,
+          Positioned(
+            right: 0,
+            top: 0,
+            child: IconButton(
+              onPressed: () {
+                _mainNotifier
+                    .customizeValueExpend(!_state.customizeValuesExpend);
+              },
+              icon: Icon(_state.customizeValuesExpend
+                  ? Icons.arrow_drop_down
+                  : Icons.arrow_drop_up),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget get _keyValueList {
-    double maxW = 0;
-    for (MapEntry<String, num> element in _mainNotifier.keyValues) {
-      double w = textSize(element.key, infoST).width;
-      if (w > maxW) maxW = w;
-    }
-    maxW += 16;
+    double maxTitleWidth = _mainNotifier.keyValues.map((e) => e.key).fold(
+          titleW,
+          (previousValue, element) {
+            double width = textSize(element, infoST).width;
+            if (width > previousValue) return width;
+            return previousValue;
+          },
+        ) +
+        16;
+
+    double maxValueWidth = _mainNotifier.keyValues
+            .map(
+          (e) => e.value,
+        )
+            .fold(
+          titleW,
+          (previousValue, element) {
+            double width = textSize(element.toString(), titleST).width;
+            if (width > previousValue) return width;
+            return previousValue;
+          },
+        ) +
+        16;
+
+    double maxDisWidth = _mainNotifier.keyValues
+            .map(
+          (e) => e.value - (_state.current ?? 0),
+        )
+            .fold(
+          infoW,
+          (previousValue, element) {
+            double width = textSize(element.toString(), infoST).width;
+            if (width > previousValue) return width;
+            return previousValue;
+          },
+        ) +
+        16;
     int indexOfCurrent = _mainNotifier.keyValues
         .indexWhere((element) => element.key == KeyValue.current.title);
     Widget content = Column(
@@ -498,26 +757,21 @@ class _MyAppState extends ConsumerState {
                             : Colors.transparent;
 
                 Widget content = Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
-                      width: maxW,
-                      child: Center(
-                        child: title(e.key),
-                      ),
-                    ),
+                    title(e.key, width: maxTitleWidth),
                     indexDis == 0
                         ? textField(
                             init: e.value > 0 ? e.value : null,
                             onChanged: (value) {
                               _mainNotifier.current = value;
                             },
+                            width: maxValueWidth,
                           )
-                        : title(e.value),
+                        : title(e.value, width: maxValueWidth),
                     ...[
                       indexDis == 0
                           ? Container(
-                              width: infoW,
+                              width: maxDisWidth,
                               height: textH,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
@@ -557,6 +811,7 @@ class _MyAppState extends ConsumerState {
                               rightLine: true,
                               leftLine: true,
                               bottomLine: e != _mainNotifier.keyValues.last,
+                              width: maxDisWidth,
                             ),
                     ]
                   ],
@@ -578,6 +833,7 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget sensitivitySpace({
+    required double titleW,
     required Direction direction,
     required Color bg,
     required SensitivitySpace sensitivitySpace,
@@ -587,6 +843,7 @@ class _MyAppState extends ConsumerState {
     required KeyValue middleKeyValue,
     required KeyValue defenseKeyValue,
     bool topLine = false,
+    bool bottomLine = true,
   }) {
     Widget hAndL({
       required int? high,
@@ -637,9 +894,9 @@ class _MyAppState extends ConsumerState {
               },
               child: Container(
                 decoration: BoxDecoration(
-                    border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
+                    border: Border(
+                  left: BorderSide(color: Colors.grey.shade300, width: 1),
+                  right: BorderSide(color: Colors.grey.shade300, width: 1),
                 )),
                 child: Stack(
                   children: [
@@ -658,7 +915,7 @@ class _MyAppState extends ConsumerState {
                 ),
               ),
             ),
-            info(attack, width: infoW),
+            info(attack, width: infoW, leftLine: false, rightLine: false),
           ],
         ),
         Row(
@@ -673,10 +930,7 @@ class _MyAppState extends ConsumerState {
               },
               child: Container(
                 decoration: BoxDecoration(
-                    border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
-                )),
+                    border: Border.all(color: Colors.grey.shade300, width: 1)),
                 child: Stack(
                   children: [
                     Positioned(
@@ -694,7 +948,7 @@ class _MyAppState extends ConsumerState {
                 ),
               ),
             ),
-            info(middle, width: infoW),
+            info(middle, width: infoW, leftLine: false, rightLine: false),
           ],
         ),
         Row(
@@ -709,9 +963,9 @@ class _MyAppState extends ConsumerState {
               },
               child: Container(
                 decoration: BoxDecoration(
-                    border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
+                    border: Border(
+                  left: BorderSide(color: Colors.grey.shade300, width: 1),
+                  right: BorderSide(color: Colors.grey.shade300, width: 1),
                 )),
                 child: Stack(
                   children: [
@@ -730,7 +984,7 @@ class _MyAppState extends ConsumerState {
                 ),
               ),
             ),
-            info(defense, width: infoW),
+            info(defense, width: infoW, leftLine: false, rightLine: false),
           ],
         ),
       ];
@@ -742,22 +996,24 @@ class _MyAppState extends ConsumerState {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: topLine
-            ? Border.all(color: Colors.grey.shade400, width: 1)
-            : Border(
-                bottom: BorderSide(color: Colors.grey.shade400, width: 1),
-                left: BorderSide(color: Colors.grey.shade400, width: 1),
-                right: BorderSide(color: Colors.grey.shade400, width: 1),
-              ),
+        border: Border(
+          bottom: bottomLine
+              ? BorderSide(color: Colors.grey.shade300, width: 1)
+              : BorderSide.none,
+          top: topLine
+              ? BorderSide(color: Colors.grey.shade300, width: 1)
+              : BorderSide.none,
+        ),
       ),
       child: Container(
         constraints: BoxConstraints(minWidth: _sensitivitySpaceWidth.value),
         color: bg,
         child: Row(
           children: [
-            title(direction.typeName,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                line: false),
+            ConstrainedBox(
+              constraints: BoxConstraints(minWidth: titleW),
+              child: title(direction.typeName, line: false),
+            ),
             hAndL(
               high: direction.isLong
                   ? sensitivitySpace.longHigh
@@ -790,6 +1046,7 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget customizeSensitivitySpace({
+    required double titleW,
     required Color bg,
     required CustomizeSensitivitySpace customizeSensitivitySpace,
     required Function(
@@ -799,6 +1056,7 @@ class _MyAppState extends ConsumerState {
             CustomizeSensitivitySpace customizeSensitivitySpace, String value)
         lowOnChange,
     bool topLine = false,
+    bool bottomLine = true,
   }) {
     Widget hAndL({
       required int? high,
@@ -858,9 +1116,9 @@ class _MyAppState extends ConsumerState {
               },
               child: Container(
                 decoration: BoxDecoration(
-                    border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
+                    border: Border(
+                  left: BorderSide(color: Colors.grey.shade300, width: 1),
+                  right: BorderSide(color: Colors.grey.shade300, width: 1),
                 )),
                 child: Stack(
                   children: [
@@ -880,7 +1138,8 @@ class _MyAppState extends ConsumerState {
                 ),
               ),
             ),
-            info(customizeSensitivitySpace.attack, width: infoW),
+            info(customizeSensitivitySpace.attack,
+                width: infoW, leftLine: false, rightLine: false),
           ],
         ),
         Row(
@@ -918,7 +1177,8 @@ class _MyAppState extends ConsumerState {
                 ),
               ),
             ),
-            info(customizeSensitivitySpace.middle, width: infoW),
+            info(customizeSensitivitySpace.middle,
+                width: infoW, leftLine: false, rightLine: false),
           ],
         ),
         Row(
@@ -934,9 +1194,9 @@ class _MyAppState extends ConsumerState {
               },
               child: Container(
                 decoration: BoxDecoration(
-                    border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
+                    border: Border(
+                  left: BorderSide(color: Colors.grey.shade300, width: 1),
+                  right: BorderSide(color: Colors.grey.shade300, width: 1),
                 )),
                 child: Stack(
                   children: [
@@ -956,7 +1216,8 @@ class _MyAppState extends ConsumerState {
                 ),
               ),
             ),
-            info(customizeSensitivitySpace.defense, width: infoW),
+            info(customizeSensitivitySpace.defense,
+                width: infoW, leftLine: false, rightLine: false),
           ],
         ),
       ];
@@ -967,18 +1228,18 @@ class _MyAppState extends ConsumerState {
       );
     }
 
-    Size nameSize = textSize(customizeSensitivitySpace.title, infoST);
     return Container(
       constraints: BoxConstraints(minWidth: _sensitivitySpaceWidth.value),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: topLine
-            ? Border.all(color: Colors.grey.shade400, width: 1)
-            : Border(
-                bottom: BorderSide(color: Colors.grey.shade400, width: 1),
-                left: BorderSide(color: Colors.grey.shade400, width: 1),
-                right: BorderSide(color: Colors.grey.shade400, width: 1),
-              ),
+        border: Border(
+          top: topLine
+              ? BorderSide(color: Colors.grey.shade300, width: 1)
+              : BorderSide.none,
+          bottom: bottomLine
+              ? BorderSide(color: Colors.grey.shade300, width: 1)
+              : BorderSide.none,
+        ),
       ),
       child: ColoredBox(
         color: bg,
@@ -987,29 +1248,25 @@ class _MyAppState extends ConsumerState {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: max(infoW, nameSize.width * 1.1) + 16,
-                  alignment: Alignment.centerLeft,
-                  child: ClipOval(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          _confirmDialog(customizeSensitivitySpace.title)
-                              .then((remove) {
-                            if (remove == true) {
-                              _mainNotifier.removeCustomizeSensitivitySpace(
-                                  customizeSensitivitySpace);
-                            }
-                          });
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Icon(
-                            Icons.delete_forever,
-                            size: 20,
-                            color: Colors.redAccent,
-                          ),
+                ClipOval(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        _confirmDialog(customizeSensitivitySpace.title)
+                            .then((remove) {
+                          if (remove == true) {
+                            _mainNotifier.removeCustomizeSensitivitySpace(
+                                customizeSensitivitySpace);
+                          }
+                        });
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.delete_forever,
+                          size: 20,
+                          color: Colors.redAccent,
                         ),
                       ),
                     ),
@@ -1017,8 +1274,8 @@ class _MyAppState extends ConsumerState {
                 ),
                 Column(
                   children: [
-                    SizedBox(
-                      width: max(infoW * 1.8, nameSize.width * 1.1) + 16,
+                    ConstrainedBox(
+                      constraints: BoxConstraints(minWidth: titleW),
                       child: textField(
                           init: customizeSensitivitySpace.title,
                           onChanged: (value) {
@@ -1049,7 +1306,7 @@ class _MyAppState extends ConsumerState {
                           [Colors.green]
                         ],
                         activeFgColor: Colors.white,
-                        inactiveBgColor: Colors.grey.shade400,
+                        inactiveBgColor: Colors.grey.shade300,
                         inactiveFgColor: Colors.black54,
                         onToggle: (index) {
                           _mainNotifier.setCustomizeSensitivitySpaceDirection(
@@ -1083,19 +1340,18 @@ class _MyAppState extends ConsumerState {
     dynamic init,
     required ValueChanged<String> onChanged,
     TextInputType? keyboardType = TextInputType.number,
+    double? width,
     String? hint = '請輸入',
     String? error,
   }) {
-    final controller = TextEditingController(text: init?.toString() ?? '');
-    controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: controller.text.length));
     return Container(
-      constraints: BoxConstraints(maxWidth: infoW, maxHeight: textH),
+      constraints: BoxConstraints(maxWidth: width ?? infoW, maxHeight: textH),
       alignment: Alignment.bottomCenter,
       child: TextFormField(
-        controller: controller,
+        initialValue: init?.toString(),
+        //controller: controller,
         textAlign: TextAlign.center,
-        keyboardType: TextInputType.text,
+        keyboardType: keyboardType,
         style: infoST,
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(

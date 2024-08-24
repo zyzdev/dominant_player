@@ -13,9 +13,10 @@ Widget title(
   String? toolTip,
   bool line = true,
   EdgeInsets padding = EdgeInsets.zero,
+  double? width,
 }) {
   Widget content = Container(
-    constraints: BoxConstraints(minWidth: titleW, minHeight: textH),
+    constraints: BoxConstraints(minWidth: width ?? titleW, minHeight: textH),
     padding: padding,
     decoration: BoxDecoration(
       color: bg,
@@ -61,6 +62,8 @@ Widget info(
   Color? color,
   bool line = true,
   String? toolTip,
+  Alignment alignment = Alignment.center,
+      EdgeInsets padding = EdgeInsets.zero,
 }) {
   double fontSize = defFontSize;
   TextStyle ts = infoST;
@@ -71,6 +74,7 @@ Widget info(
   }
   Widget content = Container(
     constraints: BoxConstraints(minWidth: width ?? infoW, minHeight: textH),
+    padding: padding,
     decoration: BoxDecoration(
       border: Border(
         bottom: bottomLine && line
@@ -87,14 +91,13 @@ Widget info(
             : BorderSide.none,
       ),
     ),
-    alignment: Alignment.center,
+    alignment: alignment,
     child: Text(
       text?.toString() ?? '',
       style: ts.copyWith(
         color: color,
         fontWeight: bold ? FontWeight.bold : FontWeight.normal,
       ),
-      textAlign: TextAlign.center,
     ),
   );
   if (toolTip != null) {
@@ -131,8 +134,6 @@ bool _overFlow(double width, String text, TextStyle ts) {
     ..layout();
   return tp.width > width;
 }
-
-
 
 typedef OnWidgetSizeChange = void Function(Size size);
 

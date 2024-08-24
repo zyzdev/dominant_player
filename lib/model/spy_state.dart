@@ -34,6 +34,8 @@ class SpyState {
     required this.considerKeyValue,
     this.customizeSensitivitySpaceExpend = true,
     required this.customizeSensitivitySpaces,
+    this.customizeValuesExpend = true,
+    required this.customizeValues,
   });
 
   factory SpyState.init() {
@@ -46,7 +48,11 @@ class SpyState {
           for (var element in KeyValue.values) element.title: true
         },
         customizeSensitivitySpaces: [
-          CustomizeSensitivitySpace(direction: Direction.customizeLong, title: '自定義靈敏度空間')
+          CustomizeSensitivitySpace(
+              direction: Direction.customizeLong, title: '自定義靈敏度空間')
+        ],
+        customizeValues: [
+          CustomizeValue(title: '自定義關鍵價')
         ]);
   }
 
@@ -68,37 +74,45 @@ class SpyState {
   double? get rangeDiv4 => range != null ? range! / 4 : null;
 
   /// 超漲
-  num? get superPress =>
-      high != null && rangeDiv4 != null && range != null ? high! - rangeDiv4! + range! : null;
+  num? get superPress => high != null && rangeDiv4 != null && range != null
+      ? high! - rangeDiv4! + range!
+      : null;
 
   /// 壓二
   num? get absolutePress =>
       superPress != null && rangeDiv4 != null ? superPress! - rangeDiv4! : null;
 
   /// 壓一
-  num? get nestPress =>
-      absolutePress != null && rangeDiv4 != null ? absolutePress! - rangeDiv4! : null;
+  num? get nestPress => absolutePress != null && rangeDiv4 != null
+      ? absolutePress! - rangeDiv4!
+      : null;
 
   /// 撐一
-  double? get nestSupport =>
-      absoluteSupport != null && rangeDiv4 != null ? absoluteSupport! + rangeDiv4! : null;
+  double? get nestSupport => absoluteSupport != null && rangeDiv4 != null
+      ? absoluteSupport! + rangeDiv4!
+      : null;
 
   /// 撐二
-  double? get absoluteSupport =>
-      superSupport != null && rangeDiv4 != null ? superSupport! + rangeDiv4! : null;
+  double? get absoluteSupport => superSupport != null && rangeDiv4 != null
+      ? superSupport! + rangeDiv4!
+      : null;
 
   /// 超跌
-  double? get superSupport =>
-      low != null && rangeDiv4 != null && range != null ? low! + rangeDiv4! - range! : null;
+  double? get superSupport => low != null && rangeDiv4 != null && range != null
+      ? low! + rangeDiv4! - range!
+      : null;
 
   /// 高成本區
-  double? get highCost => high != null && rangeDiv4 != null ? high! - rangeDiv4! : null;
+  double? get highCost =>
+      high != null && rangeDiv4 != null ? high! - rangeDiv4! : null;
 
   /// 中成本區
-  double? get middleCost => high != null && low != null ? (high! + low!) / 2 : null;
+  double? get middleCost =>
+      high != null && low != null ? (high! + low!) / 2 : null;
 
   /// 低成本區
-  double? get lowCost => low != null && rangeDiv4 != null ? low! + rangeDiv4! : null;
+  double? get lowCost =>
+      low != null && rangeDiv4 != null ? low! + rangeDiv4! : null;
 
   /// 日盤靈敏度空間
   /// 是否展開
@@ -123,11 +137,19 @@ class SpyState {
   /// 自定義靈敏度空間
   /// 是否展開
   final bool customizeSensitivitySpaceExpend;
+  @JsonKey(defaultValue: [])
   List<CustomizeSensitivitySpace> customizeSensitivitySpaces;
+
+  /// 自定義關鍵價
+  /// 是否展開
+  final bool customizeValuesExpend;
+  @JsonKey(defaultValue: [])
+  List<CustomizeValue> customizeValues;
 
   final Map<String, bool> considerKeyValue;
 
-  factory SpyState.fromJson(Map<String, dynamic> json) => _$SpyStateFromJson(json);
+  factory SpyState.fromJson(Map<String, dynamic> json) =>
+      _$SpyStateFromJson(json);
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$SpyStateToJson(this);
@@ -142,7 +164,6 @@ class SensitivitySpace {
   /// 空間偏移量
   static const int _spaceOffset = 20;
 
-
   /// 最大多方邏輯高點
   final int? longHigh;
 
@@ -150,7 +171,8 @@ class SensitivitySpace {
   final int? longLow;
 
   /// 分K最大多方邏輯中關
-  double? get longMiddle => longHigh != null && longLow != null ? (longHigh! + longLow!) / 2 : null;
+  double? get longMiddle =>
+      longHigh != null && longLow != null ? (longHigh! + longLow!) / 2 : null;
 
   /// 分K最大多方邏輯攻擊點
   int? get longAttack => longHigh != null ? longHigh! + _spaceOffset : null;
@@ -165,8 +187,9 @@ class SensitivitySpace {
   final int? shortLow;
 
   /// 分K最大空方邏輯中關
-  double? get shortMiddle =>
-      shortHigh != null && shortLow != null ? (shortHigh! + shortLow!) / 2 : null;
+  double? get shortMiddle => shortHigh != null && shortLow != null
+      ? (shortHigh! + shortLow!) / 2
+      : null;
 
   /// 分K最大空方邏輯攻擊點
   int? get shortAttack => shortLow != null ? shortLow! - _spaceOffset : null;
@@ -174,7 +197,8 @@ class SensitivitySpace {
   /// 分K最大空方邏輯防守點
   int? get shortDefense => shortHigh != null ? shortHigh! + _spaceOffset : null;
 
-  factory SensitivitySpace.fromJson(Map<String, dynamic> json) => _$SensitivitySpaceFromJson(json);
+  factory SensitivitySpace.fromJson(Map<String, dynamic> json) =>
+      _$SensitivitySpaceFromJson(json);
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$SensitivitySpaceToJson(this);
@@ -224,13 +248,29 @@ class CustomizeSensitivitySpace {
           ? high! + _spaceOffset
           : null;
 
-  CustomizeSensitivitySpace({this.high, this.low, required this.direction, required this.title});
+  CustomizeSensitivitySpace(
+      {this.high, this.low, required this.direction, required this.title});
 
   factory CustomizeSensitivitySpace.fromJson(Map<String, dynamic> json) =>
       _$CustomizeSensitivitySpaceFromJson(json);
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$CustomizeSensitivitySpaceToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+@CopyWith()
+class CustomizeValue {
+  final String title;
+  final num? value;
+
+  CustomizeValue({this.title = '自定義關鍵價', this.value});
+
+  factory CustomizeValue.fromJson(Map<String, dynamic> json) =>
+      _$CustomizeValueFromJson(json);
+
+  /// Connect the generated [_$PersonToJson] function to the `toJson` method.
+  Map<String, dynamic> toJson() => _$CustomizeValueToJson(this);
 }
 
 enum Direction {
@@ -244,7 +284,9 @@ enum Direction {
 
 extension DirectionName on Direction {
   bool get isLong =>
-      this == Direction.long15 || this == Direction.long30 || this == Direction.customizeLong;
+      this == Direction.long15 ||
+      this == Direction.long30 ||
+      this == Direction.customizeLong;
 
   String get typeName {
     switch (this) {

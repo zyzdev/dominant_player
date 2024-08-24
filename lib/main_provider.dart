@@ -26,16 +26,15 @@ class MainNotifier extends StateNotifier<SpyState> {
   static const String _statsKey = 'stats_key';
   late final SharedPreferences _prefs;
 
-
-
-  num? _current;
+  String? _current;
   Timer? _currentDebouncing;
+
   /// 設定現價
   set current(String value) {
-    _current = int.tryParse(value);
+    _current = value;
     _currentDebouncing?.cancel();
-    _currentDebouncing = Timer(const Duration(milliseconds: 300), () {
-      state = state.copyWith(current: int.tryParse(value));
+    _currentDebouncing = Timer(const Duration(milliseconds: 500), () {
+      state = state.copyWith(current: int.tryParse(_current?.toString() ?? ''));
     });
   }
 
@@ -56,7 +55,6 @@ class MainNotifier extends StateNotifier<SpyState> {
 
   /// 設定日盤15分最大多方邏輯高點
   void daySensitivitySpaceLongHigh15(String value) {
-    print(value);
     state = state.copyWith(
         daySensitivitySpace15: state.daySensitivitySpace15
             .copyWith(longHigh: int.tryParse(value)));
@@ -220,6 +218,29 @@ class MainNotifier extends StateNotifier<SpyState> {
     state = state.copyWith(customizeSensitivitySpaces: data);
   }
 
+  void addCustomizeSensitivitySpace([Direction direction = Direction.customizeLong]) {
+    String defTitle = Direction.customizeLong.typeName;
+    String title = defTitle;
+    int cnt = 0;
+
+    while (isCustomizeSensitivitySpaceTitleDuplicate(title)) {
+      cnt++;
+      title = '$defTitle$cnt';
+    }
+    final data = state.customizeSensitivitySpaces;
+    data.add(CustomizeSensitivitySpace(
+        title: title, direction: direction));
+    state = state.copyWith(customizeSensitivitySpaces: data);
+  }
+
+  void removeCustomizeSensitivitySpace(
+      CustomizeSensitivitySpace customizeSensitivitySpace) {
+    final data = state.customizeSensitivitySpaces;
+    data.remove(customizeSensitivitySpace);
+    state = state.copyWith(customizeSensitivitySpaces: data);
+  }
+
+  /// 自定義靈敏度空間名稱，是否重複
   bool isCustomizeSensitivitySpaceTitleDuplicate(String title,
       [CustomizeSensitivitySpace? except]) {
     List<String> allTitle = List.from(KeyValue.values.map((e) => e.title));
@@ -230,26 +251,55 @@ class MainNotifier extends StateNotifier<SpyState> {
     return allTitle.indexWhere((element) => element == title) != -1;
   }
 
-  void addCustomizeSensitivitySpace() {
-    const String defTitle = '自定義靈敏度空間';
+  /// 自定義關鍵價，是否展開
+  void customizeValueExpend(bool expend) {
+    state = state.copyWith(customizeValuesExpend: expend);
+  }
+
+  void setCustomizeValueTitle(CustomizeValue customizeValue, String title) {
+    final data = state.customizeValues;
+    int index = data.indexOf(customizeValue);
+    data[index] = customizeValue.copyWith(title: title);
+
+    state = state.copyWith(customizeValues: data);
+  }
+
+  void setCustomizeValueValue(CustomizeValue customizeValue, String value) {
+    final data = state.customizeValues;
+    int index = data.indexOf(customizeValue);
+    data[index] = customizeValue.copyWith(value: int.tryParse(value));
+
+    state = state.copyWith(customizeValues: data);
+  }
+
+  void addCustomizeValue() {
+    const String defTitle = '自定義關鍵價';
     String title = defTitle;
     int cnt = 0;
 
-    while (isCustomizeSensitivitySpaceTitleDuplicate(title)) {
+    while (isCustomizeValueTitleDuplicate(title)) {
       cnt++;
       title = '$defTitle$cnt';
     }
-    final data = state.customizeSensitivitySpaces;
-    data.add(CustomizeSensitivitySpace(
-        title: title, direction: Direction.customizeLong));
-    state = state.copyWith(customizeSensitivitySpaces: data);
+    final data = state.customizeValues;
+    data.add(CustomizeValue(title: title));
+    state = state.copyWith(customizeValues: data);
   }
 
-  void removeCustomizeSensitivitySpace(
-      CustomizeSensitivitySpace customizeSensitivitySpace) {
-    final data = state.customizeSensitivitySpaces;
-    data.remove(customizeSensitivitySpace);
-    state = state.copyWith(customizeSensitivitySpaces: data);
+  void removeCustomizeValue(CustomizeValue customizeValue) {
+    final data = state.customizeValues;
+    data.remove(customizeValue);
+    state = state.copyWith(customizeValues: data);
+  }
+
+  /// 自定義靈關鍵價名稱，是否重複
+  bool isCustomizeValueTitleDuplicate(String title, [CustomizeValue? except]) {
+    List<String> allTitle = List.from(KeyValue.values.map((e) => e.title));
+    allTitle.addAll(state.customizeValues
+        .where((element) => element != except)
+        .map((e) => e.title)
+        .toList());
+    return allTitle.indexWhere((element) => element == title) != -1;
   }
 
   List<MapEntry<KeyValue, num?>> get spyValues {
@@ -338,7 +388,7 @@ class MainNotifier extends StateNotifier<SpyState> {
         // 找出數值不為空值的
         where((element) => element.value != null)
         // 找出有考慮的
-        .where((element) => state.considerKeyValue[element.key.title] ?? false)
+        .where((element) => state.considerKeyValue[element.key.title] ?? true)
         .map((e) => MapEntry(e.key.title, e.value!))
         .toList();
     // 加入自定義靈敏度空間
@@ -351,7 +401,16 @@ class MainNotifier extends StateNotifier<SpyState> {
               if (element.defense != null)
                 MapEntry(element.defenseKeyTitle, element.defense!),
             ]) // 找出有考慮的
-        .where((element) => state.considerKeyValue[element.key] ?? false));
+        .where((element) => state.considerKeyValue[element.key] ?? true));
+
+    // 加入自定義關鍵價
+    keyValues.addAll(state.customizeValues
+        // 找出數值不為空值的
+        .where((element) => element.value != null)
+        // 找出有考慮的
+        .where((element) => state.considerKeyValue[element.title] ?? true)
+        .map((element) => MapEntry(element.title, element.value!)));
+
     // 用數值大小排序
     keyValues.sort(
       (a, b) {
@@ -363,7 +422,9 @@ class MainNotifier extends StateNotifier<SpyState> {
       },
     );
     // 如果現價為空，加到第一個
-    if(keyValues.indexWhere((element) => element.key == KeyValue.current.title) == -1){
+    if (keyValues
+            .indexWhere((element) => element.key == KeyValue.current.title) ==
+        -1) {
       keyValues.insert(0, MapEntry(KeyValue.current.title, -1));
     }
     return keyValues;

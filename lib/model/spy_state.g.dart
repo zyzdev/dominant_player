@@ -33,6 +33,10 @@ abstract class _$SpyStateCWProxy {
   SpyState customizeSensitivitySpaces(
       List<CustomizeSensitivitySpace> customizeSensitivitySpaces);
 
+  SpyState customizeValuesExpend(bool customizeValuesExpend);
+
+  SpyState customizeValues(List<CustomizeValue> customizeValues);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `SpyState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -52,6 +56,8 @@ abstract class _$SpyStateCWProxy {
     Map<String, bool>? considerKeyValue,
     bool? customizeSensitivitySpaceExpend,
     List<CustomizeSensitivitySpace>? customizeSensitivitySpaces,
+    bool? customizeValuesExpend,
+    List<CustomizeValue>? customizeValues,
   });
 }
 
@@ -109,6 +115,14 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
       this(customizeSensitivitySpaces: customizeSensitivitySpaces);
 
   @override
+  SpyState customizeValuesExpend(bool customizeValuesExpend) =>
+      this(customizeValuesExpend: customizeValuesExpend);
+
+  @override
+  SpyState customizeValues(List<CustomizeValue> customizeValues) =>
+      this(customizeValues: customizeValues);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `SpyState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -129,6 +143,8 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
     Object? considerKeyValue = const $CopyWithPlaceholder(),
     Object? customizeSensitivitySpaceExpend = const $CopyWithPlaceholder(),
     Object? customizeSensitivitySpaces = const $CopyWithPlaceholder(),
+    Object? customizeValuesExpend = const $CopyWithPlaceholder(),
+    Object? customizeValues = const $CopyWithPlaceholder(),
   }) {
     return SpyState(
       current: current == const $CopyWithPlaceholder()
@@ -196,6 +212,17 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
               ? _value.customizeSensitivitySpaces
               // ignore: cast_nullable_to_non_nullable
               : customizeSensitivitySpaces as List<CustomizeSensitivitySpace>,
+      customizeValuesExpend:
+          customizeValuesExpend == const $CopyWithPlaceholder() ||
+                  customizeValuesExpend == null
+              ? _value.customizeValuesExpend
+              // ignore: cast_nullable_to_non_nullable
+              : customizeValuesExpend as bool,
+      customizeValues: customizeValues == const $CopyWithPlaceholder() ||
+              customizeValues == null
+          ? _value.customizeValues
+          // ignore: cast_nullable_to_non_nullable
+          : customizeValues as List<CustomizeValue>,
     );
   }
 }
@@ -373,6 +400,66 @@ extension $CustomizeSensitivitySpaceCopyWith on CustomizeSensitivitySpace {
       _$CustomizeSensitivitySpaceCWProxyImpl(this);
 }
 
+abstract class _$CustomizeValueCWProxy {
+  CustomizeValue title(String title);
+
+  CustomizeValue value(num? value);
+
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `CustomizeValue(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  ///
+  /// Usage
+  /// ```dart
+  /// CustomizeValue(...).copyWith(id: 12, name: "My name")
+  /// ````
+  CustomizeValue call({
+    String? title,
+    num? value,
+  });
+}
+
+/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCustomizeValue.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfCustomizeValue.copyWith.fieldName(...)`
+class _$CustomizeValueCWProxyImpl implements _$CustomizeValueCWProxy {
+  const _$CustomizeValueCWProxyImpl(this._value);
+
+  final CustomizeValue _value;
+
+  @override
+  CustomizeValue title(String title) => this(title: title);
+
+  @override
+  CustomizeValue value(num? value) => this(value: value);
+
+  @override
+
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `CustomizeValue(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  ///
+  /// Usage
+  /// ```dart
+  /// CustomizeValue(...).copyWith(id: 12, name: "My name")
+  /// ````
+  CustomizeValue call({
+    Object? title = const $CopyWithPlaceholder(),
+    Object? value = const $CopyWithPlaceholder(),
+  }) {
+    return CustomizeValue(
+      title: title == const $CopyWithPlaceholder() || title == null
+          ? _value.title
+          // ignore: cast_nullable_to_non_nullable
+          : title as String,
+      value: value == const $CopyWithPlaceholder()
+          ? _value.value
+          // ignore: cast_nullable_to_non_nullable
+          : value as num?,
+    );
+  }
+}
+
+extension $CustomizeValueCopyWith on CustomizeValue {
+  /// Returns a callable class that can be used as follows: `instanceOfCustomizeValue.copyWith(...)` or like so:`instanceOfCustomizeValue.copyWith.fieldName(...)`.
+  // ignore: library_private_types_in_public_api
+  _$CustomizeValueCWProxy get copyWith => _$CustomizeValueCWProxyImpl(this);
+}
+
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
@@ -396,11 +483,17 @@ SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
       considerKeyValue: Map<String, bool>.from(json['considerKeyValue'] as Map),
       customizeSensitivitySpaceExpend:
           json['customizeSensitivitySpaceExpend'] as bool? ?? true,
-      customizeSensitivitySpaces:
-          (json['customizeSensitivitySpaces'] as List<dynamic>)
-              .map((e) =>
+      customizeSensitivitySpaces: (json['customizeSensitivitySpaces']
+                  as List<dynamic>?)
+              ?.map((e) =>
                   CustomizeSensitivitySpace.fromJson(e as Map<String, dynamic>))
-              .toList(),
+              .toList() ??
+          [],
+      customizeValuesExpend: json['customizeValuesExpend'] as bool? ?? true,
+      customizeValues: (json['customizeValues'] as List<dynamic>?)
+              ?.map((e) => CustomizeValue.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
 
 Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
@@ -417,6 +510,9 @@ Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
           instance.customizeSensitivitySpaceExpend,
       'customizeSensitivitySpaces':
           instance.customizeSensitivitySpaces.map((e) => e.toJson()).toList(),
+      'customizeValuesExpend': instance.customizeValuesExpend,
+      'customizeValues':
+          instance.customizeValues.map((e) => e.toJson()).toList(),
       'considerKeyValue': instance.considerKeyValue,
     };
 
@@ -462,3 +558,15 @@ const _$DirectionEnumMap = {
   Direction.short15: 'short15',
   Direction.short30: 'short30',
 };
+
+CustomizeValue _$CustomizeValueFromJson(Map<String, dynamic> json) =>
+    CustomizeValue(
+      title: json['title'] as String? ?? '自定義關鍵價',
+      value: json['value'] as num?,
+    );
+
+Map<String, dynamic> _$CustomizeValueToJson(CustomizeValue instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'value': instance.value,
+    };
