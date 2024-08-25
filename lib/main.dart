@@ -38,21 +38,26 @@ class _MyAppState extends ConsumerState {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('絕對主力邏輯計算器'),
+        title: Text(
+          '絕對主力邏輯計算器',
+          style: TextStyle(color: Colors.grey.shade300),
+        ),
         backgroundColor: const Color(0xff4d2bab),
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical, // 垂直滾動
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal, //
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _spy,
-              _sensitivitySpace,
-              _keyValueList,
-            ],
-          ),
+          child: _mainNotifier.inited
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _spy,
+                    _sensitivitySpace,
+                    _keyValueList,
+                  ],
+                )
+              : const SizedBox(),
         ),
       ),
     );
@@ -60,15 +65,108 @@ class _MyAppState extends ConsumerState {
 
   Widget get _spy {
     // 計算數值最大寬度
-    double valueMaxWidth = _mainNotifier.spyValues.map((e) => e.value).fold(
-          infoW,
-          (previousValue, element) {
-            double width = textSize(element.toString(), titleST).width;
-            if (previousValue < width) return width;
-            return previousValue;
-          },
-        ) +
-        16;
+    double valueMaxWidth =
+        _mainNotifier.spyValues(_state.daySpy).map((e) => e.value).fold(
+              infoW,
+              (previousValue, element) {
+                double width = textSize(element.toString(), titleST).width;
+                if (previousValue < width) return width;
+                return previousValue;
+              },
+            ) +
+            16;
+
+    Widget spyWidget(Spy spy) {
+      final spyValues = _mainNotifier.spyValues(spy);
+
+      List<Widget> values = spyValues.map((e) {
+        return Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                if (e.key == KeyValue.range || e.key == KeyValue.rangeDiv4) {
+                  return;
+                }
+                String title = '${spy.isDay ? '日' : '夜'}盤${e.key.title}';
+                _mainNotifier.considerKeyValue(
+                    title, !(_state.considerKeyValue[title] ?? false));
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    color: e.key == KeyValue.high ||
+                            e.key == KeyValue.low ||
+                            e.key == KeyValue.range ||
+                            e.key == KeyValue.rangeDiv4
+                        ? Colors.white
+                        : e.key.bg,
+                    border: e == spyValues.last
+                        ? Border.all(color: Colors.grey.shade300, width: 1)
+                        : Border(
+                            top: BorderSide(
+                                color: Colors.grey.shade300, width: 1),
+                            left: BorderSide(
+                                color: Colors.grey.shade300, width: 1),
+                            right: BorderSide(
+                                color: Colors.grey.shade300, width: 1),
+                          )),
+                child: Stack(
+                  children: [
+                    if (e.key != KeyValue.range && e.key != KeyValue.rangeDiv4)
+                      Positioned(
+                          top: 0,
+                          bottom: 0,
+                          left: 0,
+                          child: _checkbox(
+                              '${spy.isDay ? '日' : '夜'}盤${e.key.title}')),
+                    Row(
+                      children: [
+                        const SizedBox(width: 16),
+                        title(e.key.title,
+                            color:
+                                e.key == KeyValue.high || e.key == KeyValue.low
+                                    ? e.key.bg
+                                    : null,
+                            line: false)
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+            e.key == KeyValue.high || e.key == KeyValue.low
+                ? textField(
+                    width: valueMaxWidth,
+                    init: e.value,
+                    onChanged: (value) {
+                      if (e.key == KeyValue.high) {
+                        _mainNotifier.setSpyHigh(spy, value);
+                      } else if (e.key == KeyValue.low) {
+                        _mainNotifier.setSpyLow(spy, value);
+                      }
+                    },
+                  )
+                : info(
+                    e.value,
+                    width: valueMaxWidth,
+                    leftLine: false,
+                    rightLine: false,
+                    topLine: false,
+                  ),
+          ],
+        );
+      }).toList();
+      return Column(
+        children: [
+          Container(
+            width: titleW + valueMaxWidth + 16,
+            color: Colors.yellow,
+            child: title(spy.isDay ? '日盤' : '夜盤', line: false),
+          ),
+          ...values,
+        ],
+      );
+    }
+
     Widget content = Column(
       children: [
         title('SPY', line: false),
@@ -105,87 +203,11 @@ class _MyAppState extends ConsumerState {
                       ],
                     ),
                   ),
-                  info(_state.today, width: valueMaxWidth),
+                  info(_state.spyDate, width: valueMaxWidth),
                 ],
               ),
-              ..._mainNotifier.spyValues.map((e) {
-                return Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        if (e.key == KeyValue.range ||
-                            e.key == KeyValue.rangeDiv4) return;
-
-                        _mainNotifier.considerKeyValue(e.key.title,
-                            !(_state.considerKeyValue[e.key.title] ?? false));
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: e.key == KeyValue.high ||
-                                    e.key == KeyValue.low ||
-                                    e.key == KeyValue.range ||
-                                    e.key == KeyValue.rangeDiv4
-                                ? Colors.white
-                                : e.key.bg,
-                            border: e == _mainNotifier.spyValues.last
-                                ? Border.all(
-                                    color: Colors.grey.shade300, width: 1)
-                                : Border(
-                                    top: BorderSide(
-                                        color: Colors.grey.shade300, width: 1),
-                                    left: BorderSide(
-                                        color: Colors.grey.shade300, width: 1),
-                                    right: BorderSide(
-                                        color: Colors.grey.shade300, width: 1),
-                                  )),
-                        child: Stack(
-                          children: [
-                            if (e.key != KeyValue.range &&
-                                e.key != KeyValue.rangeDiv4)
-                              Positioned(
-                                  top: 0,
-                                  bottom: 0,
-                                  left: 0,
-                                  child: _checkbox(e.key.title)),
-                            Row(
-                              children: [
-                                const SizedBox(width: 16),
-                                title(e.key.title,
-                                    color: e.key == KeyValue.high ||
-                                            e.key == KeyValue.low
-                                        ? e.key.bg
-                                        : null,
-                                    line: false)
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    e.key == KeyValue.current ||
-                            e.key == KeyValue.high ||
-                            e.key == KeyValue.low
-                        ? textField(
-                            width: valueMaxWidth,
-                            init: e.value,
-                            onChanged: (value) {
-                              if (e.key == KeyValue.high) {
-                                _mainNotifier.high = value;
-                              } else if (e.key == KeyValue.low) {
-                                _mainNotifier.low = value;
-                              }
-                            },
-                          )
-                        : info(
-                            e.value,
-                            width: valueMaxWidth,
-                            leftLine: false,
-                            rightLine: false,
-                            topLine: false,
-                          ),
-                  ],
-                );
-              })
+              spyWidget(_state.daySpy),
+              spyWidget(_state.nightSpy),
             ],
           ),
         )
@@ -1349,7 +1371,6 @@ class _MyAppState extends ConsumerState {
       alignment: Alignment.bottomCenter,
       child: TextFormField(
         initialValue: init?.toString(),
-        //controller: controller,
         textAlign: TextAlign.center,
         keyboardType: keyboardType,
         style: infoST,

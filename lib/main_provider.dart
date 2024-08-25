@@ -17,11 +17,16 @@ class MainNotifier extends StateNotifier<SpyState> {
       _prefs = value;
 
       String? json = _prefs.getString(_statsKey);
+      inited = true;
       if (json != null) {
         state = SpyState.fromJson(jsonDecode(json));
+      } else {
+        state = SpyState.init();
       }
     });
   }
+
+  bool inited = false;
 
   static const String _statsKey = 'stats_key';
   late final SharedPreferences _prefs;
@@ -38,14 +43,22 @@ class MainNotifier extends StateNotifier<SpyState> {
     });
   }
 
-  /// 設定前盤高點
-  set high(String value) {
-    state = state.copyWith(high: int.tryParse(value));
+  /// 設定Spy高點
+  void setSpyHigh(Spy spy, String value) {
+    if (spy.isDay) {
+      state = state.copyWith(daySpy: spy.copyWith(high: int.tryParse(value)));
+    } else {
+      state = state.copyWith(nightSpy: spy.copyWith(high: int.tryParse(value)));
+    }
   }
 
-  /// 設定前盤低點
-  set low(String value) {
-    state = state.copyWith(low: int.tryParse(value));
+  /// 設定Spy低點
+  void setSpyLow(Spy spy, String value) {
+    if (spy.isDay) {
+      state = state.copyWith(daySpy: spy.copyWith(low: int.tryParse(value)));
+    } else {
+      state = state.copyWith(nightSpy: spy.copyWith(low: int.tryParse(value)));
+    }
   }
 
   /// 日盤靈敏度空間，是否展開
@@ -218,7 +231,8 @@ class MainNotifier extends StateNotifier<SpyState> {
     state = state.copyWith(customizeSensitivitySpaces: data);
   }
 
-  void addCustomizeSensitivitySpace([Direction direction = Direction.customizeLong]) {
+  void addCustomizeSensitivitySpace(
+      [Direction direction = Direction.customizeLong]) {
     String defTitle = Direction.customizeLong.typeName;
     String title = defTitle;
     int cnt = 0;
@@ -228,8 +242,7 @@ class MainNotifier extends StateNotifier<SpyState> {
       title = '$defTitle$cnt';
     }
     final data = state.customizeSensitivitySpaces;
-    data.add(CustomizeSensitivitySpace(
-        title: title, direction: direction));
+    data.add(CustomizeSensitivitySpace(title: title, direction: direction));
     state = state.copyWith(customizeSensitivitySpaces: data);
   }
 
@@ -302,21 +315,21 @@ class MainNotifier extends StateNotifier<SpyState> {
     return allTitle.indexWhere((element) => element == title) != -1;
   }
 
-  List<MapEntry<KeyValue, num?>> get spyValues {
+  List<MapEntry<KeyValue, num?>> spyValues(Spy spy) {
     List<MapEntry<KeyValue, num?>> keyValues = [
-      MapEntry(KeyValue.high, state.high),
-      MapEntry(KeyValue.low, state.low),
-      MapEntry(KeyValue.range, state.range),
-      MapEntry(KeyValue.rangeDiv4, state.rangeDiv4),
-      MapEntry(KeyValue.highCost, state.highCost),
-      MapEntry(KeyValue.middleCost, state.middleCost),
-      MapEntry(KeyValue.lowCost, state.lowCost),
-      MapEntry(KeyValue.superPress, state.superPress),
-      MapEntry(KeyValue.absolutePress, state.absolutePress),
-      MapEntry(KeyValue.nestPress, state.nestPress),
-      MapEntry(KeyValue.nestSupport, state.nestSupport),
-      MapEntry(KeyValue.absoluteSupport, state.absoluteSupport),
-      MapEntry(KeyValue.superSupport, state.superSupport),
+      MapEntry(KeyValue.high, spy.high),
+      MapEntry(KeyValue.low, spy.low),
+      MapEntry(KeyValue.range, spy.range),
+      MapEntry(KeyValue.rangeDiv4, spy.rangeDiv4),
+      MapEntry(KeyValue.highCost, spy.highCost),
+      MapEntry(KeyValue.middleCost, spy.middleCost),
+      MapEntry(KeyValue.lowCost, spy.lowCost),
+      MapEntry(KeyValue.superPress, spy.superPress),
+      MapEntry(KeyValue.absolutePress, spy.absolutePress),
+      MapEntry(KeyValue.nestPress, spy.nestPress),
+      MapEntry(KeyValue.nestSupport, spy.nestSupport),
+      MapEntry(KeyValue.absoluteSupport, spy.absoluteSupport),
+      MapEntry(KeyValue.superSupport, spy.superSupport),
     ];
     return keyValues;
   }
@@ -324,17 +337,6 @@ class MainNotifier extends StateNotifier<SpyState> {
   List<MapEntry<String, num>> get keyValues {
     List<MapEntry<String, num>> keyValues = [
       MapEntry(KeyValue.current, state.current),
-      MapEntry(KeyValue.high, state.high),
-      MapEntry(KeyValue.low, state.low),
-      MapEntry(KeyValue.highCost, state.highCost),
-      MapEntry(KeyValue.middleCost, state.middleCost),
-      MapEntry(KeyValue.lowCost, state.lowCost),
-      MapEntry(KeyValue.superPress, state.superPress),
-      MapEntry(KeyValue.absolutePress, state.absolutePress),
-      MapEntry(KeyValue.nestPress, state.nestPress),
-      MapEntry(KeyValue.nestSupport, state.nestSupport),
-      MapEntry(KeyValue.absoluteSupport, state.absoluteSupport),
-      MapEntry(KeyValue.superSupport, state.superSupport),
       MapEntry(
           KeyValue.dayLongAttack15, state.daySensitivitySpace15.longAttack),
       MapEntry(
@@ -384,13 +386,31 @@ class MainNotifier extends StateNotifier<SpyState> {
       MapEntry(KeyValue.nightShortDefense30,
           state.nightSensitivitySpace30.shortDefense),
     ]
-        .
         // 找出數值不為空值的
-        where((element) => element.value != null)
+        .where((element) => element.value != null)
         // 找出有考慮的
         .where((element) => state.considerKeyValue[element.key.title] ?? true)
         .map((e) => MapEntry(e.key.title, e.value!))
         .toList();
+    // 加入Spy
+    keyValues.addAll(
+      [state.daySpy, state.nightSpy]
+          .expand((spy) {
+            // 標題加入日夜盤
+            return spyValues(spy)
+                // 移除點差和點差/4
+                .where((element) =>
+                    element.key != KeyValue.range &&
+                    element.key != KeyValue.rangeDiv4)
+                .map((e) => MapEntry(
+                    '${spy.isDay ? '日' : '夜'}盤${e.key.title}', e.value));
+          })
+          // 找出數值不為空值的
+          .where((element) => element.value != null)
+          // 找出有考慮的
+          .where((element) => state.considerKeyValue[element.key] ?? true)
+          .map((e) => MapEntry(e.key, e.value!)),
+    );
     // 加入自定義靈敏度空間
     keyValues.addAll(state.customizeSensitivitySpaces
         .expand((element) => [
