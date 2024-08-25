@@ -13,6 +13,9 @@ abstract class _$SpyStateCWProxy {
 
   SpyState nightSpy(Spy nightSpy);
 
+  SpyState sensitivitySpaceWidgetIndex(
+      List<SensitivitySpaceType> sensitivitySpaceWidgetIndex);
+
   SpyState daySensitivitySpaceExpend(bool daySensitivitySpaceExpend);
 
   SpyState daySensitivitySpace15(SensitivitySpace daySensitivitySpace15);
@@ -47,6 +50,7 @@ abstract class _$SpyStateCWProxy {
     int? current,
     Spy? daySpy,
     Spy? nightSpy,
+    List<SensitivitySpaceType>? sensitivitySpaceWidgetIndex,
     bool? daySensitivitySpaceExpend,
     SensitivitySpace? daySensitivitySpace15,
     SensitivitySpace? daySensitivitySpace30,
@@ -75,6 +79,11 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
 
   @override
   SpyState nightSpy(Spy nightSpy) => this(nightSpy: nightSpy);
+
+  @override
+  SpyState sensitivitySpaceWidgetIndex(
+          List<SensitivitySpaceType> sensitivitySpaceWidgetIndex) =>
+      this(sensitivitySpaceWidgetIndex: sensitivitySpaceWidgetIndex);
 
   @override
   SpyState daySensitivitySpaceExpend(bool daySensitivitySpaceExpend) =>
@@ -134,6 +143,7 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
     Object? current = const $CopyWithPlaceholder(),
     Object? daySpy = const $CopyWithPlaceholder(),
     Object? nightSpy = const $CopyWithPlaceholder(),
+    Object? sensitivitySpaceWidgetIndex = const $CopyWithPlaceholder(),
     Object? daySensitivitySpaceExpend = const $CopyWithPlaceholder(),
     Object? daySensitivitySpace15 = const $CopyWithPlaceholder(),
     Object? daySensitivitySpace30 = const $CopyWithPlaceholder(),
@@ -159,6 +169,12 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
           ? _value.nightSpy
           // ignore: cast_nullable_to_non_nullable
           : nightSpy as Spy,
+      sensitivitySpaceWidgetIndex:
+          sensitivitySpaceWidgetIndex == const $CopyWithPlaceholder() ||
+                  sensitivitySpaceWidgetIndex == null
+              ? _value.sensitivitySpaceWidgetIndex
+              // ignore: cast_nullable_to_non_nullable
+              : sensitivitySpaceWidgetIndex as List<SensitivitySpaceType>,
       daySensitivitySpaceExpend:
           daySensitivitySpaceExpend == const $CopyWithPlaceholder() ||
                   daySensitivitySpaceExpend == null
@@ -539,6 +555,11 @@ SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
       current: (json['current'] as num?)?.toInt(),
       daySpy: Spy.fromJson(json['daySpy'] as Map<String, dynamic>),
       nightSpy: Spy.fromJson(json['nightSpy'] as Map<String, dynamic>),
+      sensitivitySpaceWidgetIndex:
+          (json['sensitivitySpaceWidgetIndex'] as List<dynamic>?)
+                  ?.map((e) => $enumDecode(_$SensitivitySpaceTypeEnumMap, e))
+                  .toList() ??
+              SensitivitySpaceType.values,
       daySensitivitySpaceExpend:
           json['daySensitivitySpaceExpend'] as bool? ?? true,
       daySensitivitySpace15: SensitivitySpace.fromJson(
@@ -571,6 +592,9 @@ Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
       'current': instance.current,
       'daySpy': instance.daySpy.toJson(),
       'nightSpy': instance.nightSpy.toJson(),
+      'sensitivitySpaceWidgetIndex': instance.sensitivitySpaceWidgetIndex
+          .map((e) => _$SensitivitySpaceTypeEnumMap[e]!)
+          .toList(),
       'daySensitivitySpaceExpend': instance.daySensitivitySpaceExpend,
       'daySensitivitySpace15': instance.daySensitivitySpace15.toJson(),
       'daySensitivitySpace30': instance.daySensitivitySpace30.toJson(),
@@ -586,6 +610,13 @@ Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
           instance.customizeValues.map((e) => e.toJson()).toList(),
       'considerKeyValue': instance.considerKeyValue,
     };
+
+const _$SensitivitySpaceTypeEnumMap = {
+  SensitivitySpaceType.day: 'day',
+  SensitivitySpaceType.night: 'night',
+  SensitivitySpaceType.customize: 'customize',
+  SensitivitySpaceType.value: 'value',
+};
 
 Spy _$SpyFromJson(Map<String, dynamic> json) => Spy(
       isDay: json['isDay'] as bool,

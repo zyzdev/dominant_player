@@ -61,6 +61,14 @@ class MainNotifier extends StateNotifier<SpyState> {
     }
   }
 
+  void exchangeSensitivitySpaceWidgetIndex(int oldIndex, int newIndex) {
+    final SensitivitySpaceType item =
+        state.sensitivitySpaceWidgetIndex.removeAt(oldIndex);
+    state.sensitivitySpaceWidgetIndex.insert(newIndex, item);
+    state = state.copyWith(
+        sensitivitySpaceWidgetIndex: state.sensitivitySpaceWidgetIndex);
+  }
+
   /// 日盤靈敏度空間，是否展開
   void daySensitivitySpaceExpend(bool expend) {
     state = state.copyWith(daySensitivitySpaceExpend: expend);

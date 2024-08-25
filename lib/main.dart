@@ -5,6 +5,7 @@ import 'package:dominant_player/model/spy_state.dart';
 import 'package:dominant_player/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reorderables/reorderables.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'model/key_value.dart';
 
@@ -244,14 +245,13 @@ class _MyAppState extends ConsumerState {
     return ValueListenableBuilder(
       valueListenable: _sensitivitySpaceWidth,
       builder: (context, width, child) {
-        Widget content = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _daySensitivitySpace(maxTitleWidth),
-            _nightSensitivitySpace(maxTitleWidth),
-            _customizeSensitivitySpace(maxTitleWidth),
-            _customizeValues(maxTitleWidth),
-          ],
+        Widget content = ReorderableWrap(
+          scrollPhysics: const NeverScrollableScrollPhysics(),
+          direction: Axis.vertical,
+          onReorder: _mainNotifier.exchangeSensitivitySpaceWidgetIndex,
+          children: _state.sensitivitySpaceWidgetIndex
+              .map((e) => _sensitivitySpaceWidget(e, maxTitleWidth))
+              .toList(),
         );
 
         if (width == 0) {
@@ -270,6 +270,30 @@ class _MyAppState extends ConsumerState {
         );
       },
     );
+  }
+
+  Widget _sensitivitySpaceWidget(
+      SensitivitySpaceType sensitivitySpaceType, double titleW) {
+    Widget content;
+    switch (sensitivitySpaceType) {
+      case SensitivitySpaceType.day:
+        content = _daySensitivitySpace(titleW);
+        break;
+      case SensitivitySpaceType.night:
+        content = _nightSensitivitySpace(titleW);
+        break;
+      case SensitivitySpaceType.customize:
+        content = _customizeSensitivitySpace(titleW);
+        break;
+      case SensitivitySpaceType.value:
+        content = _customizeValues(titleW);
+        break;
+    }
+    content = SizedBox(
+      key: ValueKey(sensitivitySpaceType),
+      child: content,
+    );
+    return content;
   }
 
   Widget _daySensitivitySpace(double titleW) {
@@ -347,6 +371,14 @@ class _MyAppState extends ConsumerState {
           SizedBox(width: _sensitivitySpaceWidth.value),
           content,
           Positioned(
+            left: 0,
+            top: 0,
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.drag_handle),
+            ),
+          ),
+          Positioned(
             right: 0,
             top: 0,
             child: IconButton(
@@ -354,7 +386,7 @@ class _MyAppState extends ConsumerState {
                 _mainNotifier.daySensitivitySpaceExpend(
                     !_state.daySensitivitySpaceExpend);
               },
-              icon: Icon(_state.daySensitivitySpaceExpend
+              icon: Icon(!_state.daySensitivitySpaceExpend
                   ? Icons.arrow_drop_down
                   : Icons.arrow_drop_up),
             ),
@@ -444,6 +476,14 @@ class _MyAppState extends ConsumerState {
           SizedBox(width: _sensitivitySpaceWidth.value),
           content,
           Positioned(
+            left: 0,
+            top: 0,
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.drag_handle),
+            ),
+          ),
+          Positioned(
             right: 0,
             top: 0,
             child: IconButton(
@@ -451,7 +491,7 @@ class _MyAppState extends ConsumerState {
                 _mainNotifier.nightSensitivitySpaceExpend(
                     !_state.nightSensitivitySpaceExpend);
               },
-              icon: Icon(_state.nightSensitivitySpaceExpend
+              icon: Icon(!_state.nightSensitivitySpaceExpend
                   ? Icons.arrow_drop_down
                   : Icons.arrow_drop_up),
             ),
@@ -551,6 +591,14 @@ class _MyAppState extends ConsumerState {
           SizedBox(width: _sensitivitySpaceWidth.value),
           content,
           Positioned(
+            left: 0,
+            top: 0,
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.drag_handle),
+            ),
+          ),
+          Positioned(
             right: 0,
             top: 0,
             child: IconButton(
@@ -558,7 +606,7 @@ class _MyAppState extends ConsumerState {
                 _mainNotifier.customizeSensitivitySpaceExpend(
                     !_state.customizeSensitivitySpaceExpend);
               },
-              icon: Icon(_state.customizeSensitivitySpaceExpend
+              icon: Icon(!_state.customizeSensitivitySpaceExpend
                   ? Icons.arrow_drop_down
                   : Icons.arrow_drop_up),
             ),
@@ -681,6 +729,14 @@ class _MyAppState extends ConsumerState {
           SizedBox(width: _sensitivitySpaceWidth.value),
           content,
           Positioned(
+            left: 0,
+            top: 0,
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.drag_handle),
+            ),
+          ),
+          Positioned(
             right: 0,
             top: 0,
             child: IconButton(
@@ -688,7 +744,7 @@ class _MyAppState extends ConsumerState {
                 _mainNotifier
                     .customizeValueExpend(!_state.customizeValuesExpend);
               },
-              icon: Icon(_state.customizeValuesExpend
+              icon: Icon(!_state.customizeValuesExpend
                   ? Icons.arrow_drop_down
                   : Icons.arrow_drop_up),
             ),

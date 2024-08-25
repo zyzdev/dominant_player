@@ -37,6 +37,7 @@ dependencies:
   shared_preferences:
   json_annotation:
   toggle_switch:
+  reorderables:
 
 dev_dependencies:
   flutter_test:

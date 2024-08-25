@@ -25,6 +25,7 @@ class SpyState {
     this.current,
     required this.daySpy,
     required this.nightSpy,
+    this.sensitivitySpaceWidgetIndex = SensitivitySpaceType.values,
     this.daySensitivitySpaceExpend = true,
     required this.daySensitivitySpace15,
     required this.daySensitivitySpace30,
@@ -82,6 +83,9 @@ class SpyState {
 
   /// 夜盤SPY
   Spy nightSpy;
+
+  /// 靈敏度空間排序
+  List<SensitivitySpaceType> sensitivitySpaceWidgetIndex;
 
   /// 日盤靈敏度空間
   /// 是否展開
@@ -238,6 +242,11 @@ class SensitivitySpace {
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$SensitivitySpaceToJson(this);
+}
+
+
+enum SensitivitySpaceType {
+  day, night, customize, value
 }
 
 @JsonSerializable(explicitToJson: true)
