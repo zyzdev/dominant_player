@@ -26,12 +26,59 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _MyAppState();
 }
 
-class _MyAppState extends ConsumerState {
+class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   SpyState get _state => ref.read(mainProvider);
 
   MainNotifier get _mainNotifier => ref.read(mainProvider.notifier);
 
   final ValueNotifier<double> _sensitivitySpaceWidth = ValueNotifier(0);
+
+  late final AnimationController _spyAnimationController = AnimationController(
+    value: _state.spyExpand ? 1 : 0,
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+  late final ReverseAnimation _spyExpandAnimation =
+      ReverseAnimation(_spyCollapseAnimation);
+  late final Animation<double> _spyCollapseAnimation = CurvedAnimation(
+    parent: _spyAnimationController,
+    curve: Curves.fastEaseInToSlowEaseOut,
+  );
+
+  late final AnimationController _sensitivitySpaceAnimationController =
+      AnimationController(
+    value: _state.sensitivitySpaceExpand ? 1 : 0,
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+  late final ReverseAnimation _sensitivitySpaceExpandAnimation =
+      ReverseAnimation(_sensitivitySpaceCollapseAnimation);
+  late final Animation<double> _sensitivitySpaceCollapseAnimation =
+      CurvedAnimation(
+    parent: _sensitivitySpaceAnimationController,
+    curve: Curves.fastEaseInToSlowEaseOut,
+  );
+
+  late final AnimationController _keyValuesAnimationController =
+      AnimationController(
+        value: _state.keyValuesExpand ? 1 : 0,
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+  late final ReverseAnimation _keyValuesExpandAnimation =
+      ReverseAnimation(_keyValuesAnimationController);
+  late final Animation<double> _keyValuesCollapseAnimation = CurvedAnimation(
+    parent: _keyValuesAnimationController,
+    curve: Curves.fastEaseInToSlowEaseOut,
+  );
+
+  @override
+  void dispose() {
+    _spyAnimationController.dispose();
+    _sensitivitySpaceAnimationController.dispose();
+    _keyValuesAnimationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,14 +100,111 @@ class _MyAppState extends ConsumerState {
             key: Key(
                 '_mainNotifier.initialization:${_mainNotifier.initialization}'),
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _spy,
-              _sensitivitySpace,
-              _keyValueList,
-            ],
+            children: _mainNotifier.initialization
+                ? [
+                    _collectedList,
+                    _spy,
+                    _sensitivitySpace,
+                    _keyValueList,
+                  ]
+                : [],
           ),
         ),
       ),
+    );
+  }
+
+  Widget get _collectedList {
+    Widget verticalText(String text, onPressed) {
+      Widget content = Column(
+        children: text.runes
+            .toList()
+            .map((e) => Text(
+                  String.fromCharCode(e),
+                  style: titleST,
+                ))
+            .toList(),
+      );
+      content = Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 16),
+            child: content,
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: IconButton(
+              onPressed: onPressed,
+              icon: const RotatedBox(
+                quarterTurns: 1,
+                child: Icon(Icons.expand),
+              ),
+            ),
+          )
+        ],
+      );
+      return GestureDetector(
+        onTap: onPressed,
+        child: SizedBox(
+          width: 48,
+          child: Center(
+            child: content,
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        SizeTransition(
+          sizeFactor: _spyExpandAnimation,
+          axis: Axis.vertical,
+          child: SizeTransition(
+            sizeFactor: _spyExpandAnimation,
+            axis: Axis.horizontal,
+            child: ColoredBox(
+              color: Colors.lightGreen.shade300,
+              child: verticalText('SPY', () {
+                _mainNotifier.spyExpand(!_state.spyExpand);
+                _spyAnimationController.forward();
+              }),
+            ),
+          ),
+        ),
+        SizeTransition(
+          sizeFactor: _sensitivitySpaceExpandAnimation,
+          axis: Axis.vertical,
+          child: SizeTransition(
+            sizeFactor: _sensitivitySpaceExpandAnimation,
+            axis: Axis.horizontal,
+            child: ColoredBox(
+              color: Colors.purple.shade300,
+              child: verticalText('靈敏度空間', () {
+                _mainNotifier
+                    .sensitivitySpaceExpand(!_state.sensitivitySpaceExpand);
+                _sensitivitySpaceAnimationController.forward();
+              }),
+            ),
+          ),
+        ),
+        SizeTransition(
+          sizeFactor: _keyValuesExpandAnimation,
+          axis: Axis.vertical,
+          child: SizeTransition(
+            sizeFactor: _keyValuesExpandAnimation,
+            axis: Axis.horizontal,
+            child: ColoredBox(
+              color: Colors.lightBlueAccent.shade100,
+              child: verticalText('關鍵價位列表', () {
+                _mainNotifier.keyValuesExpand(!_state.keyValuesExpand);
+                _keyValuesAnimationController.forward();
+              }),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -214,14 +358,33 @@ class _MyAppState extends ConsumerState {
         )
       ],
     );
-    return ColoredBox(
-      color: Colors.lightGreen,
+    content = Stack(
+      children: [
+        content,
+        Positioned(
+          right: 0,
+          top: 0,
+          child: IconButton(
+            onPressed: () {
+              _mainNotifier.spyExpand(!_state.spyExpand);
+              _spyAnimationController.reverse();
+            },
+            icon:
+                const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
+          ),
+        )
+      ],
+    );
+    content = ColoredBox(color: Colors.lightGreen.shade300, child: content);
+    return SizeTransition(
+      sizeFactor: _spyCollapseAnimation,
+      axis: Axis.horizontal,
       child: content,
     );
   }
 
   Widget get _sensitivitySpace {
-    return ValueListenableBuilder(
+    Widget content = ValueListenableBuilder(
       valueListenable: _sensitivitySpaceWidth,
       builder: (context, width, child) {
         Widget content = ReorderableWrap(
@@ -248,6 +411,37 @@ class _MyAppState extends ConsumerState {
           child: content,
         );
       },
+    );
+
+    content = Column(
+      children: [title('靈敏度空間', line: false), content],
+    );
+    content = ColoredBox(
+      color: Colors.purple.shade300,
+      child: Stack(
+        children: [
+          content,
+          Positioned(
+            right: 0,
+            top: 0,
+            child: IconButton(
+              onPressed: () {
+                _mainNotifier
+                    .sensitivitySpaceExpand(!_state.sensitivitySpaceExpand);
+                _sensitivitySpaceAnimationController.reverse();
+              },
+              icon: const RotatedBox(
+                  quarterTurns: 1, child: Icon(Icons.compress)),
+            ),
+          )
+        ],
+      ),
+    );
+
+    return SizeTransition(
+      sizeFactor: _sensitivitySpaceCollapseAnimation,
+      axis: Axis.horizontal,
+      child: content,
     );
   }
 
@@ -279,7 +473,7 @@ class _MyAppState extends ConsumerState {
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
       child: SizedBox(
-        height: _state.daySensitivitySpaceExpend ? null : 0,
+        height: _state.daySensitivitySpaceExpand ? null : 0,
         child: Column(
           children: [
             sensitivitySpace(
@@ -357,10 +551,10 @@ class _MyAppState extends ConsumerState {
             top: 0,
             child: IconButton(
               onPressed: () {
-                _mainNotifier.daySensitivitySpaceExpend(
-                    !_state.daySensitivitySpaceExpend);
+                _mainNotifier.daySensitivitySpaceExpand(
+                    !_state.daySensitivitySpaceExpand);
               },
-              icon: Icon(!_state.daySensitivitySpaceExpend
+              icon: Icon(!_state.daySensitivitySpaceExpand
                   ? Icons.arrow_drop_down
                   : Icons.arrow_drop_up),
             ),
@@ -375,7 +569,7 @@ class _MyAppState extends ConsumerState {
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
       child: SizedBox(
-        height: _state.nightSensitivitySpaceExpend ? null : 0,
+        height: _state.nightSensitivitySpaceExpand ? null : 0,
         child: Column(
           children: [
             sensitivitySpace(
@@ -458,10 +652,10 @@ class _MyAppState extends ConsumerState {
             top: 0,
             child: IconButton(
               onPressed: () {
-                _mainNotifier.nightSensitivitySpaceExpend(
-                    !_state.nightSensitivitySpaceExpend);
+                _mainNotifier.nightSensitivitySpaceExpand(
+                    !_state.nightSensitivitySpaceExpand);
               },
-              icon: Icon(!_state.nightSensitivitySpaceExpend
+              icon: Icon(!_state.nightSensitivitySpaceExpand
                   ? Icons.arrow_drop_down
                   : Icons.arrow_drop_up),
             ),
@@ -476,7 +670,7 @@ class _MyAppState extends ConsumerState {
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
       child: SizedBox(
-        height: _state.customizeSensitivitySpaceExpend ? null : 0,
+        height: _state.customizeSensitivitySpaceExpand ? null : 0,
         child: Column(
           children: [
             SizedBox(width: _sensitivitySpaceWidth.value),
@@ -572,10 +766,10 @@ class _MyAppState extends ConsumerState {
             top: 0,
             child: IconButton(
               onPressed: () {
-                _mainNotifier.customizeSensitivitySpaceExpend(
-                    !_state.customizeSensitivitySpaceExpend);
+                _mainNotifier.customizeSensitivitySpaceExpand(
+                    !_state.customizeSensitivitySpaceExpand);
               },
-              icon: Icon(!_state.customizeSensitivitySpaceExpend
+              icon: Icon(!_state.customizeSensitivitySpaceExpand
                   ? Icons.arrow_drop_down
                   : Icons.arrow_drop_up),
             ),
@@ -590,7 +784,7 @@ class _MyAppState extends ConsumerState {
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
       child: SizedBox(
-        height: _state.customizeValuesExpend ? null : 0,
+        height: _state.customizeValuesExpand ? null : 0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -730,9 +924,9 @@ class _MyAppState extends ConsumerState {
             child: IconButton(
               onPressed: () {
                 _mainNotifier
-                    .customizeValueExpend(!_state.customizeValuesExpend);
+                    .customizeValueExpand(!_state.customizeValuesExpand);
               },
-              icon: Icon(!_state.customizeValuesExpend
+              icon: Icon(!_state.customizeValuesExpand
                   ? Icons.arrow_drop_down
                   : Icons.arrow_drop_up),
             ),
@@ -908,8 +1102,29 @@ class _MyAppState extends ConsumerState {
         ),
       ],
     );
-    return ColoredBox(
+    content = ColoredBox(
       color: Colors.lightBlueAccent.shade100,
+      child: Stack(
+        children: [
+          content,
+          Positioned(
+            right: 0,
+            top: 0,
+            child: IconButton(
+              onPressed: () {
+                _mainNotifier.keyValuesExpand(!_state.keyValuesExpand);
+                _keyValuesAnimationController.reverse();
+              },
+              icon: const RotatedBox(
+                  quarterTurns: 1, child: Icon(Icons.compress)),
+            ),
+          )
+        ],
+      ),
+    );
+    return SizeTransition(
+      sizeFactor: _keyValuesCollapseAnimation,
+      axis: Axis.horizontal,
       child: content,
     );
   }

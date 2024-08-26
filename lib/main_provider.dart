@@ -43,6 +43,21 @@ class MainNotifier extends StateNotifier<SpyState> {
     });
   }
 
+  /// Spy，是否展開
+  void spyExpand(bool expand) {
+    state = state.copyWith(spyExpand: expand);
+  }
+
+  /// 靈敏度空間，是否展開
+  void sensitivitySpaceExpand(bool expand) {
+    state = state.copyWith(sensitivitySpaceExpand: expand);
+  }
+
+  /// 關鍵價位列表，是否展開
+  void keyValuesExpand(bool expand) {
+    state = state.copyWith(keyValuesExpand: expand);
+  }
+
   /// 設定Spy高點
   void setSpyHigh(Spy spy, String value) {
     if (spy.isDay) {
@@ -70,8 +85,8 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   /// 日盤靈敏度空間，是否展開
-  void daySensitivitySpaceExpend(bool expend) {
-    state = state.copyWith(daySensitivitySpaceExpend: expend);
+  void daySensitivitySpaceExpand(bool expand) {
+    state = state.copyWith(daySensitivitySpaceExpand: expand);
   }
 
   /// 設定日盤15分最大多方邏輯高點
@@ -131,8 +146,8 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   /// 夜盤靈敏度空間，是否展開
-  void nightSensitivitySpaceExpend(bool expend) {
-    state = state.copyWith(nightSensitivitySpaceExpend: expend);
+  void nightSensitivitySpaceExpand(bool expand) {
+    state = state.copyWith(nightSensitivitySpaceExpand: expand);
   }
 
   /// 設定夜盤15分最大多方邏輯高點
@@ -199,8 +214,8 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   /// 自定義靈敏度空間，是否展開
-  void customizeSensitivitySpaceExpend(bool expend) {
-    state = state.copyWith(customizeSensitivitySpaceExpend: expend);
+  void customizeSensitivitySpaceExpand(bool expand) {
+    state = state.copyWith(customizeSensitivitySpaceExpand: expand);
   }
 
   void setCustomizeSensitivitySpaceHigh(
@@ -273,8 +288,8 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   /// 自定義關鍵價，是否展開
-  void customizeValueExpend(bool expend) {
-    state = state.copyWith(customizeValuesExpend: expend);
+  void customizeValueExpand(bool expand) {
+    state = state.copyWith(customizeValuesExpand: expand);
   }
 
   void setCustomizeValueTitle(CustomizeValue customizeValue, String title) {

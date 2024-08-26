@@ -9,6 +9,12 @@ part of 'spy_state.dart';
 abstract class _$SpyStateCWProxy {
   SpyState current(int? current);
 
+  SpyState spyExpand(bool spyExpand);
+
+  SpyState sensitivitySpaceExpand(bool sensitivitySpaceExpand);
+
+  SpyState keyValuesExpand(bool keyValuesExpand);
+
   SpyState daySpy(Spy daySpy);
 
   SpyState nightSpy(Spy nightSpy);
@@ -16,13 +22,13 @@ abstract class _$SpyStateCWProxy {
   SpyState sensitivitySpaceWidgetIndex(
       List<SensitivitySpaceType> sensitivitySpaceWidgetIndex);
 
-  SpyState daySensitivitySpaceExpend(bool daySensitivitySpaceExpend);
+  SpyState daySensitivitySpaceExpand(bool daySensitivitySpaceExpand);
 
   SpyState daySensitivitySpace15(SensitivitySpace daySensitivitySpace15);
 
   SpyState daySensitivitySpace30(SensitivitySpace daySensitivitySpace30);
 
-  SpyState nightSensitivitySpaceExpend(bool nightSensitivitySpaceExpend);
+  SpyState nightSensitivitySpaceExpand(bool nightSensitivitySpaceExpand);
 
   SpyState nightSensitivitySpace15(SensitivitySpace nightSensitivitySpace15);
 
@@ -30,13 +36,13 @@ abstract class _$SpyStateCWProxy {
 
   SpyState considerKeyValue(Map<String, bool> considerKeyValue);
 
-  SpyState customizeSensitivitySpaceExpend(
-      bool customizeSensitivitySpaceExpend);
+  SpyState customizeSensitivitySpaceExpand(
+      bool customizeSensitivitySpaceExpand);
 
   SpyState customizeSensitivitySpaces(
       List<CustomizeSensitivitySpace> customizeSensitivitySpaces);
 
-  SpyState customizeValuesExpend(bool customizeValuesExpend);
+  SpyState customizeValuesExpand(bool customizeValuesExpand);
 
   SpyState customizeValues(List<CustomizeValue> customizeValues);
 
@@ -48,19 +54,22 @@ abstract class _$SpyStateCWProxy {
   /// ````
   SpyState call({
     int? current,
+    bool? spyExpand,
+    bool? sensitivitySpaceExpand,
+    bool? keyValuesExpand,
     Spy? daySpy,
     Spy? nightSpy,
     List<SensitivitySpaceType>? sensitivitySpaceWidgetIndex,
-    bool? daySensitivitySpaceExpend,
+    bool? daySensitivitySpaceExpand,
     SensitivitySpace? daySensitivitySpace15,
     SensitivitySpace? daySensitivitySpace30,
-    bool? nightSensitivitySpaceExpend,
+    bool? nightSensitivitySpaceExpand,
     SensitivitySpace? nightSensitivitySpace15,
     SensitivitySpace? nightSensitivitySpace30,
     Map<String, bool>? considerKeyValue,
-    bool? customizeSensitivitySpaceExpend,
+    bool? customizeSensitivitySpaceExpand,
     List<CustomizeSensitivitySpace>? customizeSensitivitySpaces,
-    bool? customizeValuesExpend,
+    bool? customizeValuesExpand,
     List<CustomizeValue>? customizeValues,
   });
 }
@@ -75,6 +84,17 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
   SpyState current(int? current) => this(current: current);
 
   @override
+  SpyState spyExpand(bool spyExpand) => this(spyExpand: spyExpand);
+
+  @override
+  SpyState sensitivitySpaceExpand(bool sensitivitySpaceExpand) =>
+      this(sensitivitySpaceExpand: sensitivitySpaceExpand);
+
+  @override
+  SpyState keyValuesExpand(bool keyValuesExpand) =>
+      this(keyValuesExpand: keyValuesExpand);
+
+  @override
   SpyState daySpy(Spy daySpy) => this(daySpy: daySpy);
 
   @override
@@ -86,8 +106,8 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
       this(sensitivitySpaceWidgetIndex: sensitivitySpaceWidgetIndex);
 
   @override
-  SpyState daySensitivitySpaceExpend(bool daySensitivitySpaceExpend) =>
-      this(daySensitivitySpaceExpend: daySensitivitySpaceExpend);
+  SpyState daySensitivitySpaceExpand(bool daySensitivitySpaceExpand) =>
+      this(daySensitivitySpaceExpand: daySensitivitySpaceExpand);
 
   @override
   SpyState daySensitivitySpace15(SensitivitySpace daySensitivitySpace15) =>
@@ -98,8 +118,8 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
       this(daySensitivitySpace30: daySensitivitySpace30);
 
   @override
-  SpyState nightSensitivitySpaceExpend(bool nightSensitivitySpaceExpend) =>
-      this(nightSensitivitySpaceExpend: nightSensitivitySpaceExpend);
+  SpyState nightSensitivitySpaceExpand(bool nightSensitivitySpaceExpand) =>
+      this(nightSensitivitySpaceExpand: nightSensitivitySpaceExpand);
 
   @override
   SpyState nightSensitivitySpace15(SensitivitySpace nightSensitivitySpace15) =>
@@ -114,9 +134,9 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
       this(considerKeyValue: considerKeyValue);
 
   @override
-  SpyState customizeSensitivitySpaceExpend(
-          bool customizeSensitivitySpaceExpend) =>
-      this(customizeSensitivitySpaceExpend: customizeSensitivitySpaceExpend);
+  SpyState customizeSensitivitySpaceExpand(
+          bool customizeSensitivitySpaceExpand) =>
+      this(customizeSensitivitySpaceExpand: customizeSensitivitySpaceExpand);
 
   @override
   SpyState customizeSensitivitySpaces(
@@ -124,8 +144,8 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
       this(customizeSensitivitySpaces: customizeSensitivitySpaces);
 
   @override
-  SpyState customizeValuesExpend(bool customizeValuesExpend) =>
-      this(customizeValuesExpend: customizeValuesExpend);
+  SpyState customizeValuesExpand(bool customizeValuesExpand) =>
+      this(customizeValuesExpand: customizeValuesExpand);
 
   @override
   SpyState customizeValues(List<CustomizeValue> customizeValues) =>
@@ -141,19 +161,22 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
   /// ````
   SpyState call({
     Object? current = const $CopyWithPlaceholder(),
+    Object? spyExpand = const $CopyWithPlaceholder(),
+    Object? sensitivitySpaceExpand = const $CopyWithPlaceholder(),
+    Object? keyValuesExpand = const $CopyWithPlaceholder(),
     Object? daySpy = const $CopyWithPlaceholder(),
     Object? nightSpy = const $CopyWithPlaceholder(),
     Object? sensitivitySpaceWidgetIndex = const $CopyWithPlaceholder(),
-    Object? daySensitivitySpaceExpend = const $CopyWithPlaceholder(),
+    Object? daySensitivitySpaceExpand = const $CopyWithPlaceholder(),
     Object? daySensitivitySpace15 = const $CopyWithPlaceholder(),
     Object? daySensitivitySpace30 = const $CopyWithPlaceholder(),
-    Object? nightSensitivitySpaceExpend = const $CopyWithPlaceholder(),
+    Object? nightSensitivitySpaceExpand = const $CopyWithPlaceholder(),
     Object? nightSensitivitySpace15 = const $CopyWithPlaceholder(),
     Object? nightSensitivitySpace30 = const $CopyWithPlaceholder(),
     Object? considerKeyValue = const $CopyWithPlaceholder(),
-    Object? customizeSensitivitySpaceExpend = const $CopyWithPlaceholder(),
+    Object? customizeSensitivitySpaceExpand = const $CopyWithPlaceholder(),
     Object? customizeSensitivitySpaces = const $CopyWithPlaceholder(),
-    Object? customizeValuesExpend = const $CopyWithPlaceholder(),
+    Object? customizeValuesExpand = const $CopyWithPlaceholder(),
     Object? customizeValues = const $CopyWithPlaceholder(),
   }) {
     return SpyState(
@@ -161,6 +184,21 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
           ? _value.current
           // ignore: cast_nullable_to_non_nullable
           : current as int?,
+      spyExpand: spyExpand == const $CopyWithPlaceholder() || spyExpand == null
+          ? _value.spyExpand
+          // ignore: cast_nullable_to_non_nullable
+          : spyExpand as bool,
+      sensitivitySpaceExpand:
+          sensitivitySpaceExpand == const $CopyWithPlaceholder() ||
+                  sensitivitySpaceExpand == null
+              ? _value.sensitivitySpaceExpand
+              // ignore: cast_nullable_to_non_nullable
+              : sensitivitySpaceExpand as bool,
+      keyValuesExpand: keyValuesExpand == const $CopyWithPlaceholder() ||
+              keyValuesExpand == null
+          ? _value.keyValuesExpand
+          // ignore: cast_nullable_to_non_nullable
+          : keyValuesExpand as bool,
       daySpy: daySpy == const $CopyWithPlaceholder() || daySpy == null
           ? _value.daySpy
           // ignore: cast_nullable_to_non_nullable
@@ -175,12 +213,12 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
               ? _value.sensitivitySpaceWidgetIndex
               // ignore: cast_nullable_to_non_nullable
               : sensitivitySpaceWidgetIndex as List<SensitivitySpaceType>,
-      daySensitivitySpaceExpend:
-          daySensitivitySpaceExpend == const $CopyWithPlaceholder() ||
-                  daySensitivitySpaceExpend == null
-              ? _value.daySensitivitySpaceExpend
+      daySensitivitySpaceExpand:
+          daySensitivitySpaceExpand == const $CopyWithPlaceholder() ||
+                  daySensitivitySpaceExpand == null
+              ? _value.daySensitivitySpaceExpand
               // ignore: cast_nullable_to_non_nullable
-              : daySensitivitySpaceExpend as bool,
+              : daySensitivitySpaceExpand as bool,
       daySensitivitySpace15:
           daySensitivitySpace15 == const $CopyWithPlaceholder() ||
                   daySensitivitySpace15 == null
@@ -193,12 +231,12 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
               ? _value.daySensitivitySpace30
               // ignore: cast_nullable_to_non_nullable
               : daySensitivitySpace30 as SensitivitySpace,
-      nightSensitivitySpaceExpend:
-          nightSensitivitySpaceExpend == const $CopyWithPlaceholder() ||
-                  nightSensitivitySpaceExpend == null
-              ? _value.nightSensitivitySpaceExpend
+      nightSensitivitySpaceExpand:
+          nightSensitivitySpaceExpand == const $CopyWithPlaceholder() ||
+                  nightSensitivitySpaceExpand == null
+              ? _value.nightSensitivitySpaceExpand
               // ignore: cast_nullable_to_non_nullable
-              : nightSensitivitySpaceExpend as bool,
+              : nightSensitivitySpaceExpand as bool,
       nightSensitivitySpace15:
           nightSensitivitySpace15 == const $CopyWithPlaceholder() ||
                   nightSensitivitySpace15 == null
@@ -216,24 +254,24 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
           ? _value.considerKeyValue
           // ignore: cast_nullable_to_non_nullable
           : considerKeyValue as Map<String, bool>,
-      customizeSensitivitySpaceExpend:
-          customizeSensitivitySpaceExpend == const $CopyWithPlaceholder() ||
-                  customizeSensitivitySpaceExpend == null
-              ? _value.customizeSensitivitySpaceExpend
+      customizeSensitivitySpaceExpand:
+          customizeSensitivitySpaceExpand == const $CopyWithPlaceholder() ||
+                  customizeSensitivitySpaceExpand == null
+              ? _value.customizeSensitivitySpaceExpand
               // ignore: cast_nullable_to_non_nullable
-              : customizeSensitivitySpaceExpend as bool,
+              : customizeSensitivitySpaceExpand as bool,
       customizeSensitivitySpaces:
           customizeSensitivitySpaces == const $CopyWithPlaceholder() ||
                   customizeSensitivitySpaces == null
               ? _value.customizeSensitivitySpaces
               // ignore: cast_nullable_to_non_nullable
               : customizeSensitivitySpaces as List<CustomizeSensitivitySpace>,
-      customizeValuesExpend:
-          customizeValuesExpend == const $CopyWithPlaceholder() ||
-                  customizeValuesExpend == null
-              ? _value.customizeValuesExpend
+      customizeValuesExpand:
+          customizeValuesExpand == const $CopyWithPlaceholder() ||
+                  customizeValuesExpand == null
+              ? _value.customizeValuesExpand
               // ignore: cast_nullable_to_non_nullable
-              : customizeValuesExpend as bool,
+              : customizeValuesExpand as bool,
       customizeValues: customizeValues == const $CopyWithPlaceholder() ||
               customizeValues == null
           ? _value.customizeValues
@@ -553,6 +591,9 @@ extension $CustomizeValueCopyWith on CustomizeValue {
 
 SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
       current: (json['current'] as num?)?.toInt(),
+      spyExpand: json['spyExpand'] as bool? ?? true,
+      sensitivitySpaceExpand: json['sensitivitySpaceExpand'] as bool? ?? true,
+      keyValuesExpand: json['keyValuesExpand'] as bool? ?? true,
       daySpy: Spy.fromJson(json['daySpy'] as Map<String, dynamic>),
       nightSpy: Spy.fromJson(json['nightSpy'] as Map<String, dynamic>),
       sensitivitySpaceWidgetIndex:
@@ -560,28 +601,28 @@ SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
                   ?.map((e) => $enumDecode(_$SensitivitySpaceTypeEnumMap, e))
                   .toList() ??
               SensitivitySpaceType.values,
-      daySensitivitySpaceExpend:
-          json['daySensitivitySpaceExpend'] as bool? ?? true,
+      daySensitivitySpaceExpand:
+          json['daySensitivitySpaceExpand'] as bool? ?? true,
       daySensitivitySpace15: SensitivitySpace.fromJson(
           json['daySensitivitySpace15'] as Map<String, dynamic>),
       daySensitivitySpace30: SensitivitySpace.fromJson(
           json['daySensitivitySpace30'] as Map<String, dynamic>),
-      nightSensitivitySpaceExpend:
-          json['nightSensitivitySpaceExpend'] as bool? ?? true,
+      nightSensitivitySpaceExpand:
+          json['nightSensitivitySpaceExpand'] as bool? ?? true,
       nightSensitivitySpace15: SensitivitySpace.fromJson(
           json['nightSensitivitySpace15'] as Map<String, dynamic>),
       nightSensitivitySpace30: SensitivitySpace.fromJson(
           json['nightSensitivitySpace30'] as Map<String, dynamic>),
       considerKeyValue: Map<String, bool>.from(json['considerKeyValue'] as Map),
-      customizeSensitivitySpaceExpend:
-          json['customizeSensitivitySpaceExpend'] as bool? ?? true,
+      customizeSensitivitySpaceExpand:
+          json['customizeSensitivitySpaceExpand'] as bool? ?? true,
       customizeSensitivitySpaces: (json['customizeSensitivitySpaces']
                   as List<dynamic>?)
               ?.map((e) =>
                   CustomizeSensitivitySpace.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      customizeValuesExpend: json['customizeValuesExpend'] as bool? ?? true,
+      customizeValuesExpand: json['customizeValuesExpand'] as bool? ?? true,
       customizeValues: (json['customizeValues'] as List<dynamic>?)
               ?.map((e) => CustomizeValue.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -590,22 +631,25 @@ SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
 
 Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
       'current': instance.current,
+      'spyExpand': instance.spyExpand,
+      'sensitivitySpaceExpand': instance.sensitivitySpaceExpand,
+      'keyValuesExpand': instance.keyValuesExpand,
       'daySpy': instance.daySpy.toJson(),
       'nightSpy': instance.nightSpy.toJson(),
       'sensitivitySpaceWidgetIndex': instance.sensitivitySpaceWidgetIndex
           .map((e) => _$SensitivitySpaceTypeEnumMap[e]!)
           .toList(),
-      'daySensitivitySpaceExpend': instance.daySensitivitySpaceExpend,
+      'daySensitivitySpaceExpand': instance.daySensitivitySpaceExpand,
       'daySensitivitySpace15': instance.daySensitivitySpace15.toJson(),
       'daySensitivitySpace30': instance.daySensitivitySpace30.toJson(),
-      'nightSensitivitySpaceExpend': instance.nightSensitivitySpaceExpend,
+      'nightSensitivitySpaceExpand': instance.nightSensitivitySpaceExpand,
       'nightSensitivitySpace15': instance.nightSensitivitySpace15.toJson(),
       'nightSensitivitySpace30': instance.nightSensitivitySpace30.toJson(),
-      'customizeSensitivitySpaceExpend':
-          instance.customizeSensitivitySpaceExpend,
+      'customizeSensitivitySpaceExpand':
+          instance.customizeSensitivitySpaceExpand,
       'customizeSensitivitySpaces':
           instance.customizeSensitivitySpaces.map((e) => e.toJson()).toList(),
-      'customizeValuesExpend': instance.customizeValuesExpend,
+      'customizeValuesExpand': instance.customizeValuesExpand,
       'customizeValues':
           instance.customizeValues.map((e) => e.toJson()).toList(),
       'considerKeyValue': instance.considerKeyValue,
