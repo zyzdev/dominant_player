@@ -88,7 +88,7 @@ class _MyAppState extends ConsumerState {
                 if (e.key == KeyValue.range || e.key == KeyValue.rangeDiv4) {
                   return;
                 }
-                String title = '${spy.isDay ? '日' : '夜'}盤${e.key.title}';
+                String title = '${spy.isDay ? '日' : '夜'}盤，${e.key.title}';
                 _mainNotifier.considerKeyValue(
                     title, !(_state.considerKeyValue[title] ?? false));
               },

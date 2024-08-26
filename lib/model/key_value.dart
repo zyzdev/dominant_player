@@ -71,53 +71,53 @@ extension KeyValueName on KeyValue {
       case KeyValue.superSupport:
         return '超跌';
       case KeyValue.dayLongAttack15:
-        return '日盤，15分多方最大邏輯，攻擊價';
+        return '日盤，15分多方最大邏輯，攻擊';
       case KeyValue.dayLongMiddle15:
-        return '日盤，15分多方最大邏輯，中關價';
+        return '日盤，15分多方最大邏輯，中關';
       case KeyValue.dayLongDefense15:
-        return '日盤，15分多方最大邏輯，防守價';
+        return '日盤，15分多方最大邏輯，防守';
       case KeyValue.dayShortAttack15:
-        return '日盤，15分空方最大邏輯，攻擊價';
+        return '日盤，15分空方最大邏輯，攻擊';
       case KeyValue.dayShortMiddle15:
-        return '日盤，15分空方最大邏輯，中關價';
+        return '日盤，15分空方最大邏輯，中關';
       case KeyValue.dayShortDefense15:
-        return '日盤，15分空方最大邏輯，防守價';
+        return '日盤，15分空方最大邏輯，防守';
       case KeyValue.dayLongAttack30:
-        return '日盤，30分多方最大邏輯，攻擊價';
+        return '日盤，30分多方最大邏輯，攻擊';
       case KeyValue.dayLongMiddle30:
-        return '日盤，30分多方最大邏輯，中關價';
+        return '日盤，30分多方最大邏輯，中關';
       case KeyValue.dayLongDefense30:
-        return '日盤，30分多方最大邏輯，防守價';
+        return '日盤，30分多方最大邏輯，防守';
       case KeyValue.dayShortAttack30:
-        return '日盤，30分空方最大邏輯，攻擊價';
+        return '日盤，30分空方最大邏輯，攻擊';
       case KeyValue.dayShortMiddle30:
-        return '日盤，30分空方最大邏輯，中關價';
+        return '日盤，30分空方最大邏輯，中關';
       case KeyValue.dayShortDefense30:
-        return '日盤，30分空方最大邏輯，防守價';
+        return '日盤，30分空方最大邏輯，防守';
       case KeyValue.nightLongAttack15:
-        return '夜盤，15分多方最大邏輯，攻擊價';
+        return '夜盤，15分多方最大邏輯，攻擊';
       case KeyValue.nightLongMiddle15:
-        return '夜盤，15分多方最大邏輯，中關價';
+        return '夜盤，15分多方最大邏輯，中關';
       case KeyValue.nightLongDefense15:
-        return '夜盤，15分多方最大邏輯，防守價';
+        return '夜盤，15分多方最大邏輯，防守';
       case KeyValue.nightShortAttack15:
-        return '夜盤，15分空方最大邏輯，攻擊價';
+        return '夜盤，15分空方最大邏輯，攻擊';
       case KeyValue.nightShortMiddle15:
-        return '夜盤，15分空方最大邏輯，中關價';
+        return '夜盤，15分空方最大邏輯，中關';
       case KeyValue.nightShortDefense15:
-        return '夜盤，15分空方最大邏輯，防守價';
+        return '夜盤，15分空方最大邏輯，防守';
       case KeyValue.nightLongAttack30:
-        return '夜盤，30分多方最大邏輯，攻擊價';
+        return '夜盤，30分多方最大邏輯，攻擊';
       case KeyValue.nightLongMiddle30:
-        return '夜盤，30分多方最大邏輯，中關價';
+        return '夜盤，30分多方最大邏輯，中關';
       case KeyValue.nightLongDefense30:
-        return '夜盤，30分多方最大邏輯，防守價';
+        return '夜盤，30分多方最大邏輯，防守';
       case KeyValue.nightShortAttack30:
-        return '夜盤，30分空方最大邏輯，攻擊價';
+        return '夜盤，30分空方最大邏輯，攻擊';
       case KeyValue.nightShortMiddle30:
-        return '夜盤，30分空方最大邏輯，中關價';
+        return '夜盤，30分空方最大邏輯，中關';
       case KeyValue.nightShortDefense30:
-        return '夜盤，30分空方最大邏輯，防守價';
+        return '夜盤，30分空方最大邏輯，防守';
     }
   }
 }

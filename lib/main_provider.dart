@@ -411,7 +411,7 @@ class MainNotifier extends StateNotifier<SpyState> {
                     element.key != KeyValue.range &&
                     element.key != KeyValue.rangeDiv4)
                 .map((e) => MapEntry(
-                    '${spy.isDay ? '日' : '夜'}盤${e.key.title}', e.value));
+                    '${spy.isDay ? '日' : '夜'}盤，${e.key.title}', e.value));
           })
           // 找出數值不為空值的
           .where((element) => element.value != null)
