@@ -50,7 +50,8 @@ class _MyAppState extends ConsumerState {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal, //
           child: Row(
-            key: Key('_mainNotifier.initialization:${_mainNotifier.initialization}'),
+            key: Key(
+                '_mainNotifier.initialization:${_mainNotifier.initialization}'),
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _spy,
@@ -220,27 +221,6 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget get _sensitivitySpace {
-    // 計算名稱最大寬度
-    double maxTitleWidth = [
-          ...Direction.values.map(
-            (e) => e.typeName,
-          ),
-          ..._state.customizeSensitivitySpaces.map(
-            (e) => e.title,
-          ),
-          ..._state.customizeValues.map(
-            (e) => e.title,
-          )
-        ].fold<double>(
-          -1.0,
-          (previousValue, element) {
-            double width = textSize(element, titleST).width;
-            if (previousValue < width) return width;
-            return previousValue;
-          },
-        ) +
-        16;
-
     return ValueListenableBuilder(
       valueListenable: _sensitivitySpaceWidth,
       builder: (context, width, child) {
@@ -249,7 +229,7 @@ class _MyAppState extends ConsumerState {
           direction: Axis.vertical,
           onReorder: _mainNotifier.exchangeSensitivitySpaceWidgetIndex,
           children: _state.sensitivitySpaceWidgetIndex
-              .map((e) => _sensitivitySpaceWidget(e, maxTitleWidth))
+              .map((e) => _sensitivitySpaceWidget(e))
               .toList(),
         );
 
@@ -271,21 +251,20 @@ class _MyAppState extends ConsumerState {
     );
   }
 
-  Widget _sensitivitySpaceWidget(
-      SensitivitySpaceType sensitivitySpaceType, double titleWidth) {
+  Widget _sensitivitySpaceWidget(SensitivitySpaceType sensitivitySpaceType) {
     Widget content;
     switch (sensitivitySpaceType) {
       case SensitivitySpaceType.day:
-        content = _daySensitivitySpace(titleWidth);
+        content = _daySensitivitySpace();
         break;
       case SensitivitySpaceType.night:
-        content = _nightSensitivitySpace(titleWidth);
+        content = _nightSensitivitySpace();
         break;
       case SensitivitySpaceType.customize:
-        content = _customizeSensitivitySpace(titleWidth);
+        content = _customizeSensitivitySpace();
         break;
       case SensitivitySpaceType.value:
-        content = _customizeValues(titleWidth);
+        content = _customizeValues();
         break;
     }
     content = SizedBox(
@@ -295,7 +274,7 @@ class _MyAppState extends ConsumerState {
     return content;
   }
 
-  Widget _daySensitivitySpace(double titleWidth) {
+  Widget _daySensitivitySpace() {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -304,7 +283,6 @@ class _MyAppState extends ConsumerState {
         child: Column(
           children: [
             sensitivitySpace(
-              titleWidth: titleWidth,
               direction: Direction.long15,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace15,
@@ -316,7 +294,6 @@ class _MyAppState extends ConsumerState {
               topLine: true,
             ),
             sensitivitySpace(
-              titleWidth: titleWidth,
               direction: Direction.long30,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace30,
@@ -327,7 +304,6 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.dayLongDefense30,
             ),
             sensitivitySpace(
-              titleWidth: titleWidth,
               direction: Direction.short15,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace15,
@@ -338,7 +314,6 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.dayShortDefense15,
             ),
             sensitivitySpace(
-              titleWidth: titleWidth,
               direction: Direction.short30,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace30,
@@ -395,7 +370,7 @@ class _MyAppState extends ConsumerState {
     );
   }
 
-  Widget _nightSensitivitySpace(double titleW) {
+  Widget _nightSensitivitySpace() {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -404,7 +379,6 @@ class _MyAppState extends ConsumerState {
         child: Column(
           children: [
             sensitivitySpace(
-              titleWidth: titleW,
               direction: Direction.long15,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace15,
@@ -416,7 +390,6 @@ class _MyAppState extends ConsumerState {
               topLine: true,
             ),
             sensitivitySpace(
-              titleWidth: titleW,
               direction: Direction.long30,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace30,
@@ -427,7 +400,6 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.nightLongDefense30,
             ),
             sensitivitySpace(
-              titleWidth: titleW,
               direction: Direction.short15,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace15,
@@ -438,7 +410,6 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.nightShortDefense15,
             ),
             sensitivitySpace(
-              titleWidth: titleW,
               direction: Direction.short30,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace30,
@@ -500,7 +471,7 @@ class _MyAppState extends ConsumerState {
     );
   }
 
-  Widget _customizeSensitivitySpace(double titleWidth) {
+  Widget _customizeSensitivitySpace() {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -511,7 +482,6 @@ class _MyAppState extends ConsumerState {
             SizedBox(width: _sensitivitySpaceWidth.value),
             ..._state.customizeSensitivitySpaces.map((e) =>
                 customizeSensitivitySpace(
-                  titleWidth: titleWidth,
                   bg: e.direction.isLong
                       ? winColor.withOpacity(0.2)
                       : loseColor.withOpacity(0.2),
@@ -615,7 +585,7 @@ class _MyAppState extends ConsumerState {
     );
   }
 
-  Widget _customizeValues(double titleW) {
+  Widget _customizeValues() {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -660,20 +630,39 @@ class _MyAppState extends ConsumerState {
                         ),
                         Row(
                           children: [
-                            ConstrainedBox(
-                              constraints: BoxConstraints(minWidth: titleW),
-                              child: textField(
-                                  init: e.title,
-                                  onChanged: (value) {
-                                    _mainNotifier.setCustomizeValueTitle(
-                                        e, value);
-                                  },
-                                  keyboardType: TextInputType.text,
-                                  error: _mainNotifier
-                                          .isCustomizeValueTitleDuplicate(
-                                              e.title, e)
-                                      ? '名稱請不要重複！'
-                                      : null),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Stack(
+                                children: [
+                                  // 用Text把widget的寬度長出來
+                                  // 以讓textField可以到最寬
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    child: Text(
+                                      e.title,
+                                      style: titleST.copyWith(
+                                          color:
+                                              Colors.black.withOpacity(0.01)),
+                                    ),
+                                  ),
+                                  Positioned.fill(
+                                      child: textField(
+                                          init: e.title,
+                                          onChanged: (value) {
+                                            _mainNotifier
+                                                .setCustomizeValueTitle(
+                                                    e, value);
+                                          },
+                                          keyboardType: TextInputType.text,
+                                          error: _mainNotifier
+                                                  .isCustomizeValueTitleDuplicate(
+                                                      e.title, e)
+                                              ? '名稱請不要重複！'
+                                              : null))
+                                ],
+                              ),
                             ),
                             _checkbox(e.title),
                             textField(
@@ -754,15 +743,12 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget get _keyValueList {
-    double maxTitleWidth = _mainNotifier.keyValues.map((e) => e.key).fold(
-          titleW,
-          (previousValue, element) {
-            double width = textSize(element, infoST).width;
-            if (width > previousValue) return width;
-            return previousValue;
-          },
-        ) +
-        16;
+    String maxLengthTitle =
+        _mainNotifier.keyValues.fold('', (previousValue, element) {
+      return element.key.length > previousValue.length
+          ? element.key
+          : previousValue;
+    });
 
     double maxValueWidth = _mainNotifier.keyValues
             .map(
@@ -820,22 +806,41 @@ class _MyAppState extends ConsumerState {
                 num valueDis = indexOfCurrent == -1 || _state.current == null
                     ? 0
                     : e.value - _mainNotifier.keyValues[indexOfCurrent].value;
+                bool currentIsNull =
+                    _mainNotifier.keyValues[indexOfCurrent].value <= 0;
                 int indexDis = indexOfCurrent - index;
                 Color noticeBg = indexOfCurrent == -1
                     ? Colors.transparent
                     : indexDis == 0
                         ? noteColor.withOpacity(0.5)
                         : indexDis.abs() < 4
-                            ? indexDis > 0
-                                ? winColor
-                                    .withOpacity(0.4 - indexDis.abs() * 0.1)
-                                : loseColor
-                                    .withOpacity(0.4 - indexDis.abs() * 0.1)
+                            ? currentIsNull
+                                ? Colors.transparent
+                                : indexDis > 0
+                                    ? winColor
+                                        .withOpacity(0.4 - indexDis.abs() * 0.1)
+                                    : loseColor
+                                        .withOpacity(0.4 - indexDis.abs() * 0.1)
                             : Colors.transparent;
 
                 Widget content = Row(
                   children: [
-                    title(e.key, width: maxTitleWidth),
+                    Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 0, horizontal: 16),
+                          child: title(
+                            maxLengthTitle,
+                            color: Colors.black.withOpacity(0.01),
+                            line: false,
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: title(e.key, rightLine: true),
+                        )
+                      ],
+                    ),
                     indexDis == 0
                         ? textField(
                             init: e.value > 0 ? e.value : null,
@@ -844,7 +849,7 @@ class _MyAppState extends ConsumerState {
                             },
                             width: maxValueWidth,
                           )
-                        : title(e.value, width: maxValueWidth),
+                        : title(e.value, width: maxValueWidth, leftLine: false),
                     ...[
                       indexDis == 0
                           ? Container(
@@ -910,7 +915,6 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget sensitivitySpace({
-    required double titleWidth,
     required Direction direction,
     required Color bg,
     required SensitivitySpace sensitivitySpace,
@@ -1087,9 +1091,8 @@ class _MyAppState extends ConsumerState {
         color: bg,
         child: Row(
           children: [
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              constraints: BoxConstraints(minWidth: titleWidth),
               child: title(direction.typeName, line: false),
             ),
             hAndL(
@@ -1124,7 +1127,6 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget customizeSensitivitySpace({
-    required double titleWidth,
     required Color bg,
     required CustomizeSensitivitySpace customizeSensitivitySpace,
     required Function(
@@ -1352,23 +1354,37 @@ class _MyAppState extends ConsumerState {
                 ),
                 Column(
                   children: [
-                    Container(
-                      constraints: BoxConstraints(minWidth: titleWidth),
+                    Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: textField(
-                          init: customizeSensitivitySpace.title,
-                          width: titleWidth,
-                          onChanged: (value) {
-                            _mainNotifier.setCustomizeSensitivitySpaceTitle(
-                                customizeSensitivitySpace, value);
-                          },
-                          keyboardType: TextInputType.text,
-                          error: _mainNotifier
-                                  .isCustomizeSensitivitySpaceTitleDuplicate(
-                                      customizeSensitivitySpace.title,
-                                      customizeSensitivitySpace)
-                              ? '名稱請不要重複！'
-                              : null),
+                      child: Stack(
+                        children: [
+                          // 用Text把widget的寬度長出來
+                          // 以讓textField可以到最寬
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Text(
+                              customizeSensitivitySpace.title,
+                              style: titleST.copyWith(
+                                  color: Colors.black12.withOpacity(0.01)),
+                            ),
+                          ),
+                          Positioned.fill(
+                              child: textField(
+                                  init: customizeSensitivitySpace.title,
+                                  onChanged: (value) {
+                                    _mainNotifier
+                                        .setCustomizeSensitivitySpaceTitle(
+                                            customizeSensitivitySpace, value);
+                                  },
+                                  keyboardType: TextInputType.text,
+                                  error: _mainNotifier
+                                          .isCustomizeSensitivitySpaceTitleDuplicate(
+                                              customizeSensitivitySpace.title,
+                                              customizeSensitivitySpace)
+                                      ? '名稱請不要重複！'
+                                      : null))
+                        ],
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(12),
