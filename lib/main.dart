@@ -49,16 +49,15 @@ class _MyAppState extends ConsumerState {
         scrollDirection: Axis.vertical, // 垂直滾動
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal, //
-          child: _mainNotifier.inited
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _spy,
-                    _sensitivitySpace,
-                    _keyValueList,
-                  ],
-                )
-              : const SizedBox(),
+          child: Row(
+            key: Key('_mainNotifier.initialization:${_mainNotifier.initialization}'),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _spy,
+              _sensitivitySpace,
+              _keyValueList,
+            ],
+          ),
         ),
       ),
     );
@@ -273,20 +272,20 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget _sensitivitySpaceWidget(
-      SensitivitySpaceType sensitivitySpaceType, double titleW) {
+      SensitivitySpaceType sensitivitySpaceType, double titleWidth) {
     Widget content;
     switch (sensitivitySpaceType) {
       case SensitivitySpaceType.day:
-        content = _daySensitivitySpace(titleW);
+        content = _daySensitivitySpace(titleWidth);
         break;
       case SensitivitySpaceType.night:
-        content = _nightSensitivitySpace(titleW);
+        content = _nightSensitivitySpace(titleWidth);
         break;
       case SensitivitySpaceType.customize:
-        content = _customizeSensitivitySpace(titleW);
+        content = _customizeSensitivitySpace(titleWidth);
         break;
       case SensitivitySpaceType.value:
-        content = _customizeValues(titleW);
+        content = _customizeValues(titleWidth);
         break;
     }
     content = SizedBox(
@@ -296,7 +295,7 @@ class _MyAppState extends ConsumerState {
     return content;
   }
 
-  Widget _daySensitivitySpace(double titleW) {
+  Widget _daySensitivitySpace(double titleWidth) {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -305,7 +304,7 @@ class _MyAppState extends ConsumerState {
         child: Column(
           children: [
             sensitivitySpace(
-              titleW: titleW,
+              titleWidth: titleWidth,
               direction: Direction.long15,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace15,
@@ -317,7 +316,7 @@ class _MyAppState extends ConsumerState {
               topLine: true,
             ),
             sensitivitySpace(
-              titleW: titleW,
+              titleWidth: titleWidth,
               direction: Direction.long30,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace30,
@@ -328,7 +327,7 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.dayLongDefense30,
             ),
             sensitivitySpace(
-              titleW: titleW,
+              titleWidth: titleWidth,
               direction: Direction.short15,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace15,
@@ -339,7 +338,7 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.dayShortDefense15,
             ),
             sensitivitySpace(
-              titleW: titleW,
+              titleWidth: titleWidth,
               direction: Direction.short30,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.daySensitivitySpace30,
@@ -405,7 +404,7 @@ class _MyAppState extends ConsumerState {
         child: Column(
           children: [
             sensitivitySpace(
-              titleW: titleW,
+              titleWidth: titleW,
               direction: Direction.long15,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace15,
@@ -417,7 +416,7 @@ class _MyAppState extends ConsumerState {
               topLine: true,
             ),
             sensitivitySpace(
-              titleW: titleW,
+              titleWidth: titleW,
               direction: Direction.long30,
               bg: winColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace30,
@@ -428,7 +427,7 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.nightLongDefense30,
             ),
             sensitivitySpace(
-              titleW: titleW,
+              titleWidth: titleW,
               direction: Direction.short15,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace15,
@@ -439,7 +438,7 @@ class _MyAppState extends ConsumerState {
               defenseKeyValue: KeyValue.nightShortDefense15,
             ),
             sensitivitySpace(
-              titleW: titleW,
+              titleWidth: titleW,
               direction: Direction.short30,
               bg: loseColor.withOpacity(0.2),
               sensitivitySpace: _state.nightSensitivitySpace30,
@@ -501,7 +500,7 @@ class _MyAppState extends ConsumerState {
     );
   }
 
-  Widget _customizeSensitivitySpace(double titleW) {
+  Widget _customizeSensitivitySpace(double titleWidth) {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -512,7 +511,7 @@ class _MyAppState extends ConsumerState {
             SizedBox(width: _sensitivitySpaceWidth.value),
             ..._state.customizeSensitivitySpaces.map((e) =>
                 customizeSensitivitySpace(
-                  titleW: titleW,
+                  titleWidth: titleWidth,
                   bg: e.direction.isLong
                       ? winColor.withOpacity(0.2)
                       : loseColor.withOpacity(0.2),
@@ -911,7 +910,7 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget sensitivitySpace({
-    required double titleW,
+    required double titleWidth,
     required Direction direction,
     required Color bg,
     required SensitivitySpace sensitivitySpace,
@@ -1088,8 +1087,9 @@ class _MyAppState extends ConsumerState {
         color: bg,
         child: Row(
           children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(minWidth: titleW),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              constraints: BoxConstraints(minWidth: titleWidth),
               child: title(direction.typeName, line: false),
             ),
             hAndL(
@@ -1124,7 +1124,7 @@ class _MyAppState extends ConsumerState {
   }
 
   Widget customizeSensitivitySpace({
-    required double titleW,
+    required double titleWidth,
     required Color bg,
     required CustomizeSensitivitySpace customizeSensitivitySpace,
     required Function(
@@ -1352,10 +1352,12 @@ class _MyAppState extends ConsumerState {
                 ),
                 Column(
                   children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: titleW),
+                    Container(
+                      constraints: BoxConstraints(minWidth: titleWidth),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: textField(
                           init: customizeSensitivitySpace.title,
+                          width: titleWidth,
                           onChanged: (value) {
                             _mainNotifier.setCustomizeSensitivitySpaceTitle(
                                 customizeSensitivitySpace, value);

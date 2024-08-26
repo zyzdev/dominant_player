@@ -17,7 +17,7 @@ class MainNotifier extends StateNotifier<SpyState> {
       _prefs = value;
 
       String? json = _prefs.getString(_statsKey);
-      inited = true;
+      initialization = true;
       if (json != null) {
         state = SpyState.fromJson(jsonDecode(json));
       } else {
@@ -26,7 +26,7 @@ class MainNotifier extends StateNotifier<SpyState> {
     });
   }
 
-  bool inited = false;
+  bool initialization = false;
 
   static const String _statsKey = 'stats_key';
   late final SharedPreferences _prefs;
