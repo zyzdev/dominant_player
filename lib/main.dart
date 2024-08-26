@@ -888,7 +888,7 @@ class _MyAppState extends ConsumerState {
                                   ? winColor
                                   : valueDis < 0
                                       ? loseColor
-                                      : Colors.transparent,
+                                      : Colors.black,
                               topLine: true,
                               rightLine: true,
                               leftLine: true,
