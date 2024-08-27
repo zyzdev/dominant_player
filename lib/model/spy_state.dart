@@ -23,32 +23,130 @@ part 'spy_state.g.dart';
 class SpyState {
   SpyState({
     this.current,
-    this.high,
-    this.low,
+    this.spyExpand = true,
+    this.sensitivitySpaceExpand = true,
+    this.keyValuesExpand = true,
+    required this.daySpy,
+    required this.nightSpy,
+    this.sensitivitySpaceWidgetIndex = SensitivitySpaceType.values,
+    this.daySensitivitySpaceExpand = true,
     required this.daySensitivitySpace15,
     required this.daySensitivitySpace30,
+    this.nightSensitivitySpaceExpand = true,
     required this.nightSensitivitySpace15,
     required this.nightSensitivitySpace30,
     required this.considerKeyValue,
+    this.customizeSensitivitySpaceExpand = true,
+    required this.customizeSensitivitySpaces,
+    this.customizeValuesExpand = true,
+    required this.customizeValues,
   });
 
   factory SpyState.init() {
     return SpyState(
-      daySensitivitySpace15: SensitivitySpace(),
-      daySensitivitySpace30: SensitivitySpace(),
-      nightSensitivitySpace15: SensitivitySpace(),
-      nightSensitivitySpace30: SensitivitySpace(),
-      considerKeyValue: Map.fromIterable(
-        KeyValue.values,
-        value: (element) => true,
-      ),
-    );
+        daySpy: Spy(isDay: true),
+        nightSpy: Spy(isDay: false),
+        daySensitivitySpace15: SensitivitySpace(),
+        daySensitivitySpace30: SensitivitySpace(),
+        nightSensitivitySpace15: SensitivitySpace(),
+        nightSensitivitySpace30: SensitivitySpace(),
+        considerKeyValue: {
+          for (var element in KeyValue.values) element.title: true
+        },
+        customizeSensitivitySpaces: [
+          CustomizeSensitivitySpace(
+              direction: Direction.customizeLong, title: '自定義靈敏度空間')
+        ],
+        customizeValues: [
+          CustomizeValue(title: '自定義關鍵價')
+        ]);
   }
 
-  String get today => DateFormat('M/dd').format(DateTime.now());
+  String get spyDate {
+    final now = DateTime.now();
+    // final now = DateTime.now().subtract(Duration(days: 2, hours: 1, minutes: 47));
+    late DateTime spyDate;
+    if (now.weekday > DateTime.friday) {
+      spyDate = now.subtract(Duration(days: now.weekday - DateTime.friday));
+    } else {
+      if (now.hour < 15 && now.minute < 55) {
+        spyDate = now.subtract(const Duration(days: 1));
+      } else {
+        spyDate = now;
+      }
+    }
+    return DateFormat('M/dd').format(spyDate);
+  }
 
   /// 目前點數
   final int? current;
+
+  /// SPY是否展開
+  @JsonKey(defaultValue: true)
+  final bool spyExpand;
+
+  /// 靈敏度空間是否展開
+  @JsonKey(defaultValue: true)
+  final bool sensitivitySpaceExpand;
+
+  /// 關鍵價位列表是否展開
+  @JsonKey(defaultValue: true)
+  final bool keyValuesExpand;
+
+  /// 日盤SPY
+  Spy daySpy;
+
+  /// 夜盤SPY
+  Spy nightSpy;
+
+  /// 靈敏度空間排序
+  List<SensitivitySpaceType> sensitivitySpaceWidgetIndex;
+
+  /// 日盤靈敏度空間
+  /// 是否展開
+  final bool daySensitivitySpaceExpand;
+
+  /// 15分K靈敏度空間
+  final SensitivitySpace daySensitivitySpace15;
+
+  /// 30分K靈敏度空間
+  final SensitivitySpace daySensitivitySpace30;
+
+  /// 夜盤靈敏度空間
+  /// 是否展開
+  final bool nightSensitivitySpaceExpand;
+
+  /// 15分K靈敏度空間
+  final SensitivitySpace nightSensitivitySpace15;
+
+  /// 30分K靈敏度空間
+  final SensitivitySpace nightSensitivitySpace30;
+
+  /// 自定義靈敏度空間
+  /// 是否展開
+  final bool customizeSensitivitySpaceExpand;
+  @JsonKey(defaultValue: [])
+  List<CustomizeSensitivitySpace> customizeSensitivitySpaces;
+
+  /// 自定義關鍵價
+  /// 是否展開
+  final bool customizeValuesExpand;
+  @JsonKey(defaultValue: [])
+  List<CustomizeValue> customizeValues;
+
+  final Map<String, bool> considerKeyValue;
+
+  factory SpyState.fromJson(Map<String, dynamic> json) =>
+      _$SpyStateFromJson(json);
+
+  /// Connect the generated [_$PersonToJson] function to the `toJson` method.
+  Map<String, dynamic> toJson() => _$SpyStateToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+@CopyWith()
+class Spy {
+  bool isDay;
 
   /// 高點
   final int? high;
@@ -103,27 +201,12 @@ class SpyState {
   double? get lowCost =>
       low != null && rangeDiv4 != null ? low! + rangeDiv4! : null;
 
-  /// 日盤靈敏度空間
-  /// 15分K靈敏度空間
-  final SensitivitySpace daySensitivitySpace15;
+  Spy({required this.isDay, this.high, this.low});
 
-  /// 30分K靈敏度空間
-  final SensitivitySpace daySensitivitySpace30;
-
-  /// 夜盤靈敏度空間
-  /// 15分K靈敏度空間
-  final SensitivitySpace nightSensitivitySpace15;
-
-  /// 30分K靈敏度空間
-  final SensitivitySpace nightSensitivitySpace30;
-
-  final Map<KeyValue, bool> considerKeyValue;
-
-  factory SpyState.fromJson(Map<String, dynamic> json) =>
-      _$SpyStateFromJson(json);
+  factory Spy.fromJson(Map<String, dynamic> json) => _$SpyFromJson(json);
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
-  Map<String, dynamic> toJson() => _$SpyStateToJson(this);
+  Map<String, dynamic> toJson() => _$SpyToJson(this);
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -131,9 +214,6 @@ class SpyState {
 class SensitivitySpace {
   SensitivitySpace(
       {this.longHigh, this.longLow, this.shortHigh, this.shortLow});
-
-  factory SensitivitySpace.init() => SensitivitySpace(
-      longHigh: null, longLow: null, shortHigh: null, shortLow: null);
 
   /// 空間偏移量
   static const int _spaceOffset = 20;
@@ -176,4 +256,108 @@ class SensitivitySpace {
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$SensitivitySpaceToJson(this);
+}
+
+enum SensitivitySpaceType { day, night, customize, value }
+
+@JsonSerializable(explicitToJson: true)
+@CopyWith()
+class CustomizeSensitivitySpace {
+  final String title;
+
+  /// 空間偏移量
+  static const int _spaceOffset = 20;
+
+  final Direction direction;
+
+  /// 高點
+  final int? high;
+
+  /// 低點
+  final int? low;
+
+  /// 攻擊title
+  String get attackKeyTitle => '$title攻擊';
+
+  String get middleKeyTitle => '$title中關';
+
+  String get defenseKeyTitle => '$title防守';
+
+  /// 分K最大多方邏輯中關
+  double? get middle => high != null && low != null ? (high! + low!) / 2 : null;
+
+  /// 分K最大多方邏輯攻擊點
+  int? get attack => direction.isLong
+      ? high != null
+          ? high! + _spaceOffset
+          : null
+      : low != null
+          ? low! - _spaceOffset
+          : null;
+
+  /// 分K最大多方邏輯防守點
+  int? get defense => direction.isLong
+      ? low != null
+          ? low! - _spaceOffset
+          : null
+      : high != null
+          ? high! + _spaceOffset
+          : null;
+
+  CustomizeSensitivitySpace(
+      {this.high, this.low, required this.direction, required this.title});
+
+  factory CustomizeSensitivitySpace.fromJson(Map<String, dynamic> json) =>
+      _$CustomizeSensitivitySpaceFromJson(json);
+
+  /// Connect the generated [_$PersonToJson] function to the `toJson` method.
+  Map<String, dynamic> toJson() => _$CustomizeSensitivitySpaceToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+@CopyWith()
+class CustomizeValue {
+  final String title;
+  final num? value;
+
+  CustomizeValue({this.title = '自定義關鍵價', this.value});
+
+  factory CustomizeValue.fromJson(Map<String, dynamic> json) =>
+      _$CustomizeValueFromJson(json);
+
+  /// Connect the generated [_$PersonToJson] function to the `toJson` method.
+  Map<String, dynamic> toJson() => _$CustomizeValueToJson(this);
+}
+
+enum Direction {
+  customizeLong,
+  customizeShort,
+  long15,
+  long30,
+  short15,
+  short30,
+}
+
+extension DirectionName on Direction {
+  bool get isLong =>
+      this == Direction.long15 ||
+      this == Direction.long30 ||
+      this == Direction.customizeLong;
+
+  String get typeName {
+    switch (this) {
+      case Direction.long15:
+        return '15分多方最大邏輯';
+      case Direction.long30:
+        return '30分多方最大邏輯';
+      case Direction.short15:
+        return '15分空方最大邏輯';
+      case Direction.short30:
+        return '30分空方最大邏輯';
+      case Direction.customizeLong:
+        return '自定義多方邏輯';
+      case Direction.customizeShort:
+        return '自定義空方邏輯';
+    }
+  }
 }
