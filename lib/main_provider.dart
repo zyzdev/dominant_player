@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:dominant_player/model/key_value.dart';
 import 'package:dominant_player/model/txf_info.dart';
 import 'package:dominant_player/service/holiday_info.dart';
@@ -46,6 +45,9 @@ final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
     }
   } catch (e, stack) {
     state = SpyState.init();
+
+    debugPrint(e.toString());
+    debugPrint(stack.toString());
   }
 
   return MainNotifier(state);
@@ -58,6 +60,7 @@ class MainNotifier extends StateNotifier<SpyState> {
 
   late final RestClient _restClient = RestClient.instance;
 
+  String _currentMonth = '';
   TextEditingController currentController = TextEditingController();
   String? _current;
   Timer? _currentDebouncing;
@@ -74,20 +77,51 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   /// 取得SPY價格
-  void _init() {
+  Future<void> _init() async {
+    await _fetchCurrentMonth();
     _fetchCurrentPrice();
   }
 
+  /// 取得近月
+  Future<void> _fetchCurrentMonth() async {
+    try {
+      final response =
+          await _restClient.getProductMonthsInfo(TxfRequest.current());
+      _currentMonth = response.rtData.items
+          .where((element) => element.item.length == 6)
+          .reduce((value, element) {
+        DateTime parseDate(String dateStr) {
+          if (dateStr.length != 6) {
+            throw const FormatException("Invalid date format");
+          }
+          final year = int.parse(dateStr.substring(0, 4));
+          final month = int.parse(dateStr.substring(4, 6));
+          return DateTime(year, month, 1);
+        }
+
+        // 找尋時間最小的，就是近月
+        DateTime currentMonth = parseDate(value.item);
+        DateTime compareMonth = parseDate(element.item);
+        return currentMonth.isBefore(compareMonth) ? value : element;
+      }).item;
+      // ignore: empty_catches
+    } catch (e, stack) {
+      debugPrint(e.toString());
+      debugPrint(stack.toString());
+    }
+  }
+
   /// 取得現價
-  void _fetchCurrentPrice() {
-    _restClient.getTxfInfo(TxfRequest.current()).then((value) {
-      int? price =
-          double.tryParse(value.rtData.quoteList[1].cLastPrice)?.toInt();
-      state = state.copyWith(current: price);
-      currentController.text = price?.toString() ?? '';
-      Future.delayed(const Duration(seconds: 1), () {
-        _fetchCurrentPrice();
-      });
+  Future<void> _fetchCurrentPrice() async {
+    final response = await _restClient.getTxfInfo(TxfRequest.current(_currentMonth));
+    final quoteList = response.rtData.quoteList.length == 1
+        ? response.rtData.quoteList.first
+        : response.rtData.quoteList[1];
+    int? price = double.tryParse(quoteList.cLastPrice)?.toInt();
+    state = state.copyWith(current: price);
+    currentController.text = price?.toString() ?? '';
+    Future.delayed(const Duration(seconds: 1), () {
+      _fetchCurrentPrice();
     });
   }
 

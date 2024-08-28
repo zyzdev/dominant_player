@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'txf_info.g.dart'; // 更改為你實際的 Dart 文件名
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class TxfResponse {
   @JsonKey(name: 'RtCode')
   final String rtCode;
@@ -23,7 +23,7 @@ class TxfResponse {
   Map<String, dynamic> toJson() => _$TxfResponseToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class RtData {
   @JsonKey(name: 'QuoteList')
   final List<Quote> quoteList;
@@ -38,7 +38,7 @@ class RtData {
   Map<String, dynamic> toJson() => _$RtDataToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class Quote {
   @JsonKey(name: 'SymbolID')
   final String symbolID;
@@ -172,7 +172,7 @@ class Quote {
   Map<String, dynamic> toJson() => _$QuoteToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class TxfRequest {
   @JsonKey(name: 'MarketType')
   final String marketType;
@@ -214,16 +214,14 @@ class TxfRequest {
   });
 
   /// 現價
-  factory TxfRequest.current() {
+  factory TxfRequest.current([String month = '']) {
     // 判斷使用日盤還是夜盤
     final now = DateTime.now().toUtc().add(const Duration(hours: 8));
     final nowYMD = DateTime(now.year, now.month, now.day);
     DateTime dayStartTime = nowYMD.add(const Duration(hours: 8, minutes: 45)); // 8:45
     DateTime dayEndTime = nowYMD.add(const Duration(hours: 15, minutes: 00)); // 15:00
     bool useDay = now.isAfter(dayStartTime) && now.isBefore(dayEndTime);
-    return TxfRequest.fromJson(jsonDecode('''
-  {"MarketType":"${useDay ? '0' : '1'}","SymbolType":"F","KindID":"1","CID":"TXF","ExpireMonth":"","RowSize":"全部","PageNo":"","SortColumn":"","AscDesc":"A"}
-  '''));
+    return useDay ? TxfRequest.dayExpireMonth(month) : TxfRequest.nightExpireMonth(month);
   }
 
   /// 日盤全部

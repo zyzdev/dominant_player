@@ -16,7 +16,7 @@ Map<String, dynamic> _$TxfResponseToJson(TxfResponse instance) =>
     <String, dynamic>{
       'RtCode': instance.rtCode,
       'RtMsg': instance.rtMsg,
-      'RtData': instance.rtData,
+      'RtData': instance.rtData.toJson(),
     };
 
 RtData _$RtDataFromJson(Map<String, dynamic> json) => RtData(
@@ -27,7 +27,7 @@ RtData _$RtDataFromJson(Map<String, dynamic> json) => RtData(
     );
 
 Map<String, dynamic> _$RtDataToJson(RtData instance) => <String, dynamic>{
-      'QuoteList': instance.quoteList,
+      'QuoteList': instance.quoteList.map((e) => e.toJson()).toList(),
       'QuoteCount': instance.quoteCount,
     };
 
