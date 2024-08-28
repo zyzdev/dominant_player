@@ -207,6 +207,8 @@ class Spy {
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$SpyToJson(this);
+
+
 }
 
 @JsonSerializable(explicitToJson: true)

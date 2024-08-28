@@ -7,6 +7,7 @@ import 'package:dominant_player/model/key_value.dart';
 import 'package:dominant_player/model/txf_info.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:dominant_player/service/rest_client.dart';
+import 'package:dominant_player/service/spy_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,6 +66,8 @@ class MainNotifier extends StateNotifier<SpyState> {
   String? _current;
   Timer? _currentDebouncing;
 
+  bool loading = true;
+
   /// 設定現價
   set current(String value) {
     _current = value;
@@ -79,7 +82,13 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 取得SPY價格
   Future<void> _init() async {
     await _fetchCurrentMonth();
-    _fetchCurrentPrice();
+    await Future.wait([
+      _fetchCurrentPrice(),
+      _fetchSpyPrice(),
+    ]);
+
+    loading = false;
+    state = state.copyWith();
   }
 
   /// 取得近月
@@ -111,9 +120,64 @@ class MainNotifier extends StateNotifier<SpyState> {
     }
   }
 
+  Future<void> _fetchSpyPrice() async {
+    await Future.wait([
+      fetchSpyPrice(),
+      if (isDay) fetchSpyPrice(false),
+    ]).then((value) {
+      String dayHigh = value[0][0];
+      String dayLow = value[0][1];
+      // 日盤SPY
+      state = state.copyWith(
+          daySpy: state.daySpy.copyWith(
+              high: int.tryParse(dayHigh), low: int.tryParse(dayLow)));
+      daySpyHighController.text = dayHigh;
+      daySpyLowController.text = dayLow;
+      // 夜盤SPY
+      if (isDay) {
+        String nightHigh = value[1][0];
+        String nightLow = value[1][1];
+        state = state.copyWith(
+            nightSpy: state.nightSpy.copyWith(
+                high: int.tryParse(nightHigh), low: int.tryParse(nightLow)));
+        nightSpyHighController.text = nightHigh;
+        nightSpyLowController.text = nightLow;
+      }
+    });
+    // 計算下一次更新SPY的時間
+    DateTime now = DateTime.now().toUtc().add(const Duration(hours: 8));
+    if (isDay) {
+      // 日盤等收盤就可以更新
+      Future.delayed(
+          DateTime(now.year, now.month, now.day, 13, 45).difference(now), () {
+        _fetchSpyPrice();
+      });
+    } else {
+      // 夜盤等收盤就可以更新
+      late Duration diff;
+      late DateTime dis;
+      if (now.hour >= 15 && now.hour <= 23) {
+        dis = DateTime.fromMillisecondsSinceEpoch(
+            DateTime(now.year, now.month, now.day + 1, 5, 0)
+                .millisecondsSinceEpoch -
+                now.millisecondsSinceEpoch);
+      } else {
+        dis = DateTime.fromMillisecondsSinceEpoch(
+            DateTime(now.year, now.month, now.day, 5, 0)
+                    .millisecondsSinceEpoch -
+                now.millisecondsSinceEpoch);
+      }
+      diff = Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
+      Future.delayed(diff, () {
+        _fetchSpyPrice();
+      });
+    }
+  }
+
   /// 取得現價
   Future<void> _fetchCurrentPrice() async {
-    final response = await _restClient.getTxfInfo(TxfRequest.current(_currentMonth));
+    final response =
+        await _restClient.getTxfInfo(TxfRequest.current(_currentMonth));
     final quoteList = response.rtData.quoteList.length == 1
         ? response.rtData.quoteList.first
         : response.rtData.quoteList[1];
@@ -123,6 +187,17 @@ class MainNotifier extends StateNotifier<SpyState> {
     Future.delayed(const Duration(seconds: 1), () {
       _fetchCurrentPrice();
     });
+  }
+
+  bool get isDay {
+    // 判斷現在是日盤還是夜盤
+    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
+    final nowYMD = DateTime(now.year, now.month, now.day);
+    DateTime dayStartTime =
+        nowYMD.add(const Duration(hours: 5, minutes: 00)); // 8:45
+    DateTime dayEndTime =
+        nowYMD.add(const Duration(hours: 13, minutes: 45)); // 15:00
+    return now.isAfter(dayStartTime) && now.isBefore(dayEndTime);
   }
 
   /// Spy，是否展開
@@ -139,6 +214,11 @@ class MainNotifier extends StateNotifier<SpyState> {
   void keyValuesExpand(bool expand) {
     state = state.copyWith(keyValuesExpand: expand);
   }
+
+  final TextEditingController daySpyHighController = TextEditingController();
+  final TextEditingController daySpyLowController = TextEditingController();
+  final TextEditingController nightSpyHighController = TextEditingController();
+  final TextEditingController nightSpyLowController = TextEditingController();
 
   /// 設定Spy高點
   void setSpyHigh(Spy spy, String value) {
