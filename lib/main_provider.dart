@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:dominant_player/model/key_value.dart';
 import 'package:dominant_player/model/txf_info.dart';
 import 'package:dominant_player/service/holiday_info.dart';
+import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/service/rest_client.dart';
 import 'package:dominant_player/service/spy_info.dart';
 import 'package:flutter/cupertino.dart';
@@ -57,9 +58,62 @@ final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
 class MainNotifier extends StateNotifier<SpyState> {
   MainNotifier(SpyState state) : super(state) {
     _init();
+    noticeDisController.text = state.noticeDis.toString();
   }
 
   late final RestClient _restClient = RestClient.instance;
+
+  void setAutoNotice(bool enable) {
+    state = state.copyWith(autoNotice: enable);
+  }
+
+  String? _noticeDis;
+  TextEditingController noticeDisController = TextEditingController();
+  Timer? _noticeDisDebouncing;
+  Map<String, bool> noticedKeyValues = {};
+
+  set noticeDis(String value) {
+    _noticeDis = value;
+    _noticeDisDebouncing?.cancel();
+    _noticeDisDebouncing = Timer(const Duration(milliseconds: 500), () {
+      int? newDis = int.tryParse(_noticeDis?.toString() ?? '');
+      if (newDis == state.noticeDis) return;
+      state = state.copyWith(noticeDis: newDis);
+      noticeDisController.text = newDis?.toString() ?? '';
+      _shouldNotice();
+    });
+  }
+
+  /// 紀錄最近才推播過的關鍵價
+  final List<String> _justNotificationKeyValues = [];
+
+  void _shouldNotice() {
+    if (state.current == null) return;
+    // 找尋需要推播的關鍵價
+    String msg = '\n';
+    keyValues.where((element) => element.key != KeyValue.current.title)
+        .where((element) => !_justNotificationKeyValues.contains(element.key))
+        .forEach((element) {
+      num dis = element.value - state.current!;
+      if (dis.abs() <= state.noticeDis) {
+        msg += '${element.key}：${element.value}\n差距：${dis > 0 ? '+' : ''}$dis\n';
+        _justNotificationKeyValues.add(element.key);
+      }
+    });
+    if(msg.trim().isNotEmpty) {
+      // 移除最後一個換行符號
+      msg = '現價：${state.current}\n${msg.trim()}';
+      sendNotification(msg);
+    }
+    // 移除剛推播過，但已離現價較遠的關鍵價
+    keyValues
+        .where((element) => _justNotificationKeyValues.contains(element.key))
+        .where((element) =>
+            (element.value - state.current!).abs() > state.noticeDis + 5)
+        .forEach((element) {
+      _justNotificationKeyValues.remove(element.key);
+    });
+  }
 
   String _currentMonth = '';
   TextEditingController currentController = TextEditingController();
@@ -159,7 +213,7 @@ class MainNotifier extends StateNotifier<SpyState> {
       if (now.hour >= 15 && now.hour <= 23) {
         dis = DateTime.fromMillisecondsSinceEpoch(
             DateTime(now.year, now.month, now.day + 1, 5, 0)
-                .millisecondsSinceEpoch -
+                    .millisecondsSinceEpoch -
                 now.millisecondsSinceEpoch);
       } else {
         dis = DateTime.fromMillisecondsSinceEpoch(
@@ -167,7 +221,8 @@ class MainNotifier extends StateNotifier<SpyState> {
                     .millisecondsSinceEpoch -
                 now.millisecondsSinceEpoch);
       }
-      diff = Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
+      diff =
+          Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
       Future.delayed(diff, () {
         _fetchSpyPrice();
       });
@@ -182,11 +237,13 @@ class MainNotifier extends StateNotifier<SpyState> {
         ? response.rtData.quoteList.first
         : response.rtData.quoteList[1];
     int? price = double.tryParse(quoteList.cLastPrice)?.toInt();
-    state = state.copyWith(current: price);
-    currentController.text = price?.toString() ?? '';
     Future.delayed(const Duration(seconds: 1), () {
       _fetchCurrentPrice();
     });
+    if (price == state.current) return;
+    state = state.copyWith(current: price);
+    currentController.text = price?.toString() ?? '';
+    _shouldNotice();
   }
 
   bool get isDay {
@@ -519,7 +576,11 @@ class MainNotifier extends StateNotifier<SpyState> {
     return keyValues;
   }
 
-  List<MapEntry<String, num>> get keyValues {
+  List<MapEntry<String, num>> _keyValues = [];
+
+  List<MapEntry<String, num>> get keyValues => _keyValues;
+
+  void updateKeyValues() {
     List<MapEntry<String, num>> keyValues = [
       MapEntry(KeyValue.current, state.current),
       MapEntry(
@@ -632,7 +693,7 @@ class MainNotifier extends StateNotifier<SpyState> {
         -1) {
       keyValues.insert(0, MapEntry(KeyValue.current.title, -1));
     }
-    return keyValues;
+    _keyValues = keyValues;
   }
 
   bool isSensitivitySpaceTitleDuplicate(String title) {
@@ -649,6 +710,7 @@ class MainNotifier extends StateNotifier<SpyState> {
   @override
   set state(SpyState state) {
     super.state = state;
+    updateKeyValues();
     prefs.setString(_statsKey, jsonEncode(state.toJson()));
   }
 }

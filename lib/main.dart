@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/spy_state.dart';
+import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -83,6 +84,12 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     parent: _keyValuesAnimationController,
     curve: Curves.fastEaseInToSlowEaseOut,
   );
+
+  @override
+  void initState() {
+    notificationInit();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -1005,14 +1012,15 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   }
 
   Widget get _keyValueList {
+    final keyValues = _mainNotifier.keyValues;
     String maxLengthTitle =
-        _mainNotifier.keyValues.fold('', (previousValue, element) {
+    keyValues.fold('', (previousValue, element) {
       return element.key.length > previousValue.length
           ? element.key
           : previousValue;
     });
 
-    double maxValueWidth = _mainNotifier.keyValues
+    double maxValueWidth = keyValues
             .map(
           (e) => e.value,
         )
@@ -1026,7 +1034,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
         ) +
         16;
 
-    double maxDisWidth = _mainNotifier.keyValues
+    double maxDisWidth = keyValues
             .map(
           (e) => e.value - (_state.current ?? 0),
         )
@@ -1039,20 +1047,39 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           },
         ) +
         16;
-    int indexOfCurrent = _mainNotifier.keyValues
+    int indexOfCurrent = keyValues
         .indexWhere((element) => element.key == KeyValue.current.title);
     Widget content = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         title('關鍵價位列表', line: false),
+        Row(
+          children: [
+            Checkbox(
+              value: _state.autoNotice,
+              onChanged: (enable) {
+                if(enable == null) return;
+                _mainNotifier.setAutoNotice(enable);
+              },
+            ),
+            Text("現價接近關鍵價自動提醒", style: infoST,),
+            textField(
+              controller: _mainNotifier.noticeDisController,
+              hint: '價差',
+              onChanged: (value) {
+                _mainNotifier.noticeDis = value;
+              },
+            ),
+          ],
+        ),
         ColoredBox(
           color: const Color(0xFFFAFAFA),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (_mainNotifier.keyValues.isEmpty)
+              if (keyValues.isEmpty)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -1061,15 +1088,15 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                     style: titleST,
                   ),
                 ),
-              ..._mainNotifier.keyValues.map((e) {
-                int index = _mainNotifier.keyValues.indexWhere(
+              ...keyValues.map((e) {
+                int index = keyValues.indexWhere(
                   (element) => element.key == e.key,
                 );
                 num valueDis = indexOfCurrent == -1 || _state.current == null
                     ? 0
-                    : e.value - _mainNotifier.keyValues[indexOfCurrent].value;
+                    : e.value - keyValues[indexOfCurrent].value;
                 bool currentIsNull =
-                    _mainNotifier.keyValues[indexOfCurrent].value <= 0;
+                    keyValues[indexOfCurrent].value <= 0;
                 int indexDis = indexOfCurrent - index;
                 Color noticeBg = indexOfCurrent == -1
                     ? Colors.transparent
@@ -1154,7 +1181,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                               topLine: true,
                               rightLine: true,
                               leftLine: true,
-                              bottomLine: e != _mainNotifier.keyValues.last,
+                              bottomLine: e != keyValues.last,
                               width: maxDisWidth,
                             ),
                     ]

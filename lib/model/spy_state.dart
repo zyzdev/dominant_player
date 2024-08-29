@@ -22,6 +22,8 @@ part 'spy_state.g.dart';
 @CopyWith()
 class SpyState {
   SpyState({
+    this.autoNotice = true,
+    this.noticeDis = 10,
     this.current,
     this.spyExpand = true,
     this.sensitivitySpaceExpand = true,
@@ -77,6 +79,14 @@ class SpyState {
     }
     return DateFormat('M/dd').format(spyDate);
   }
+
+  /// 接近關鍵價，自動提醒
+  @JsonKey(defaultValue: true)
+  final bool autoNotice;
+
+  /// 接近關鍵價[noticeDis]，自動提醒
+  @JsonKey(defaultValue: 10)
+  final int noticeDis;
 
   /// 目前點數
   final int? current;
