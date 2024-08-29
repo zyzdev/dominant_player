@@ -240,7 +240,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                 }
                 String title = '${spy.isDay ? '日' : '夜'}盤，${e.key.title}';
                 _mainNotifier.considerKeyValue(
-                    title, !(_state.considerKeyValue[title] ?? false));
+                    title, !(_state.considerKeyValue[title] ?? true));
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -268,7 +268,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                           bottom: 0,
                           left: 0,
                           child: _checkbox(
-                              '${spy.isDay ? '日' : '夜'}盤${e.key.title}')),
+                              '${spy.isDay ? '日' : '夜'}盤，${e.key.title}')),
                     Row(
                       children: [
                         const SizedBox(width: 16),
