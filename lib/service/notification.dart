@@ -74,7 +74,8 @@ Future<void> notificationInit() async {
       onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
 }
 
-void sendNotification(String msg) {
+int _notificationCnt = 0;
+Future<void> sendNotification(String msg) async {
   const DarwinNotificationDetails macosNotificationDetails =
       DarwinNotificationDetails(
     subtitle: '接近關鍵價位！',
@@ -82,9 +83,8 @@ void sendNotification(String msg) {
 
   const NotificationDetails notificationDetails =
       NotificationDetails(macOS: macosNotificationDetails);
-  flutterLocalNotificationsPlugin.cancelAll();
   flutterLocalNotificationsPlugin.show(
-    0,
+    _notificationCnt ++,
     '接近關鍵價位！',
     msg,
     notificationDetails,
