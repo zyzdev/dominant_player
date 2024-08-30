@@ -54,6 +54,7 @@ dev_dependencies:
   custom_lint:
   copy_with_extension_gen:
   json_serializable:
+  flutter_launcher_icons:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
