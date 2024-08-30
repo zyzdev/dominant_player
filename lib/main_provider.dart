@@ -1,36 +1,64 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:dominant_player/model/key_value.dart';
+import 'package:dominant_player/model/txf_info.dart';
+import 'package:dominant_player/service/holiday_info.dart';
+import 'package:dominant_player/service/rest_client.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'model/spy_state.dart';
 
-final mainProvider =
-    StateNotifierProvider<MainNotifier, SpyState>((ref) => MainNotifier());
+SharedPreferences? _prefs;
 
-class MainNotifier extends StateNotifier<SpyState> {
-  MainNotifier() : super(SpyState.init()) {
-    SharedPreferences.getInstance().then((value) {
-      _prefs = value;
+SharedPreferences get prefs => _prefs!;
 
-      String? json = _prefs.getString(_statsKey);
-      initialization = true;
-      if (json != null) {
-        state = SpyState.fromJson(jsonDecode(json));
-      } else {
-        state = SpyState.init();
-      }
-    });
+Future<void> init() async {
+  _prefs ??= await SharedPreferences.getInstance();
+  HttpOverrides.global = MyHttpOverrides();
+  await fetchTaiwanHoliday();
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+const String _statsKey = 'stats_key';
+
+final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
+  String? json = prefs.getString(_statsKey);
+  late SpyState state;
+  try {
+    if (json != null) {
+      state = SpyState.fromJson(jsonDecode(json));
+    } else {
+      state = SpyState.init();
+    }
+  } catch (e, stack) {
+    state = SpyState.init();
   }
 
-  bool initialization = false;
+  return MainNotifier(state);
+});
 
-  static const String _statsKey = 'stats_key';
-  late final SharedPreferences _prefs;
+class MainNotifier extends StateNotifier<SpyState> {
+  MainNotifier(SpyState state) : super(state) {
+    _init();
+  }
 
+  late final RestClient _restClient = RestClient.instance;
+
+  TextEditingController currentController = TextEditingController();
   String? _current;
   Timer? _currentDebouncing;
 
@@ -40,6 +68,26 @@ class MainNotifier extends StateNotifier<SpyState> {
     _currentDebouncing?.cancel();
     _currentDebouncing = Timer(const Duration(milliseconds: 500), () {
       state = state.copyWith(current: int.tryParse(_current?.toString() ?? ''));
+      currentController.text =
+          int.tryParse(_current?.toString() ?? '').toString();
+    });
+  }
+
+  /// 取得SPY價格
+  void _init() {
+    _fetchCurrentPrice();
+  }
+
+  /// 取得現價
+  void _fetchCurrentPrice() {
+    _restClient.getTxfInfo(TxfRequest.current()).then((value) {
+      int? price =
+          double.tryParse(value.rtData.quoteList[1].cLastPrice)?.toInt();
+      state = state.copyWith(current: price);
+      currentController.text = price?.toString() ?? '';
+      Future.delayed(const Duration(seconds: 1), () {
+        _fetchCurrentPrice();
+      });
     });
   }
 
@@ -487,6 +535,6 @@ class MainNotifier extends StateNotifier<SpyState> {
   @override
   set state(SpyState state) {
     super.state = state;
-    _prefs.setString(_statsKey, jsonEncode(state.toJson()));
+    prefs.setString(_statsKey, jsonEncode(state.toJson()));
   }
 }

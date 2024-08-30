@@ -39,6 +39,10 @@ dependencies:
   toggle_switch:
   reorderables:
   window_manager:
+  retrofit:
+  dio:
+  html:
+  http:
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +60,7 @@ dev_dependencies:
   copy_with_extension_gen:
   json_serializable:
   flutter_launcher_icons:
+  retrofit_generator:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

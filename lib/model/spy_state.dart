@@ -63,7 +63,7 @@ class SpyState {
   }
 
   String get spyDate {
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
     // final now = DateTime.now().subtract(Duration(days: 2, hours: 1, minutes: 47));
     late DateTime spyDate;
     if (now.weekday > DateTime.friday) {
@@ -289,20 +289,20 @@ class CustomizeSensitivitySpace {
   /// 分K最大多方邏輯攻擊點
   int? get attack => direction.isLong
       ? high != null
-          ? high! + _spaceOffset
-          : null
+      ? high! + _spaceOffset
+      : null
       : low != null
-          ? low! - _spaceOffset
-          : null;
+      ? low! - _spaceOffset
+      : null;
 
   /// 分K最大多方邏輯防守點
   int? get defense => direction.isLong
       ? low != null
-          ? low! - _spaceOffset
-          : null
+      ? low! - _spaceOffset
+      : null
       : high != null
-          ? high! + _spaceOffset
-          : null;
+      ? high! + _spaceOffset
+      : null;
 
   CustomizeSensitivitySpace(
       {this.high, this.low, required this.direction, required this.title});
@@ -341,8 +341,8 @@ enum Direction {
 extension DirectionName on Direction {
   bool get isLong =>
       this == Direction.long15 ||
-      this == Direction.long30 ||
-      this == Direction.customizeLong;
+          this == Direction.long30 ||
+          this == Direction.customizeLong;
 
   String get typeName {
     switch (this) {
