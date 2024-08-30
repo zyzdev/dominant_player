@@ -55,7 +55,7 @@ class SpyState {
         },
         customizeSensitivitySpaces: [
           CustomizeSensitivitySpace(
-              direction: Direction.customizeLong, title: '自定義靈敏度空間')
+              direction: Direction.customizeLong, title:  Direction.customizeLong.typeName)
         ],
         customizeValues: [
           CustomizeValue(title: '自定義關鍵價')
