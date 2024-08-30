@@ -256,7 +256,7 @@ class MainNotifier extends StateNotifier<SpyState> {
 
   void addCustomizeSensitivitySpace(
       [Direction direction = Direction.customizeLong]) {
-    String defTitle = Direction.customizeLong.typeName;
+    String defTitle =  direction.typeName;
     String title = defTitle;
     int cnt = 0;
 
