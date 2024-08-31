@@ -38,6 +38,7 @@ dependencies:
   json_annotation:
   toggle_switch:
   reorderables:
+  window_manager:
 
 dev_dependencies:
   flutter_test:

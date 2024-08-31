@@ -3,16 +3,27 @@ import 'dart:math';
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/spy_state.dart';
 import 'package:dominant_player/widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import 'package:window_manager/window_manager.dart';
 import 'model/key_value.dart';
 
-void main() {
+Future<void> main() async {
+  if(!kIsWeb) {
+    WidgetsFlutterBinding.ensureInitialized();
+    // Must add this line.
+    await windowManager.ensureInitialized();
+    windowManager.waitUntilReadyToShow(const WindowOptions(), () {
+      windowManager.setTitle('絕對主力邏輯助手');
+    },);
+  }
   runApp(
     const ProviderScope(
       child: MaterialApp(
+        title: '絕對主力邏輯助手',
         home: MyApp(),
       ),
     ),
@@ -85,13 +96,6 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     ref.watch(mainProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '絕對主力邏輯計算器',
-          style: TextStyle(color: Colors.grey.shade300),
-        ),
-        backgroundColor: const Color(0xff4d2bab),
-      ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical, // 垂直滾動
         child: SingleChildScrollView(
