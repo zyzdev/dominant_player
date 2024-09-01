@@ -58,6 +58,11 @@ final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
 class MainNotifier extends StateNotifier<SpyState> {
   MainNotifier(SpyState state) : super(state) {
     _init();
+    currentController.text = state.current?.toString() ?? '';
+    daySpyHighController.text = state.daySpy.high?.toString() ?? '';
+    daySpyLowController.text = state.daySpy.low?.toString() ?? '';
+    nightSpyHighController.text = state.nightSpy.high?.toString() ?? '';
+    nightSpyLowController.text = state.nightSpy.low?.toString() ?? '';
     noticeDisController.text = state.noticeDis.toString();
   }
 
@@ -87,20 +92,22 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 紀錄最近才推播過的關鍵價
   final List<String> _justNotificationKeyValues = [];
 
-  void _shouldNotice() {
+  Future<void> _shouldNotice() async {
     if (state.current == null) return;
     // 找尋需要推播的關鍵價
     String msg = '\n';
-    keyValues.where((element) => element.key != KeyValue.current.title)
+    keyValues
+        .where((element) => element.key != KeyValue.current.title)
         .where((element) => !_justNotificationKeyValues.contains(element.key))
         .forEach((element) {
       num dis = element.value - state.current!;
       if (dis.abs() <= state.noticeDis) {
-        msg += '${element.key}：${element.value}\n差距：${dis > 0 ? '+' : ''}$dis\n';
+        msg +=
+            '${element.key}：${element.value}\n差距：${dis > 0 ? '+' : ''}$dis\n';
         _justNotificationKeyValues.add(element.key);
       }
     });
-    if(msg.trim().isNotEmpty) {
+    if (msg.trim().isNotEmpty) {
       // 移除最後一個換行符號
       msg = '現價：${state.current}\n${msg.trim()}';
       sendNotification(msg);
@@ -130,6 +137,7 @@ class MainNotifier extends StateNotifier<SpyState> {
       state = state.copyWith(current: int.tryParse(_current?.toString() ?? ''));
       currentController.text =
           int.tryParse(_current?.toString() ?? '').toString();
+      _shouldNotice();
     });
   }
 
@@ -175,9 +183,12 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   Future<void> _fetchSpyPrice() async {
+    // 判斷是否需要夜盤資訊
+    // 日盤和週末需要日盤和夜盤資訊
+    bool needNightSPY = isDay || isWeekend;
     await Future.wait([
       fetchSpyPrice(),
-      if (isDay) fetchSpyPrice(false),
+      if (needNightSPY) fetchSpyPrice(false),
     ]).then((value) {
       String dayHigh = value[0][0];
       String dayLow = value[0][1];
@@ -188,7 +199,7 @@ class MainNotifier extends StateNotifier<SpyState> {
       daySpyHighController.text = dayHigh;
       daySpyLowController.text = dayLow;
       // 夜盤SPY
-      if (isDay) {
+      if (needNightSPY) {
         String nightHigh = value[1][0];
         String nightLow = value[1][1];
         state = state.copyWith(
@@ -233,17 +244,24 @@ class MainNotifier extends StateNotifier<SpyState> {
   Future<void> _fetchCurrentPrice() async {
     final response =
         await _restClient.getTxfInfo(TxfRequest.current(_currentMonth));
-    final quoteList = response.rtData.quoteList.length == 1
+    final quote = response.rtData.quoteList.length == 1
         ? response.rtData.quoteList.first
         : response.rtData.quoteList[1];
-    int? price = double.tryParse(quoteList.cLastPrice)?.toInt();
-    Future.delayed(const Duration(seconds: 1), () {
-      _fetchCurrentPrice();
-    });
+    int? price = double.tryParse(quote.cLastPrice)?.toInt();
+    if (!isHoliday(DateTime.now().toUtc().add(const Duration(hours: 8)))) {
+      Future.delayed(const Duration(seconds: 1), () {
+        _fetchCurrentPrice();
+      });
+    }
     if (price == state.current) return;
     state = state.copyWith(current: price);
     currentController.text = price?.toString() ?? '';
     _shouldNotice();
+  }
+
+  bool get isWeekend {
+    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
+    return now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
   }
 
   bool get isDay {
@@ -475,7 +493,7 @@ class MainNotifier extends StateNotifier<SpyState> {
 
   void addCustomizeSensitivitySpace(
       [Direction direction = Direction.customizeLong]) {
-    String defTitle =  direction.typeName;
+    String defTitle = direction.typeName;
     String title = defTitle;
     int cnt = 0;
 

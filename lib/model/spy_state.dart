@@ -64,22 +64,6 @@ class SpyState {
         ]);
   }
 
-  String get spyDate {
-    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
-    // final now = DateTime.now().subtract(Duration(days: 2, hours: 1, minutes: 47));
-    late DateTime spyDate;
-    if (now.weekday > DateTime.friday) {
-      spyDate = now.subtract(Duration(days: now.weekday - DateTime.friday));
-    } else {
-      if (now.hour < 15 && now.minute < 55) {
-        spyDate = now.subtract(const Duration(days: 1));
-      } else {
-        spyDate = now;
-      }
-    }
-    return DateFormat('M/dd').format(spyDate);
-  }
-
   /// 接近關鍵價，自動提醒
   @JsonKey(defaultValue: true)
   final bool autoNotice;
@@ -157,6 +141,24 @@ class SpyState {
 @CopyWith()
 class Spy {
   bool isDay;
+
+  String get spyDate {
+    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
+    // final now = DateTime.now().subtract(Duration(days: 2, hours: 1, minutes: 47));
+    late DateTime spyDate;
+    if (now.weekday > DateTime.friday) {
+      spyDate = isDay
+          ? now.subtract(Duration(days: now.weekday - DateTime.friday))
+          : now.add(Duration(days: now.weekday == DateTime.saturday ? 2 : 1));
+    } else {
+      if (now.hour < 15 && now.minute < 55) {
+        spyDate = now.subtract(const Duration(days: 1));
+      } else {
+        spyDate = now;
+      }
+    }
+    return DateFormat('MM/dd').format(spyDate);
+  }
 
   /// 高點
   final int? high;

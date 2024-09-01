@@ -3,16 +3,17 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
-
 /// return [high, low]
-/// [day] 是否抓取日盤
-Future<List<String>> fetchSpyPrice([bool day = true]) async {
-  String spyDate() {
+/// [isDay] 是否為日盤
+Future<List<String>> fetchSpyPrice([bool isDay = true]) async {
+  String spyDate(bool isDay) {
     final now = DateTime.now().toUtc().add(const Duration(hours: 8));
     // final now = DateTime.now().subtract(Duration(days: 2, hours: 1, minutes: 47));
     late DateTime spyDate;
     if (now.weekday > DateTime.friday) {
-      spyDate = now.subtract(Duration(days: now.weekday - DateTime.friday));
+      spyDate = isDay
+          ? now.subtract(Duration(days: now.weekday - DateTime.friday))
+          : now.add(Duration(days: now.weekday == DateTime.saturday ? 2 : 1));
     } else {
       if (now.hour < 15 && now.minute < 55) {
         spyDate = now.subtract(const Duration(days: 1));
@@ -20,20 +21,19 @@ Future<List<String>> fetchSpyPrice([bool day = true]) async {
         spyDate = now;
       }
     }
-    return DateFormat('M/dd').format(spyDate);
+    return DateFormat('yyyy/MM/dd').format(spyDate);
   }
 
   final response = await Client().post(
       Uri.parse('https://www.taifex.com.tw/cht/3/futDailyMarketReport'),
       body: {
         'queryType': '2',
-        'marketCode': day ? '0' : '1',
+        'marketCode': isDay ? '0' : '1',
         'commodity_id': 'TX',
-        'queryDate': spyDate(),
+        'queryDate': spyDate(isDay),
         'MarketCode': '0',
         'commodity_idt': 'TX'
       });
-
   String high = '';
   String low = '';
   if (response.statusCode == 200) {

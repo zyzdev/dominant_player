@@ -238,6 +238,37 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     Widget spyWidget(Spy spy) {
       final spyValues = _mainNotifier.spyValues(spy);
 
+      Widget sypDate() =>               Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey.shade300,
+                  width: 1,
+                )),
+            child: Stack(
+              children: [
+                Positioned(
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    child: Opacity(
+                      opacity: 0,
+                      child: _checkbox(null),
+                    )),
+                Row(
+                  children: [
+                    const SizedBox(width: 16),
+                    title('日期', line: false)
+                  ],
+                ),
+              ],
+            ),
+          ),
+          info(spy.spyDate, width: valueMaxWidth),
+        ],
+      );
       List<Widget> values = spyValues.map((e) {
         return Row(
           children: [
@@ -329,6 +360,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             color: Colors.yellow,
             child: title(spy.isDay ? '日盤' : '夜盤', line: false),
           ),
+          sypDate(),
           ...values,
         ],
       );
@@ -342,37 +374,6 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                      color: Colors.grey.shade300,
-                      width: 1,
-                    )),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                            top: 0,
-                            bottom: 0,
-                            left: 0,
-                            child: Opacity(
-                              opacity: 0,
-                              child: _checkbox(null),
-                            )),
-                        Row(
-                          children: [
-                            const SizedBox(width: 16),
-                            title('日期', line: false)
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  info(_state.spyDate, width: valueMaxWidth),
-                ],
-              ),
               spyWidget(_state.daySpy),
               spyWidget(_state.nightSpy),
             ],

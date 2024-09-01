@@ -31,7 +31,8 @@ Future<void> fetchTaiwanHoliday() async {
     final document = parse(req.body);
     final List<Element> months = document
         .getElementsByTagName('div')
-        .where((element) => element.className == 'p-1 calendar-font-zh-jp')
+        .where((element) => element.className == 'item01' || element.className == 'item02')
+    .expand((element) => element.getElementsByClassName('month-cell'))
         .toList();
     for (int i = 0; i < months.length; i++) {
       months[i].getElementsByTagName('tr').forEach((element) {
