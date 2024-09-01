@@ -291,11 +291,11 @@ class CustomizeSensitivitySpace {
   final int? low;
 
   /// 攻擊title
-  String get attackKeyTitle => '$title攻擊';
+  String get attackKeyTitle => '$title，攻擊';
 
-  String get middleKeyTitle => '$title中關';
+  String get middleKeyTitle => '$title，中關';
 
-  String get defenseKeyTitle => '$title防守';
+  String get defenseKeyTitle => '$title，防守';
 
   /// 分K最大多方邏輯中關
   double? get middle => high != null && low != null ? (high! + low!) / 2 : null;

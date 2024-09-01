@@ -10,6 +10,7 @@ import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/service/rest_client.dart';
 import 'package:dominant_player/service/spy_info.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,8 +22,10 @@ SharedPreferences get prefs => _prefs!;
 
 Future<void> init() async {
   _prefs ??= await SharedPreferences.getInstance();
-  HttpOverrides.global = MyHttpOverrides();
-  await fetchTaiwanHoliday();
+  if(!kIsWeb) {
+    HttpOverrides.global = MyHttpOverrides();
+    await fetchTaiwanHoliday();
+  }
 }
 
 class MyHttpOverrides extends HttpOverrides {
@@ -57,13 +60,14 @@ final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
 
 class MainNotifier extends StateNotifier<SpyState> {
   MainNotifier(SpyState state) : super(state) {
-    _init();
+    if(!kIsWeb) _initFetch();
     currentController.text = state.current?.toString() ?? '';
     daySpyHighController.text = state.daySpy.high?.toString() ?? '';
     daySpyLowController.text = state.daySpy.low?.toString() ?? '';
     nightSpyHighController.text = state.nightSpy.high?.toString() ?? '';
     nightSpyLowController.text = state.nightSpy.low?.toString() ?? '';
     noticeDisController.text = state.noticeDis.toString();
+    updateKeyValues();
   }
 
   late final RestClient _restClient = RestClient.instance;
@@ -93,7 +97,7 @@ class MainNotifier extends StateNotifier<SpyState> {
   final List<String> _justNotificationKeyValues = [];
 
   Future<void> _shouldNotice() async {
-    if (state.current == null) return;
+    if (state.current == null || kIsWeb) return;
     // 找尋需要推播的關鍵價
     String msg = '\n';
     keyValues
@@ -142,7 +146,7 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   /// 取得SPY價格
-  Future<void> _init() async {
+  Future<void> _initFetch() async {
     await _fetchCurrentMonth();
     await Future.wait([
       _fetchCurrentPrice(),

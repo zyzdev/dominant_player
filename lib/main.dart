@@ -13,15 +13,18 @@ import 'package:window_manager/window_manager.dart';
 import 'model/key_value.dart';
 
 Future<void> main() async {
-  if(!kIsWeb) {
+  if (!kIsWeb) {
     WidgetsFlutterBinding.ensureInitialized();
     // Must add this line.
     await windowManager.ensureInitialized();
-    windowManager.waitUntilReadyToShow(const WindowOptions(), () {
-      windowManager.setTitle('絕對主力邏輯助手');
-    },);
-    await init();
+    windowManager.waitUntilReadyToShow(
+      const WindowOptions(),
+      () {
+        windowManager.setTitle('絕對主力邏輯助手');
+      },
+    );
   }
+  await init();
   runApp(
     const ProviderScope(
       child: MaterialApp(
@@ -238,37 +241,37 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     Widget spyWidget(Spy spy) {
       final spyValues = _mainNotifier.spyValues(spy);
 
-      Widget sypDate() =>               Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-                border: Border.all(
+      Widget sypDate() => Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    border: Border.all(
                   color: Colors.grey.shade300,
                   width: 1,
                 )),
-            child: Stack(
-              children: [
-                Positioned(
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    child: Opacity(
-                      opacity: 0,
-                      child: _checkbox(null),
-                    )),
-                Row(
+                child: Stack(
                   children: [
-                    const SizedBox(width: 16),
-                    title('日期', line: false)
+                    Positioned(
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        child: Opacity(
+                          opacity: 0,
+                          child: _checkbox(null),
+                        )),
+                    Row(
+                      children: [
+                        const SizedBox(width: 16),
+                        title('日期', line: false)
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          info(spy.spyDate, width: valueMaxWidth),
-        ],
-      );
+              ),
+              info(spy.spyDate, width: valueMaxWidth),
+            ],
+          );
       List<Widget> values = spyValues.map((e) {
         return Row(
           children: [
@@ -1014,8 +1017,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
 
   Widget get _keyValueList {
     final keyValues = _mainNotifier.keyValues;
-    String maxLengthTitle =
-    keyValues.fold('', (previousValue, element) {
+    String maxLengthTitle = keyValues.fold('', (previousValue, element) {
       return element.key.length > previousValue.length
           ? element.key
           : previousValue;
@@ -1055,25 +1057,29 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         title('關鍵價位列表', line: false),
-        Row(
-          children: [
-            Checkbox(
-              value: _state.autoNotice,
-              onChanged: (enable) {
-                if(enable == null) return;
-                _mainNotifier.setAutoNotice(enable);
-              },
-            ),
-            Text("現價接近關鍵價自動提醒", style: infoST,),
-            textField(
-              controller: _mainNotifier.noticeDisController,
-              hint: '價差',
-              onChanged: (value) {
-                _mainNotifier.noticeDis = value;
-              },
-            ),
-          ],
-        ),
+        if (!kIsWeb)
+          Row(
+            children: [
+              Checkbox(
+                value: _state.autoNotice,
+                onChanged: (enable) {
+                  if (enable == null) return;
+                  _mainNotifier.setAutoNotice(enable);
+                },
+              ),
+              Text(
+                "現價接近關鍵價自動提醒",
+                style: infoST,
+              ),
+              textField(
+                controller: _mainNotifier.noticeDisController,
+                hint: '價差',
+                onChanged: (value) {
+                  _mainNotifier.noticeDis = value;
+                },
+              ),
+            ],
+          ),
         ColoredBox(
           color: const Color(0xFFFAFAFA),
           child: Column(
@@ -1096,8 +1102,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                 num valueDis = indexOfCurrent == -1 || _state.current == null
                     ? 0
                     : e.value - keyValues[indexOfCurrent].value;
-                bool currentIsNull =
-                    keyValues[indexOfCurrent].value <= 0;
+                bool currentIsNull = keyValues[indexOfCurrent].value <= 0;
                 int indexDis = indexOfCurrent - index;
                 Color noticeBg = indexOfCurrent == -1
                     ? Colors.transparent
@@ -1173,7 +1178,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                               ),
                             )
                           : info(
-                              '${valueDis > 0 ? '+' : ''}$valueDis',
+                              _state.current == null
+                                  ? ''
+                                  : '${valueDis > 0 ? '+' : ''}$valueDis',
                               color: valueDis > 0
                                   ? winColor
                                   : valueDis < 0
