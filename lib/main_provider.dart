@@ -1,38 +1,137 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 
 import 'package:dominant_player/model/key_value.dart';
+import 'package:dominant_player/model/txf_info.dart';
+import 'package:dominant_player/service/holiday_info.dart';
+import 'package:dominant_player/service/notification.dart';
+import 'package:dominant_player/service/rest_client.dart';
+import 'package:dominant_player/service/spy_info.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'model/spy_state.dart';
 
-final mainProvider =
-    StateNotifierProvider<MainNotifier, SpyState>((ref) => MainNotifier());
+SharedPreferences? _prefs;
+
+SharedPreferences get prefs => _prefs!;
+
+Future<void> init() async {
+  _prefs ??= await SharedPreferences.getInstance();
+  if(!kIsWeb) {
+    HttpOverrides.global = MyHttpOverrides();
+    await fetchTaiwanHoliday();
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+const String _statsKey = 'stats_key';
+
+final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
+  String? json = prefs.getString(_statsKey);
+  late SpyState state;
+  try {
+    if (json != null) {
+      state = SpyState.fromJson(jsonDecode(json));
+    } else {
+      state = SpyState.init();
+    }
+  } catch (e, stack) {
+    state = SpyState.init();
+
+    debugPrint(e.toString());
+    debugPrint(stack.toString());
+  }
+
+  return MainNotifier(state);
+});
 
 class MainNotifier extends StateNotifier<SpyState> {
-  MainNotifier() : super(SpyState.init()) {
-    SharedPreferences.getInstance().then((value) {
-      _prefs = value;
+  MainNotifier(SpyState state) : super(state) {
+    if(!kIsWeb) _initFetch();
+    currentController.text = state.current?.toString() ?? '';
+    daySpyHighController.text = state.daySpy.high?.toString() ?? '';
+    daySpyLowController.text = state.daySpy.low?.toString() ?? '';
+    nightSpyHighController.text = state.nightSpy.high?.toString() ?? '';
+    nightSpyLowController.text = state.nightSpy.low?.toString() ?? '';
+    noticeDisController.text = state.noticeDis.toString();
+    updateKeyValues();
+  }
 
-      String? json = _prefs.getString(_statsKey);
-      initialization = true;
-      if (json != null) {
-        state = SpyState.fromJson(jsonDecode(json));
-      } else {
-        state = SpyState.init();
-      }
+  late final RestClient _restClient = RestClient.instance;
+
+  void setAutoNotice(bool enable) {
+    state = state.copyWith(autoNotice: enable);
+  }
+
+  String? _noticeDis;
+  TextEditingController noticeDisController = TextEditingController();
+  Timer? _noticeDisDebouncing;
+  Map<String, bool> noticedKeyValues = {};
+
+  set noticeDis(String value) {
+    _noticeDis = value;
+    _noticeDisDebouncing?.cancel();
+    _noticeDisDebouncing = Timer(const Duration(milliseconds: 500), () {
+      int? newDis = int.tryParse(_noticeDis?.toString() ?? '');
+      if (newDis == state.noticeDis) return;
+      state = state.copyWith(noticeDis: newDis);
+      noticeDisController.text = newDis?.toString() ?? '';
+      _shouldNotice();
     });
   }
 
-  bool initialization = false;
+  /// 紀錄最近才推播過的關鍵價
+  final List<String> _justNotificationKeyValues = [];
 
-  static const String _statsKey = 'stats_key';
-  late final SharedPreferences _prefs;
+  Future<void> _shouldNotice() async {
+    if (state.current == null || kIsWeb) return;
+    // 找尋需要推播的關鍵價
+    String msg = '\n';
+    keyValues
+        .where((element) => element.key != KeyValue.current.title)
+        .where((element) => !_justNotificationKeyValues.contains(element.key))
+        .forEach((element) {
+      num dis = element.value - state.current!;
+      if (dis.abs() <= state.noticeDis) {
+        msg +=
+            '${element.key}：${element.value}\n差距：${dis > 0 ? '+' : ''}$dis\n';
+        _justNotificationKeyValues.add(element.key);
+      }
+    });
+    if (msg.trim().isNotEmpty) {
+      // 移除最後一個換行符號
+      msg = '現價：${state.current}\n${msg.trim()}';
+      sendNotification(msg);
+    }
+    // 移除剛推播過，但已離現價較遠的關鍵價
+    keyValues
+        .where((element) => _justNotificationKeyValues.contains(element.key))
+        .where((element) =>
+            (element.value - state.current!).abs() > state.noticeDis + 5)
+        .forEach((element) {
+      _justNotificationKeyValues.remove(element.key);
+    });
+  }
 
+  String _currentMonth = '';
+  TextEditingController currentController = TextEditingController();
   String? _current;
   Timer? _currentDebouncing;
+
+  bool loading = true;
 
   /// 設定現價
   set current(String value) {
@@ -40,7 +139,144 @@ class MainNotifier extends StateNotifier<SpyState> {
     _currentDebouncing?.cancel();
     _currentDebouncing = Timer(const Duration(milliseconds: 500), () {
       state = state.copyWith(current: int.tryParse(_current?.toString() ?? ''));
+      currentController.text =
+          int.tryParse(_current?.toString() ?? '').toString();
+      _shouldNotice();
     });
+  }
+
+  /// 取得SPY價格
+  Future<void> _initFetch() async {
+    await _fetchCurrentMonth();
+    await Future.wait([
+      _fetchCurrentPrice(),
+      _fetchSpyPrice(),
+    ]);
+
+    loading = false;
+    state = state.copyWith();
+  }
+
+  /// 取得近月
+  Future<void> _fetchCurrentMonth() async {
+    try {
+      final response =
+          await _restClient.getProductMonthsInfo(TxfRequest.current());
+      _currentMonth = response.rtData.items
+          .where((element) => element.item.length == 6)
+          .reduce((value, element) {
+        DateTime parseDate(String dateStr) {
+          if (dateStr.length != 6) {
+            throw const FormatException("Invalid date format");
+          }
+          final year = int.parse(dateStr.substring(0, 4));
+          final month = int.parse(dateStr.substring(4, 6));
+          return DateTime(year, month, 1);
+        }
+
+        // 找尋時間最小的，就是近月
+        DateTime currentMonth = parseDate(value.item);
+        DateTime compareMonth = parseDate(element.item);
+        return currentMonth.isBefore(compareMonth) ? value : element;
+      }).item;
+      // ignore: empty_catches
+    } catch (e, stack) {
+      debugPrint(e.toString());
+      debugPrint(stack.toString());
+    }
+  }
+
+  Future<void> _fetchSpyPrice() async {
+    // 判斷是否需要夜盤資訊
+    // 日盤和週末需要日盤和夜盤資訊
+    bool needNightSPY = isDay || isWeekend;
+    await Future.wait([
+      fetchSpyPrice(),
+      if (needNightSPY) fetchSpyPrice(false),
+    ]).then((value) {
+      String dayHigh = value[0][0];
+      String dayLow = value[0][1];
+      // 日盤SPY
+      state = state.copyWith(
+          daySpy: state.daySpy.copyWith(
+              high: int.tryParse(dayHigh), low: int.tryParse(dayLow)));
+      daySpyHighController.text = dayHigh;
+      daySpyLowController.text = dayLow;
+      // 夜盤SPY
+      if (needNightSPY) {
+        String nightHigh = value[1][0];
+        String nightLow = value[1][1];
+        state = state.copyWith(
+            nightSpy: state.nightSpy.copyWith(
+                high: int.tryParse(nightHigh), low: int.tryParse(nightLow)));
+        nightSpyHighController.text = nightHigh;
+        nightSpyLowController.text = nightLow;
+      }
+    });
+    // 計算下一次更新SPY的時間
+    DateTime now = DateTime.now().toUtc().add(const Duration(hours: 8));
+    if (isDay) {
+      // 日盤等收盤就可以更新
+      Future.delayed(
+          DateTime(now.year, now.month, now.day, 13, 45).difference(now), () {
+        _fetchSpyPrice();
+      });
+    } else {
+      // 夜盤等收盤就可以更新
+      late Duration diff;
+      late DateTime dis;
+      if (now.hour >= 15 && now.hour <= 23) {
+        dis = DateTime.fromMillisecondsSinceEpoch(
+            DateTime(now.year, now.month, now.day + 1, 5, 0)
+                    .millisecondsSinceEpoch -
+                now.millisecondsSinceEpoch);
+      } else {
+        dis = DateTime.fromMillisecondsSinceEpoch(
+            DateTime(now.year, now.month, now.day, 5, 0)
+                    .millisecondsSinceEpoch -
+                now.millisecondsSinceEpoch);
+      }
+      diff =
+          Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
+      Future.delayed(diff, () {
+        _fetchSpyPrice();
+      });
+    }
+  }
+
+  /// 取得現價
+  Future<void> _fetchCurrentPrice() async {
+    final response =
+        await _restClient.getTxfInfo(TxfRequest.current(_currentMonth));
+    final quote = response.rtData.quoteList.length == 1
+        ? response.rtData.quoteList.first
+        : response.rtData.quoteList[1];
+    int? price = double.tryParse(quote.cLastPrice)?.toInt();
+    if (!isHoliday(DateTime.now().toUtc().add(const Duration(hours: 8)))) {
+      Future.delayed(const Duration(seconds: 1), () {
+        _fetchCurrentPrice();
+      });
+    }
+    if (price == state.current) return;
+    state = state.copyWith(current: price);
+    currentController.text = price?.toString() ?? '';
+    _shouldNotice();
+  }
+
+  bool get isWeekend {
+    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
+    return now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
+  }
+
+  bool get isDay {
+    // 判斷現在是日盤還是夜盤
+    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
+    final nowYMD = DateTime(now.year, now.month, now.day);
+    DateTime dayStartTime =
+        nowYMD.add(const Duration(hours: 5, minutes: 00)); // 8:45
+    DateTime dayEndTime =
+        nowYMD.add(const Duration(hours: 13, minutes: 45)); // 15:00
+    return now.isAfter(dayStartTime) && now.isBefore(dayEndTime);
   }
 
   /// Spy，是否展開
@@ -57,6 +293,11 @@ class MainNotifier extends StateNotifier<SpyState> {
   void keyValuesExpand(bool expand) {
     state = state.copyWith(keyValuesExpand: expand);
   }
+
+  final TextEditingController daySpyHighController = TextEditingController();
+  final TextEditingController daySpyLowController = TextEditingController();
+  final TextEditingController nightSpyHighController = TextEditingController();
+  final TextEditingController nightSpyLowController = TextEditingController();
 
   /// 設定Spy高點
   void setSpyHigh(Spy spy, String value) {
@@ -256,7 +497,7 @@ class MainNotifier extends StateNotifier<SpyState> {
 
   void addCustomizeSensitivitySpace(
       [Direction direction = Direction.customizeLong]) {
-    String defTitle =  direction.typeName;
+    String defTitle = direction.typeName;
     String title = defTitle;
     int cnt = 0;
 
@@ -357,7 +598,11 @@ class MainNotifier extends StateNotifier<SpyState> {
     return keyValues;
   }
 
-  List<MapEntry<String, num>> get keyValues {
+  List<MapEntry<String, num>> _keyValues = [];
+
+  List<MapEntry<String, num>> get keyValues => _keyValues;
+
+  void updateKeyValues() {
     List<MapEntry<String, num>> keyValues = [
       MapEntry(KeyValue.current, state.current),
       MapEntry(
@@ -470,7 +715,7 @@ class MainNotifier extends StateNotifier<SpyState> {
         -1) {
       keyValues.insert(0, MapEntry(KeyValue.current.title, -1));
     }
-    return keyValues;
+    _keyValues = keyValues;
   }
 
   bool isSensitivitySpaceTitleDuplicate(String title) {
@@ -487,6 +732,7 @@ class MainNotifier extends StateNotifier<SpyState> {
   @override
   set state(SpyState state) {
     super.state = state;
-    _prefs.setString(_statsKey, jsonEncode(state.toJson()));
+    updateKeyValues();
+    prefs.setString(_statsKey, jsonEncode(state.toJson()));
   }
 }

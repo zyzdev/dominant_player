@@ -22,6 +22,8 @@ part 'spy_state.g.dart';
 @CopyWith()
 class SpyState {
   SpyState({
+    this.autoNotice = true,
+    this.noticeDis = 10,
     this.current,
     this.spyExpand = true,
     this.sensitivitySpaceExpand = true,
@@ -62,21 +64,13 @@ class SpyState {
         ]);
   }
 
-  String get spyDate {
-    final now = DateTime.now();
-    // final now = DateTime.now().subtract(Duration(days: 2, hours: 1, minutes: 47));
-    late DateTime spyDate;
-    if (now.weekday > DateTime.friday) {
-      spyDate = now.subtract(Duration(days: now.weekday - DateTime.friday));
-    } else {
-      if (now.hour < 15 && now.minute < 55) {
-        spyDate = now.subtract(const Duration(days: 1));
-      } else {
-        spyDate = now;
-      }
-    }
-    return DateFormat('M/dd').format(spyDate);
-  }
+  /// 接近關鍵價，自動提醒
+  @JsonKey(defaultValue: true)
+  final bool autoNotice;
+
+  /// 接近關鍵價[noticeDis]，自動提醒
+  @JsonKey(defaultValue: 10)
+  final int noticeDis;
 
   /// 目前點數
   final int? current;
@@ -148,6 +142,24 @@ class SpyState {
 class Spy {
   bool isDay;
 
+  String get spyDate {
+    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
+    // final now = DateTime.now().subtract(Duration(days: 2, hours: 1, minutes: 47));
+    late DateTime spyDate;
+    if (now.weekday > DateTime.friday) {
+      spyDate = isDay
+          ? now.subtract(Duration(days: now.weekday - DateTime.friday))
+          : now.add(Duration(days: now.weekday == DateTime.saturday ? 2 : 1));
+    } else {
+      if (now.hour < 15 && now.minute < 55) {
+        spyDate = now.subtract(const Duration(days: 1));
+      } else {
+        spyDate = now;
+      }
+    }
+    return DateFormat('MM/dd').format(spyDate);
+  }
+
   /// 高點
   final int? high;
 
@@ -207,6 +219,8 @@ class Spy {
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$SpyToJson(this);
+
+
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -277,11 +291,11 @@ class CustomizeSensitivitySpace {
   final int? low;
 
   /// 攻擊title
-  String get attackKeyTitle => '$title攻擊';
+  String get attackKeyTitle => '$title，攻擊';
 
-  String get middleKeyTitle => '$title中關';
+  String get middleKeyTitle => '$title，中關';
 
-  String get defenseKeyTitle => '$title防守';
+  String get defenseKeyTitle => '$title，防守';
 
   /// 分K最大多方邏輯中關
   double? get middle => high != null && low != null ? (high! + low!) / 2 : null;
@@ -289,20 +303,20 @@ class CustomizeSensitivitySpace {
   /// 分K最大多方邏輯攻擊點
   int? get attack => direction.isLong
       ? high != null
-          ? high! + _spaceOffset
-          : null
+      ? high! + _spaceOffset
+      : null
       : low != null
-          ? low! - _spaceOffset
-          : null;
+      ? low! - _spaceOffset
+      : null;
 
   /// 分K最大多方邏輯防守點
   int? get defense => direction.isLong
       ? low != null
-          ? low! - _spaceOffset
-          : null
+      ? low! - _spaceOffset
+      : null
       : high != null
-          ? high! + _spaceOffset
-          : null;
+      ? high! + _spaceOffset
+      : null;
 
   CustomizeSensitivitySpace(
       {this.high, this.low, required this.direction, required this.title});
@@ -341,8 +355,8 @@ enum Direction {
 extension DirectionName on Direction {
   bool get isLong =>
       this == Direction.long15 ||
-      this == Direction.long30 ||
-      this == Direction.customizeLong;
+          this == Direction.long30 ||
+          this == Direction.customizeLong;
 
   String get typeName {
     switch (this) {

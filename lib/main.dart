@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/spy_state.dart';
+import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,14 +13,18 @@ import 'package:window_manager/window_manager.dart';
 import 'model/key_value.dart';
 
 Future<void> main() async {
-  if(!kIsWeb) {
+  if (!kIsWeb) {
     WidgetsFlutterBinding.ensureInitialized();
     // Must add this line.
     await windowManager.ensureInitialized();
-    windowManager.waitUntilReadyToShow(const WindowOptions(), () {
-      windowManager.setTitle('絕對主力邏輯助手');
-    },);
+    windowManager.waitUntilReadyToShow(
+      const WindowOptions(),
+      () {
+        windowManager.setTitle('絕對主力邏輯助手');
+      },
+    );
   }
+  await init();
   runApp(
     const ProviderScope(
       child: MaterialApp(
@@ -84,6 +89,12 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   );
 
   @override
+  void initState() {
+    notificationInit();
+    super.initState();
+  }
+
+  @override
   void dispose() {
     _spyAnimationController.dispose();
     _sensitivitySpaceAnimationController.dispose();
@@ -101,17 +112,13 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal, //
           child: Row(
-            key: Key(
-                '_mainNotifier.initialization:${_mainNotifier.initialization}'),
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: _mainNotifier.initialization
-                ? [
-                    _collectedList,
-                    _spy,
-                    _sensitivitySpace,
-                    _keyValueList,
-                  ]
-                : [],
+            children: [
+              _collectedList,
+              _spy,
+              _sensitivitySpace,
+              _keyValueList,
+            ],
           ),
         ),
       ),
@@ -234,6 +241,37 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     Widget spyWidget(Spy spy) {
       final spyValues = _mainNotifier.spyValues(spy);
 
+      Widget sypDate() => Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    border: Border.all(
+                  color: Colors.grey.shade300,
+                  width: 1,
+                )),
+                child: Stack(
+                  children: [
+                    Positioned(
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        child: Opacity(
+                          opacity: 0,
+                          child: _checkbox(null),
+                        )),
+                    Row(
+                      children: [
+                        const SizedBox(width: 16),
+                        title('日期', line: false)
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              info(spy.spyDate, width: valueMaxWidth),
+            ],
+          );
       List<Widget> values = spyValues.map((e) {
         return Row(
           children: [
@@ -290,8 +328,16 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             ),
             e.key == KeyValue.high || e.key == KeyValue.low
                 ? textField(
+                    controller: e.key == KeyValue.high
+                        ? spy.isDay
+                            ? _mainNotifier.daySpyHighController
+                            : _mainNotifier.nightSpyHighController
+                        : e.key == KeyValue.low
+                            ? spy.isDay
+                                ? _mainNotifier.daySpyLowController
+                                : _mainNotifier.nightSpyLowController
+                            : null,
                     width: valueMaxWidth,
-                    init: e.value,
                     onChanged: (value) {
                       if (e.key == KeyValue.high) {
                         _mainNotifier.setSpyHigh(spy, value);
@@ -317,6 +363,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             color: Colors.yellow,
             child: title(spy.isDay ? '日盤' : '夜盤', line: false),
           ),
+          sypDate(),
           ...values,
         ],
       );
@@ -330,37 +377,6 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                      color: Colors.grey.shade300,
-                      width: 1,
-                    )),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                            top: 0,
-                            bottom: 0,
-                            left: 0,
-                            child: Opacity(
-                              opacity: 0,
-                              child: _checkbox(null),
-                            )),
-                        Row(
-                          children: [
-                            const SizedBox(width: 16),
-                            title('日期', line: false)
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  info(_state.spyDate, width: valueMaxWidth),
-                ],
-              ),
               spyWidget(_state.daySpy),
               spyWidget(_state.nightSpy),
             ],
@@ -1000,14 +1016,14 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   }
 
   Widget get _keyValueList {
-    String maxLengthTitle =
-        _mainNotifier.keyValues.fold('', (previousValue, element) {
+    final keyValues = _mainNotifier.keyValues;
+    String maxLengthTitle = keyValues.fold('', (previousValue, element) {
       return element.key.length > previousValue.length
           ? element.key
           : previousValue;
     });
 
-    double maxValueWidth = _mainNotifier.keyValues
+    double maxValueWidth = keyValues
             .map(
           (e) => e.value,
         )
@@ -1021,7 +1037,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
         ) +
         16;
 
-    double maxDisWidth = _mainNotifier.keyValues
+    double maxDisWidth = keyValues
             .map(
           (e) => e.value - (_state.current ?? 0),
         )
@@ -1034,20 +1050,43 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           },
         ) +
         16;
-    int indexOfCurrent = _mainNotifier.keyValues
+    int indexOfCurrent = keyValues
         .indexWhere((element) => element.key == KeyValue.current.title);
     Widget content = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         title('關鍵價位列表', line: false),
+        if (!kIsWeb)
+          Row(
+            children: [
+              Checkbox(
+                value: _state.autoNotice,
+                onChanged: (enable) {
+                  if (enable == null) return;
+                  _mainNotifier.setAutoNotice(enable);
+                },
+              ),
+              Text(
+                "現價接近關鍵價自動提醒",
+                style: infoST,
+              ),
+              textField(
+                controller: _mainNotifier.noticeDisController,
+                hint: '價差',
+                onChanged: (value) {
+                  _mainNotifier.noticeDis = value;
+                },
+              ),
+            ],
+          ),
         ColoredBox(
           color: const Color(0xFFFAFAFA),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (_mainNotifier.keyValues.isEmpty)
+              if (keyValues.isEmpty)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -1056,15 +1095,14 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                     style: titleST,
                   ),
                 ),
-              ..._mainNotifier.keyValues.map((e) {
-                int index = _mainNotifier.keyValues.indexWhere(
+              ...keyValues.map((e) {
+                int index = keyValues.indexWhere(
                   (element) => element.key == e.key,
                 );
                 num valueDis = indexOfCurrent == -1 || _state.current == null
                     ? 0
-                    : e.value - _mainNotifier.keyValues[indexOfCurrent].value;
-                bool currentIsNull =
-                    _mainNotifier.keyValues[indexOfCurrent].value <= 0;
+                    : e.value - keyValues[indexOfCurrent].value;
+                bool currentIsNull = keyValues[indexOfCurrent].value <= 0;
                 int indexDis = indexOfCurrent - index;
                 Color noticeBg = indexOfCurrent == -1
                     ? Colors.transparent
@@ -1100,7 +1138,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                     ),
                     indexDis == 0
                         ? textField(
-                            init: e.value > 0 ? e.value : null,
+                            controller: _mainNotifier.currentController,
                             onChanged: (value) {
                               _mainNotifier.current = value;
                             },
@@ -1140,7 +1178,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                               ),
                             )
                           : info(
-                              '${valueDis > 0 ? '+' : ''}$valueDis',
+                              _state.current == null
+                                  ? ''
+                                  : '${valueDis > 0 ? '+' : ''}$valueDis',
                               color: valueDis > 0
                                   ? winColor
                                   : valueDis < 0
@@ -1149,7 +1189,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                               topLine: true,
                               rightLine: true,
                               leftLine: true,
-                              bottomLine: e != _mainNotifier.keyValues.last,
+                              bottomLine: e != keyValues.last,
                               width: maxDisWidth,
                             ),
                     ]
@@ -1721,6 +1761,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   Widget textField({
     dynamic init,
     required ValueChanged<String> onChanged,
+    TextEditingController? controller,
     TextInputType? keyboardType = TextInputType.number,
     double? width,
     String? hint = '請輸入',
@@ -1731,6 +1772,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       alignment: Alignment.bottomCenter,
       child: TextFormField(
         initialValue: init?.toString(),
+        controller: controller,
         textAlign: TextAlign.center,
         keyboardType: keyboardType,
         style: infoST,

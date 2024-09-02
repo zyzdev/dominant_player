@@ -7,6 +7,10 @@ part of 'spy_state.dart';
 // **************************************************************************
 
 abstract class _$SpyStateCWProxy {
+  SpyState autoNotice(bool autoNotice);
+
+  SpyState noticeDis(int noticeDis);
+
   SpyState current(int? current);
 
   SpyState spyExpand(bool spyExpand);
@@ -53,6 +57,8 @@ abstract class _$SpyStateCWProxy {
   /// SpyState(...).copyWith(id: 12, name: "My name")
   /// ````
   SpyState call({
+    bool? autoNotice,
+    int? noticeDis,
     int? current,
     bool? spyExpand,
     bool? sensitivitySpaceExpand,
@@ -79,6 +85,12 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
   const _$SpyStateCWProxyImpl(this._value);
 
   final SpyState _value;
+
+  @override
+  SpyState autoNotice(bool autoNotice) => this(autoNotice: autoNotice);
+
+  @override
+  SpyState noticeDis(int noticeDis) => this(noticeDis: noticeDis);
 
   @override
   SpyState current(int? current) => this(current: current);
@@ -160,6 +172,8 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
   /// SpyState(...).copyWith(id: 12, name: "My name")
   /// ````
   SpyState call({
+    Object? autoNotice = const $CopyWithPlaceholder(),
+    Object? noticeDis = const $CopyWithPlaceholder(),
     Object? current = const $CopyWithPlaceholder(),
     Object? spyExpand = const $CopyWithPlaceholder(),
     Object? sensitivitySpaceExpand = const $CopyWithPlaceholder(),
@@ -180,6 +194,15 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
     Object? customizeValues = const $CopyWithPlaceholder(),
   }) {
     return SpyState(
+      autoNotice:
+          autoNotice == const $CopyWithPlaceholder() || autoNotice == null
+              ? _value.autoNotice
+              // ignore: cast_nullable_to_non_nullable
+              : autoNotice as bool,
+      noticeDis: noticeDis == const $CopyWithPlaceholder() || noticeDis == null
+          ? _value.noticeDis
+          // ignore: cast_nullable_to_non_nullable
+          : noticeDis as int,
       current: current == const $CopyWithPlaceholder()
           ? _value.current
           // ignore: cast_nullable_to_non_nullable
@@ -590,6 +613,8 @@ extension $CustomizeValueCopyWith on CustomizeValue {
 // **************************************************************************
 
 SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
+      autoNotice: json['autoNotice'] as bool? ?? true,
+      noticeDis: (json['noticeDis'] as num?)?.toInt() ?? 10,
       current: (json['current'] as num?)?.toInt(),
       spyExpand: json['spyExpand'] as bool? ?? true,
       sensitivitySpaceExpand: json['sensitivitySpaceExpand'] as bool? ?? true,
@@ -630,6 +655,8 @@ SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
     );
 
 Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
+      'autoNotice': instance.autoNotice,
+      'noticeDis': instance.noticeDis,
       'current': instance.current,
       'spyExpand': instance.spyExpand,
       'sensitivitySpaceExpand': instance.sensitivitySpaceExpand,
