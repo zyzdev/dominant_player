@@ -9,6 +9,7 @@ import 'package:dominant_player/service/holiday_info.dart';
 import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/service/rest_client.dart';
 import 'package:dominant_player/service/spy_info.dart';
+import 'package:dominant_player/widgets/keyK/key_k_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,7 +23,7 @@ SharedPreferences get prefs => _prefs!;
 
 Future<void> init() async {
   _prefs ??= await SharedPreferences.getInstance();
-  if(!kIsWeb) {
+  if (!kIsWeb) {
     HttpOverrides.global = MyHttpOverrides();
     await fetchTaiwanHoliday();
   }
@@ -55,12 +56,12 @@ final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
     debugPrint(stack.toString());
   }
 
-  return MainNotifier(state);
+  return MainNotifier(state, ref);
 });
 
 class MainNotifier extends StateNotifier<SpyState> {
-  MainNotifier(SpyState state) : super(state) {
-    if(!kIsWeb) _initFetch();
+  MainNotifier(SpyState state, StateNotifierProviderRef ref) : super(state) {
+    if (!kIsWeb) _initFetch();
     currentController.text = state.current?.toString() ?? '';
     daySpyHighController.text = state.daySpy.high?.toString() ?? '';
     daySpyLowController.text = state.daySpy.low?.toString() ?? '';
@@ -68,6 +69,8 @@ class MainNotifier extends StateNotifier<SpyState> {
     nightSpyLowController.text = state.nightSpy.low?.toString() ?? '';
     noticeDisController.text = state.noticeDis.toString();
     updateKeyValues();
+
+    ref.read(keyKProvider(KeyKState(title: '123', kPeriod: 5)));
   }
 
   late final RestClient _restClient = RestClient.instance;
@@ -179,6 +182,34 @@ class MainNotifier extends StateNotifier<SpyState> {
         DateTime compareMonth = parseDate(element.item);
         return currentMonth.isBefore(compareMonth) ? value : element;
       }).item;
+
+      // 計算下一次更新近月的時間
+      DateTime now = DateTime.now().toUtc().add(const Duration(hours: 8));
+      late Duration delay;
+      if (isDay) {
+        // 日盤等收盤就可以更新
+        delay = DateTime(now.year, now.month, now.day, 13, 45).difference(now);
+      } else {
+        // 夜盤等收盤就可以更新
+        late Duration diff;
+        late DateTime dis;
+        if (now.hour >= 15 && now.hour <= 23) {
+          dis = DateTime.fromMillisecondsSinceEpoch(
+              DateTime(now.year, now.month, now.day + 1, 5, 0)
+                  .millisecondsSinceEpoch -
+                  now.millisecondsSinceEpoch);
+        } else {
+          dis = DateTime.fromMillisecondsSinceEpoch(
+              DateTime(now.year, now.month, now.day, 5, 0)
+                  .millisecondsSinceEpoch -
+                  now.millisecondsSinceEpoch);
+        }
+        delay =
+            Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
+      }
+      Future.delayed(delay, () {
+        _fetchCurrentMonth();
+      });
       // ignore: empty_catches
     } catch (e, stack) {
       debugPrint(e.toString());
@@ -215,15 +246,12 @@ class MainNotifier extends StateNotifier<SpyState> {
     });
     // 計算下一次更新SPY的時間
     DateTime now = DateTime.now().toUtc().add(const Duration(hours: 8));
+    late Duration delay;
     if (isDay) {
       // 日盤等收盤就可以更新
-      Future.delayed(
-          DateTime(now.year, now.month, now.day, 13, 45).difference(now), () {
-        _fetchSpyPrice();
-      });
+      delay = DateTime(now.year, now.month, now.day, 13, 45).difference(now);
     } else {
       // 夜盤等收盤就可以更新
-      late Duration diff;
       late DateTime dis;
       if (now.hour >= 15 && now.hour <= 23) {
         dis = DateTime.fromMillisecondsSinceEpoch(
@@ -236,12 +264,12 @@ class MainNotifier extends StateNotifier<SpyState> {
                     .millisecondsSinceEpoch -
                 now.millisecondsSinceEpoch);
       }
-      diff =
+      delay =
           Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
-      Future.delayed(diff, () {
-        _fetchSpyPrice();
-      });
     }
+    Future.delayed(delay, () {
+      _fetchSpyPrice();
+    });
   }
 
   /// 取得現價

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:dominant_player/model/chart_data.dart';
 import 'package:dominant_player/model/product_months_info.dart';
 import 'package:dominant_player/model/txf_info.dart';
 import 'package:retrofit/retrofit.dart';
@@ -16,4 +17,7 @@ abstract class RestClient {
 
   @POST('futures/api/getCmdyMonthDDLItemByKind')
   Future<ProductMonthsInfoResponse> getProductMonthsInfo(@Body() TxfRequest request);
+
+  @POST('futures/api/getChartData1M')
+  Future<ChartDataResponse> getPerMinutePriceInfo(@Field('SymbolID') String symbolID);
 }
