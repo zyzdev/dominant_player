@@ -21,7 +21,7 @@ Map<String, dynamic> _$ChartDataResponseToJson(ChartDataResponse instance) =>
     };
 
 RtData _$RtDataFromJson(Map<String, dynamic> json) => RtData(
-      spotID: json['SpotID'] as String,
+      spotID: json['SpotID'] as String?,
       symbolID: json['SymbolID'] as String,
       dispCName: json['DispCName'] as String,
       dispEName: json['DispEName'] as String,

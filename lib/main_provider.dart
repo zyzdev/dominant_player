@@ -4,10 +4,10 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:dominant_player/model/key_value.dart';
-import 'package:dominant_player/model/txf_info.dart';
+import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
+import 'package:dominant_player/provider/current_price_provider.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:dominant_player/service/notification.dart';
-import 'package:dominant_player/service/rest_client.dart';
 import 'package:dominant_player/service/spy_info.dart';
 import 'package:dominant_player/widgets/keyK/key_k_provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,6 +16,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'model/spy_state.dart';
+import 'provider/current_month_provider.dart';
 
 SharedPreferences? _prefs;
 
@@ -33,8 +34,7 @@ class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
 
@@ -61,7 +61,7 @@ final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
 
 class MainNotifier extends StateNotifier<SpyState> {
   MainNotifier(SpyState state, StateNotifierProviderRef ref) : super(state) {
-    if (!kIsWeb) _initFetch();
+    if (!kIsWeb) _initFetch(ref);
     currentController.text = state.current?.toString() ?? '';
     daySpyHighController.text = state.daySpy.high?.toString() ?? '';
     daySpyLowController.text = state.daySpy.low?.toString() ?? '';
@@ -69,11 +69,7 @@ class MainNotifier extends StateNotifier<SpyState> {
     nightSpyLowController.text = state.nightSpy.low?.toString() ?? '';
     noticeDisController.text = state.noticeDis.toString();
     updateKeyValues();
-
-    ref.read(keyKProvider(KeyKState(title: '123', kPeriod: 5)));
   }
-
-  late final RestClient _restClient = RestClient.instance;
 
   void setAutoNotice(bool enable) {
     state = state.copyWith(autoNotice: enable);
@@ -109,8 +105,7 @@ class MainNotifier extends StateNotifier<SpyState> {
         .forEach((element) {
       num dis = element.value - state.current!;
       if (dis.abs() <= state.noticeDis) {
-        msg +=
-            '${element.key}：${element.value}\n差距：${dis > 0 ? '+' : ''}$dis\n';
+        msg += '${element.key}：${element.value}\n差距：${dis > 0 ? '+' : ''}$dis\n';
         _justNotificationKeyValues.add(element.key);
       }
     });
@@ -122,14 +117,12 @@ class MainNotifier extends StateNotifier<SpyState> {
     // 移除剛推播過，但已離現價較遠的關鍵價
     keyValues
         .where((element) => _justNotificationKeyValues.contains(element.key))
-        .where((element) =>
-            (element.value - state.current!).abs() > state.noticeDis + 5)
+        .where((element) => (element.value - state.current!).abs() > state.noticeDis + 5)
         .forEach((element) {
       _justNotificationKeyValues.remove(element.key);
     });
   }
 
-  String _currentMonth = '';
   TextEditingController currentController = TextEditingController();
   String? _current;
   Timer? _currentDebouncing;
@@ -142,79 +135,31 @@ class MainNotifier extends StateNotifier<SpyState> {
     _currentDebouncing?.cancel();
     _currentDebouncing = Timer(const Duration(milliseconds: 500), () {
       state = state.copyWith(current: int.tryParse(_current?.toString() ?? ''));
-      currentController.text =
-          int.tryParse(_current?.toString() ?? '').toString();
+      currentController.text = int.tryParse(_current?.toString() ?? '').toString();
       _shouldNotice();
     });
   }
 
   /// 取得SPY價格
-  Future<void> _initFetch() async {
-    await _fetchCurrentMonth();
-    await Future.wait([
-      _fetchCurrentPrice(),
-      _fetchSpyPrice(),
-    ]);
+  Future<void> _initFetch(StateNotifierProviderRef ref) async {
+    ref.listen(currentMonthProvider, (previous, currentMonth) {
+      fetchCurrentMonthSymbolID(ref);
+    });
+    ref.listen(currentMonthSymbolIdProvider, (previous, currentSymbolId) {
+      fetchCurrentPrice(ref);
+    });
+    ref.listen(currentPriceProvider, (previous, currentPrice) {
+      currentController.text = currentPrice?.toString() ?? '';
+      updateKeyValues();
+      _shouldNotice();
+      state = state.copyWith(current: currentPrice);
+    });
+
+    ref.read(keyKProvider(KeyKState(title: '123', kPeriod: 5)));
+    Future.wait([_fetchSpyPrice(), fetchCurrentMonth(ref)]);
 
     loading = false;
     state = state.copyWith();
-  }
-
-  /// 取得近月
-  Future<void> _fetchCurrentMonth() async {
-    try {
-      final response =
-          await _restClient.getProductMonthsInfo(TxfRequest.current());
-      _currentMonth = response.rtData.items
-          .where((element) => element.item.length == 6)
-          .reduce((value, element) {
-        DateTime parseDate(String dateStr) {
-          if (dateStr.length != 6) {
-            throw const FormatException("Invalid date format");
-          }
-          final year = int.parse(dateStr.substring(0, 4));
-          final month = int.parse(dateStr.substring(4, 6));
-          return DateTime(year, month, 1);
-        }
-
-        // 找尋時間最小的，就是近月
-        DateTime currentMonth = parseDate(value.item);
-        DateTime compareMonth = parseDate(element.item);
-        return currentMonth.isBefore(compareMonth) ? value : element;
-      }).item;
-
-      // 計算下一次更新近月的時間
-      DateTime now = DateTime.now().toUtc().add(const Duration(hours: 8));
-      late Duration delay;
-      if (isDay) {
-        // 日盤等收盤就可以更新
-        delay = DateTime(now.year, now.month, now.day, 13, 45).difference(now);
-      } else {
-        // 夜盤等收盤就可以更新
-        late Duration diff;
-        late DateTime dis;
-        if (now.hour >= 15 && now.hour <= 23) {
-          dis = DateTime.fromMillisecondsSinceEpoch(
-              DateTime(now.year, now.month, now.day + 1, 5, 0)
-                  .millisecondsSinceEpoch -
-                  now.millisecondsSinceEpoch);
-        } else {
-          dis = DateTime.fromMillisecondsSinceEpoch(
-              DateTime(now.year, now.month, now.day, 5, 0)
-                  .millisecondsSinceEpoch -
-                  now.millisecondsSinceEpoch);
-        }
-        delay =
-            Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
-      }
-      Future.delayed(delay, () {
-        _fetchCurrentMonth();
-      });
-      // ignore: empty_catches
-    } catch (e, stack) {
-      debugPrint(e.toString());
-      debugPrint(stack.toString());
-    }
   }
 
   Future<void> _fetchSpyPrice() async {
@@ -229,8 +174,7 @@ class MainNotifier extends StateNotifier<SpyState> {
       String dayLow = value[0][1];
       // 日盤SPY
       state = state.copyWith(
-          daySpy: state.daySpy.copyWith(
-              high: int.tryParse(dayHigh), low: int.tryParse(dayLow)));
+          daySpy: state.daySpy.copyWith(high: int.tryParse(dayHigh), low: int.tryParse(dayLow)));
       daySpyHighController.text = dayHigh;
       daySpyLowController.text = dayLow;
       // 夜盤SPY
@@ -238,8 +182,8 @@ class MainNotifier extends StateNotifier<SpyState> {
         String nightHigh = value[1][0];
         String nightLow = value[1][1];
         state = state.copyWith(
-            nightSpy: state.nightSpy.copyWith(
-                high: int.tryParse(nightHigh), low: int.tryParse(nightLow)));
+            nightSpy: state.nightSpy
+                .copyWith(high: int.tryParse(nightHigh), low: int.tryParse(nightLow)));
         nightSpyHighController.text = nightHigh;
         nightSpyLowController.text = nightLow;
       }
@@ -255,40 +199,18 @@ class MainNotifier extends StateNotifier<SpyState> {
       late DateTime dis;
       if (now.hour >= 15 && now.hour <= 23) {
         dis = DateTime.fromMillisecondsSinceEpoch(
-            DateTime(now.year, now.month, now.day + 1, 5, 0)
-                    .millisecondsSinceEpoch -
+            DateTime(now.year, now.month, now.day + 1, 5, 0).millisecondsSinceEpoch -
                 now.millisecondsSinceEpoch);
       } else {
         dis = DateTime.fromMillisecondsSinceEpoch(
-            DateTime(now.year, now.month, now.day, 5, 0)
-                    .millisecondsSinceEpoch -
+            DateTime(now.year, now.month, now.day, 5, 0).millisecondsSinceEpoch -
                 now.millisecondsSinceEpoch);
       }
-      delay =
-          Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
+      delay = Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
     }
     Future.delayed(delay, () {
       _fetchSpyPrice();
     });
-  }
-
-  /// 取得現價
-  Future<void> _fetchCurrentPrice() async {
-    final response =
-        await _restClient.getTxfInfo(TxfRequest.current(_currentMonth));
-    final quote = response.rtData.quoteList.length == 1
-        ? response.rtData.quoteList.first
-        : response.rtData.quoteList[1];
-    int? price = double.tryParse(quote.cLastPrice)?.toInt();
-    if (!isHoliday(DateTime.now().toUtc().add(const Duration(hours: 8)))) {
-      Future.delayed(const Duration(seconds: 1), () {
-        _fetchCurrentPrice();
-      });
-    }
-    if (price == state.current) return;
-    state = state.copyWith(current: price);
-    currentController.text = price?.toString() ?? '';
-    _shouldNotice();
   }
 
   bool get isWeekend {
@@ -300,10 +222,8 @@ class MainNotifier extends StateNotifier<SpyState> {
     // 判斷現在是日盤還是夜盤
     final now = DateTime.now().toUtc().add(const Duration(hours: 8));
     final nowYMD = DateTime(now.year, now.month, now.day);
-    DateTime dayStartTime =
-        nowYMD.add(const Duration(hours: 5, minutes: 00)); // 8:45
-    DateTime dayEndTime =
-        nowYMD.add(const Duration(hours: 13, minutes: 45)); // 15:00
+    DateTime dayStartTime = nowYMD.add(const Duration(hours: 5, minutes: 00)); // 8:45
+    DateTime dayEndTime = nowYMD.add(const Duration(hours: 13, minutes: 45)); // 15:00
     return now.isAfter(dayStartTime) && now.isBefore(dayEndTime);
   }
 
@@ -346,11 +266,9 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   void exchangeSensitivitySpaceWidgetIndex(int oldIndex, int newIndex) {
-    final SensitivitySpaceType item =
-        state.sensitivitySpaceWidgetIndex.removeAt(oldIndex);
+    final SensitivitySpaceType item = state.sensitivitySpaceWidgetIndex.removeAt(oldIndex);
     state.sensitivitySpaceWidgetIndex.insert(newIndex, item);
-    state = state.copyWith(
-        sensitivitySpaceWidgetIndex: state.sensitivitySpaceWidgetIndex);
+    state = state.copyWith(sensitivitySpaceWidgetIndex: state.sensitivitySpaceWidgetIndex);
   }
 
   /// 日盤靈敏度空間，是否展開
@@ -361,57 +279,51 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 設定日盤15分最大多方邏輯高點
   void daySensitivitySpaceLongHigh15(String value) {
     state = state.copyWith(
-        daySensitivitySpace15: state.daySensitivitySpace15
-            .copyWith(longHigh: int.tryParse(value)));
+        daySensitivitySpace15: state.daySensitivitySpace15.copyWith(longHigh: int.tryParse(value)));
   }
 
   /// 設定日盤15分最大多方邏輯低點
   void daySensitivitySpaceLongLow15(String value) {
     state = state.copyWith(
-        daySensitivitySpace15:
-            state.daySensitivitySpace15.copyWith(longLow: int.tryParse(value)));
+        daySensitivitySpace15: state.daySensitivitySpace15.copyWith(longLow: int.tryParse(value)));
   }
 
   /// 設定日盤30分最大多方邏輯高點
   void daySensitivitySpaceLongHigh30(String value) {
     state = state.copyWith(
-        daySensitivitySpace30: state.daySensitivitySpace30
-            .copyWith(longHigh: int.tryParse(value)));
+        daySensitivitySpace30: state.daySensitivitySpace30.copyWith(longHigh: int.tryParse(value)));
   }
 
   /// 設定30分最大多方邏輯低點
   void daySensitivitySpaceLongLow30(String value) {
     state = state.copyWith(
-        daySensitivitySpace30:
-            state.daySensitivitySpace30.copyWith(longLow: int.tryParse(value)));
+        daySensitivitySpace30: state.daySensitivitySpace30.copyWith(longLow: int.tryParse(value)));
   }
 
   /// 設定日盤15分最大空方邏輯高點
   void daySensitivitySpaceShortHigh15(String value) {
     state = state.copyWith(
-        daySensitivitySpace15: state.daySensitivitySpace15
-            .copyWith(shortHigh: int.tryParse(value)));
+        daySensitivitySpace15:
+            state.daySensitivitySpace15.copyWith(shortHigh: int.tryParse(value)));
   }
 
   /// 設定日盤15分最大空方邏輯低點
   void daySensitivitySpaceShortLow15(String value) {
     state = state.copyWith(
-        daySensitivitySpace15: state.daySensitivitySpace15
-            .copyWith(shortLow: int.tryParse(value)));
+        daySensitivitySpace15: state.daySensitivitySpace15.copyWith(shortLow: int.tryParse(value)));
   }
 
   /// 設定日盤30分最大空方邏輯高點
   void daySensitivitySpaceShortHigh30(String value) {
     state = state.copyWith(
-        daySensitivitySpace30: state.daySensitivitySpace30
-            .copyWith(shortHigh: int.tryParse(value)));
+        daySensitivitySpace30:
+            state.daySensitivitySpace30.copyWith(shortHigh: int.tryParse(value)));
   }
 
   /// 設定日盤30分最大空方邏輯低點
   void daySensitivitySpaceShortLow30(String value) {
     state = state.copyWith(
-        daySensitivitySpace30: state.daySensitivitySpace30
-            .copyWith(shortLow: int.tryParse(value)));
+        daySensitivitySpace30: state.daySensitivitySpace30.copyWith(shortLow: int.tryParse(value)));
   }
 
   /// 夜盤靈敏度空間，是否展開
@@ -422,57 +334,57 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 設定夜盤15分最大多方邏輯高點
   void nightSensitivitySpaceLongHigh15(String value) {
     state = state.copyWith(
-        nightSensitivitySpace15: state.nightSensitivitySpace15
-            .copyWith(longHigh: int.tryParse(value)));
+        nightSensitivitySpace15:
+            state.nightSensitivitySpace15.copyWith(longHigh: int.tryParse(value)));
   }
 
   /// 設定夜盤15分最大多方邏輯低點
   void nightSensitivitySpaceLongLow15(String value) {
     state = state.copyWith(
-        nightSensitivitySpace15: state.nightSensitivitySpace15
-            .copyWith(longLow: int.tryParse(value)));
+        nightSensitivitySpace15:
+            state.nightSensitivitySpace15.copyWith(longLow: int.tryParse(value)));
   }
 
   /// 設定夜盤30分最大多方邏輯高點
   void nightSensitivitySpaceLongHigh30(String value) {
     state = state.copyWith(
-        nightSensitivitySpace30: state.nightSensitivitySpace30
-            .copyWith(longHigh: int.tryParse(value)));
+        nightSensitivitySpace30:
+            state.nightSensitivitySpace30.copyWith(longHigh: int.tryParse(value)));
   }
 
   /// 設定30分最大多方邏輯低點
   void nightSensitivitySpaceLongLow30(String value) {
     state = state.copyWith(
-        nightSensitivitySpace30: state.nightSensitivitySpace30
-            .copyWith(longLow: int.tryParse(value)));
+        nightSensitivitySpace30:
+            state.nightSensitivitySpace30.copyWith(longLow: int.tryParse(value)));
   }
 
   /// 設定夜盤15分最大空方邏輯高點
   void nightSensitivitySpaceShortHigh15(String value) {
     state = state.copyWith(
-        nightSensitivitySpace15: state.nightSensitivitySpace15
-            .copyWith(shortHigh: int.tryParse(value)));
+        nightSensitivitySpace15:
+            state.nightSensitivitySpace15.copyWith(shortHigh: int.tryParse(value)));
   }
 
   /// 設定夜盤15分最大空方邏輯低點
   void nightSensitivitySpaceShortLow15(String value) {
     state = state.copyWith(
-        nightSensitivitySpace15: state.nightSensitivitySpace15
-            .copyWith(shortLow: int.tryParse(value)));
+        nightSensitivitySpace15:
+            state.nightSensitivitySpace15.copyWith(shortLow: int.tryParse(value)));
   }
 
   /// 設定夜盤30分最大空方邏輯高點
   void nightSensitivitySpaceShortHigh30(String value) {
     state = state.copyWith(
-        nightSensitivitySpace30: state.nightSensitivitySpace30
-            .copyWith(shortHigh: int.tryParse(value)));
+        nightSensitivitySpace30:
+            state.nightSensitivitySpace30.copyWith(shortHigh: int.tryParse(value)));
   }
 
   /// 設定日盤30分最大空方邏輯低點
   void nightSensitivitySpaceShortLow30(String value) {
     state = state.copyWith(
-        nightSensitivitySpace30: state.nightSensitivitySpace30
-            .copyWith(shortLow: int.tryParse(value)));
+        nightSensitivitySpace30:
+            state.nightSensitivitySpace30.copyWith(shortLow: int.tryParse(value)));
   }
 
   /// 是否考慮此關鍵價位
@@ -514,8 +426,7 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   void setCustomizeSensitivitySpaceDirection(
-      CustomizeSensitivitySpace customizeSensitivitySpace,
-      Direction direction) {
+      CustomizeSensitivitySpace customizeSensitivitySpace, Direction direction) {
     final data = state.customizeSensitivitySpaces;
     int index = data.indexOf(customizeSensitivitySpace);
     data[index] = customizeSensitivitySpace.copyWith(direction: direction);
@@ -523,8 +434,7 @@ class MainNotifier extends StateNotifier<SpyState> {
     state = state.copyWith(customizeSensitivitySpaces: data);
   }
 
-  void addCustomizeSensitivitySpace(
-      [Direction direction = Direction.customizeLong]) {
+  void addCustomizeSensitivitySpace([Direction direction = Direction.customizeLong]) {
     String defTitle = direction.typeName;
     String title = defTitle;
     int cnt = 0;
@@ -538,8 +448,7 @@ class MainNotifier extends StateNotifier<SpyState> {
     state = state.copyWith(customizeSensitivitySpaces: data);
   }
 
-  void removeCustomizeSensitivitySpace(
-      CustomizeSensitivitySpace customizeSensitivitySpace) {
+  void removeCustomizeSensitivitySpace(CustomizeSensitivitySpace customizeSensitivitySpace) {
     final data = state.customizeSensitivitySpaces;
     data.remove(customizeSensitivitySpace);
     state = state.copyWith(customizeSensitivitySpaces: data);
@@ -600,10 +509,8 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 自定義靈關鍵價名稱，是否重複
   bool isCustomizeValueTitleDuplicate(String title, [CustomizeValue? except]) {
     List<String> allTitle = List.from(KeyValue.values.map((e) => e.title));
-    allTitle.addAll(state.customizeValues
-        .where((element) => element != except)
-        .map((e) => e.title)
-        .toList());
+    allTitle.addAll(
+        state.customizeValues.where((element) => element != except).map((e) => e.title).toList());
     return allTitle.indexWhere((element) => element == title) != -1;
   }
 
@@ -633,54 +540,30 @@ class MainNotifier extends StateNotifier<SpyState> {
   void updateKeyValues() {
     List<MapEntry<String, num>> keyValues = [
       MapEntry(KeyValue.current, state.current),
-      MapEntry(
-          KeyValue.dayLongAttack15, state.daySensitivitySpace15.longAttack),
-      MapEntry(
-          KeyValue.dayLongMiddle15, state.daySensitivitySpace15.longMiddle),
-      MapEntry(
-          KeyValue.dayLongDefense15, state.daySensitivitySpace15.longDefense),
-      MapEntry(
-          KeyValue.dayLongAttack30, state.daySensitivitySpace30.longAttack),
-      MapEntry(
-          KeyValue.dayLongMiddle30, state.daySensitivitySpace30.longMiddle),
-      MapEntry(
-          KeyValue.dayLongDefense30, state.daySensitivitySpace30.longDefense),
-      MapEntry(
-          KeyValue.dayShortAttack15, state.daySensitivitySpace15.shortAttack),
-      MapEntry(
-          KeyValue.dayShortMiddle15, state.daySensitivitySpace15.shortMiddle),
-      MapEntry(
-          KeyValue.dayShortDefense15, state.daySensitivitySpace15.shortDefense),
-      MapEntry(
-          KeyValue.dayShortAttack30, state.daySensitivitySpace30.shortAttack),
-      MapEntry(
-          KeyValue.dayShortMiddle30, state.daySensitivitySpace30.shortMiddle),
-      MapEntry(
-          KeyValue.dayShortDefense30, state.daySensitivitySpace30.shortDefense),
-      MapEntry(
-          KeyValue.nightLongAttack15, state.nightSensitivitySpace15.longAttack),
-      MapEntry(
-          KeyValue.nightLongMiddle15, state.nightSensitivitySpace15.longMiddle),
-      MapEntry(KeyValue.nightLongDefense15,
-          state.nightSensitivitySpace15.longDefense),
-      MapEntry(
-          KeyValue.nightLongAttack30, state.nightSensitivitySpace30.longAttack),
-      MapEntry(
-          KeyValue.nightLongMiddle30, state.nightSensitivitySpace30.longMiddle),
-      MapEntry(KeyValue.nightLongDefense30,
-          state.nightSensitivitySpace30.longDefense),
-      MapEntry(KeyValue.nightShortAttack15,
-          state.nightSensitivitySpace15.shortAttack),
-      MapEntry(KeyValue.nightShortMiddle15,
-          state.nightSensitivitySpace15.shortMiddle),
-      MapEntry(KeyValue.nightShortDefense15,
-          state.nightSensitivitySpace15.shortDefense),
-      MapEntry(KeyValue.nightShortAttack30,
-          state.nightSensitivitySpace30.shortAttack),
-      MapEntry(KeyValue.nightShortMiddle30,
-          state.nightSensitivitySpace30.shortMiddle),
-      MapEntry(KeyValue.nightShortDefense30,
-          state.nightSensitivitySpace30.shortDefense),
+      MapEntry(KeyValue.dayLongAttack15, state.daySensitivitySpace15.longAttack),
+      MapEntry(KeyValue.dayLongMiddle15, state.daySensitivitySpace15.longMiddle),
+      MapEntry(KeyValue.dayLongDefense15, state.daySensitivitySpace15.longDefense),
+      MapEntry(KeyValue.dayLongAttack30, state.daySensitivitySpace30.longAttack),
+      MapEntry(KeyValue.dayLongMiddle30, state.daySensitivitySpace30.longMiddle),
+      MapEntry(KeyValue.dayLongDefense30, state.daySensitivitySpace30.longDefense),
+      MapEntry(KeyValue.dayShortAttack15, state.daySensitivitySpace15.shortAttack),
+      MapEntry(KeyValue.dayShortMiddle15, state.daySensitivitySpace15.shortMiddle),
+      MapEntry(KeyValue.dayShortDefense15, state.daySensitivitySpace15.shortDefense),
+      MapEntry(KeyValue.dayShortAttack30, state.daySensitivitySpace30.shortAttack),
+      MapEntry(KeyValue.dayShortMiddle30, state.daySensitivitySpace30.shortMiddle),
+      MapEntry(KeyValue.dayShortDefense30, state.daySensitivitySpace30.shortDefense),
+      MapEntry(KeyValue.nightLongAttack15, state.nightSensitivitySpace15.longAttack),
+      MapEntry(KeyValue.nightLongMiddle15, state.nightSensitivitySpace15.longMiddle),
+      MapEntry(KeyValue.nightLongDefense15, state.nightSensitivitySpace15.longDefense),
+      MapEntry(KeyValue.nightLongAttack30, state.nightSensitivitySpace30.longAttack),
+      MapEntry(KeyValue.nightLongMiddle30, state.nightSensitivitySpace30.longMiddle),
+      MapEntry(KeyValue.nightLongDefense30, state.nightSensitivitySpace30.longDefense),
+      MapEntry(KeyValue.nightShortAttack15, state.nightSensitivitySpace15.shortAttack),
+      MapEntry(KeyValue.nightShortMiddle15, state.nightSensitivitySpace15.shortMiddle),
+      MapEntry(KeyValue.nightShortDefense15, state.nightSensitivitySpace15.shortDefense),
+      MapEntry(KeyValue.nightShortAttack30, state.nightSensitivitySpace30.shortAttack),
+      MapEntry(KeyValue.nightShortMiddle30, state.nightSensitivitySpace30.shortMiddle),
+      MapEntry(KeyValue.nightShortDefense30, state.nightSensitivitySpace30.shortDefense),
     ]
         // 找出數值不為空值的
         .where((element) => element.value != null)
@@ -695,11 +578,9 @@ class MainNotifier extends StateNotifier<SpyState> {
             // 標題加入日夜盤
             return spyValues(spy)
                 // 移除點差和點差/4
-                .where((element) =>
-                    element.key != KeyValue.range &&
-                    element.key != KeyValue.rangeDiv4)
-                .map((e) => MapEntry(
-                    '${spy.isDay ? '日' : '夜'}盤，${e.key.title}', e.value));
+                .where(
+                    (element) => element.key != KeyValue.range && element.key != KeyValue.rangeDiv4)
+                .map((e) => MapEntry('${spy.isDay ? '日' : '夜'}盤，${e.key.title}', e.value));
           })
           // 找出數值不為空值的
           .where((element) => element.value != null)
@@ -710,12 +591,9 @@ class MainNotifier extends StateNotifier<SpyState> {
     // 加入自定義靈敏度空間
     keyValues.addAll(state.customizeSensitivitySpaces
         .expand((element) => [
-              if (element.attack != null)
-                MapEntry(element.attackKeyTitle, element.attack!),
-              if (element.middle != null)
-                MapEntry(element.middleKeyTitle, element.middle!),
-              if (element.defense != null)
-                MapEntry(element.defenseKeyTitle, element.defense!),
+              if (element.attack != null) MapEntry(element.attackKeyTitle, element.attack!),
+              if (element.middle != null) MapEntry(element.middleKeyTitle, element.middle!),
+              if (element.defense != null) MapEntry(element.defenseKeyTitle, element.defense!),
             ]) // 找出有考慮的
         .where((element) => state.considerKeyValue[element.key] ?? true));
 
@@ -738,9 +616,7 @@ class MainNotifier extends StateNotifier<SpyState> {
       },
     );
     // 如果現價為空，加到第一個
-    if (keyValues
-            .indexWhere((element) => element.key == KeyValue.current.title) ==
-        -1) {
+    if (keyValues.indexWhere((element) => element.key == KeyValue.current.title) == -1) {
       keyValues.insert(0, MapEntry(KeyValue.current.title, -1));
     }
     _keyValues = keyValues;

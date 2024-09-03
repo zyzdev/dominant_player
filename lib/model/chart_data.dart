@@ -26,7 +26,7 @@ class ChartDataResponse {
 @JsonSerializable(explicitToJson: true)
 class RtData {
   @JsonKey(name: 'SpotID')
-  final String spotID;
+  final String? spotID;
   @JsonKey(name: 'SymbolID')
   final String symbolID;
   @JsonKey(name: 'DispCName')
@@ -42,6 +42,12 @@ class RtData {
   @JsonKey(name: 'Ticks')
   final List<List<String>> ticks;
 
+  String time(List<String> tick) => tick[0];
+  String open(List<String> tick) => tick[1];
+  String high(List<String> tick) => tick[2];
+  String low(List<String> tick) => tick[3];
+  String close(List<String> tick) => tick[4];
+  String volume(List<String> tick) => tick[5];
   RtData({
     required this.spotID,
     required this.symbolID,
