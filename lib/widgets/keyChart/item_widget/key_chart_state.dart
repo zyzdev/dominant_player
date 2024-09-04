@@ -11,10 +11,16 @@ class KeyChartState {
   final String title;
 
   /// 關鍵K棒的週期
-  final int kPeriod;
+  final int? kPeriod;
 
   KeyChartState({
     required this.title,
-    required this.kPeriod,
+    this.kPeriod,
   });
+
+  factory KeyChartState.fromJson(Map<String, dynamic> json) =>
+      _$KeyChartStateFromJson(json);
+
+  /// Connect the generated [_$PersonToJson] function to the `toJson` method.
+  Map<String, dynamic> toJson() => _$KeyChartStateToJson(this);
 }

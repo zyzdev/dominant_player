@@ -9,7 +9,7 @@ part of 'key_chart_state.dart';
 abstract class _$KeyChartStateCWProxy {
   KeyChartState title(String title);
 
-  KeyChartState kPeriod(int kPeriod);
+  KeyChartState kPeriod(int? kPeriod);
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `KeyChartState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -33,7 +33,7 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
   KeyChartState title(String title) => this(title: title);
 
   @override
-  KeyChartState kPeriod(int kPeriod) => this(kPeriod: kPeriod);
+  KeyChartState kPeriod(int? kPeriod) => this(kPeriod: kPeriod);
 
   @override
 
@@ -52,10 +52,10 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
           ? _value.title
           // ignore: cast_nullable_to_non_nullable
           : title as String,
-      kPeriod: kPeriod == const $CopyWithPlaceholder() || kPeriod == null
+      kPeriod: kPeriod == const $CopyWithPlaceholder()
           ? _value.kPeriod
           // ignore: cast_nullable_to_non_nullable
-          : kPeriod as int,
+          : kPeriod as int?,
     );
   }
 }
@@ -73,7 +73,7 @@ extension $KeyChartStateCopyWith on KeyChartState {
 KeyChartState _$KeyChartStateFromJson(Map<String, dynamic> json) =>
     KeyChartState(
       title: json['title'] as String,
-      kPeriod: (json['kPeriod'] as num).toInt(),
+      kPeriod: (json['kPeriod'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$KeyChartStateToJson(KeyChartState instance) =>

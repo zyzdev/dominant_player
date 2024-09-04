@@ -1,8 +1,7 @@
-import 'dart:math';
-
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/main_state.dart';
 import 'package:dominant_player/service/notification.dart';
+import 'package:dominant_player/widgets/keyChart/key_chart_main_widget.dart';
 import 'package:dominant_player/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -896,7 +895,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
-                                _confirmDialog(e.title).then((remove) {
+                                confirmDialog(e.title, context).then((remove) {
                                   if (remove == true) {
                                     _mainNotifier.removeCustomizeValue(e);
                                   }
@@ -1282,6 +1281,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           title('關鍵K棒提醒', line: false),
+          const KeyChartMainWidget(),
         ],
       ),
     );
@@ -1739,7 +1739,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        _confirmDialog(customizeSensitivitySpace.title)
+                        confirmDialog(customizeSensitivitySpace.title, context)
                             .then((remove) {
                           if (remove == true) {
                             _mainNotifier.removeCustomizeSensitivitySpace(
@@ -1838,36 +1838,6 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     );
   }
 
-  Widget textField({
-    dynamic init,
-    required ValueChanged<String> onChanged,
-    TextEditingController? controller,
-    TextInputType? keyboardType = TextInputType.number,
-    double? width,
-    String? hint = '請輸入',
-    String? error,
-  }) {
-    return Container(
-      constraints: BoxConstraints(maxWidth: width ?? infoW, maxHeight: textH),
-      alignment: Alignment.bottomCenter,
-      child: TextFormField(
-        initialValue: init?.toString(),
-        controller: controller,
-        textAlign: TextAlign.center,
-        keyboardType: keyboardType,
-        style: infoST,
-        textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-            errorText: error,
-            hintText: hint,
-            hintStyle: infoST.copyWith(
-                fontSize: max(1, infoST.fontSize! - 4),
-                color: Colors.grey.withOpacity(0.75))),
-        onChanged: onChanged,
-      ),
-    );
-  }
-
   Widget _checkbox(String? keyValue) {
     Widget content = Checkbox(
       activeColor: Colors.blue,
@@ -1884,61 +1854,6 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       },
     );
     return Transform.scale(scale: 0.7, child: content);
-  }
-
-  Future<bool?> _confirmDialog(String title) async {
-    return showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "再次確認",
-            style: titleST,
-          ),
-          content: Text.rich(
-            TextSpan(style: infoST, children: [
-              const TextSpan(text: '您確定要刪除"'),
-              TextSpan(
-                  text: title,
-                  style: infoST.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.lightBlue,
-                  )),
-              const TextSpan(text: '"嗎？'),
-            ]),
-            style: infoST,
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                "取消",
-                style: infoST,
-              ),
-              onPressed: () => Navigator.of(context).pop(), // 关闭对话框
-            ),
-            TextButton(
-              child: Text(
-                "刪除",
-                style: infoST.copyWith(color: Colors.red),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Size textSize(String text, TextStyle style) {
-    final TextPainter textPainter = TextPainter(
-        text: TextSpan(text: text, style: style),
-        maxLines: 1,
-        textDirection: TextDirection.ltr)
-      ..layout(minWidth: 0, maxWidth: double.infinity);
-    return textPainter.size;
   }
 }
 

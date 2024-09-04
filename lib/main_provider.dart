@@ -9,8 +9,6 @@ import 'package:dominant_player/provider/current_price_provider.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/service/spy_info.dart';
-import 'package:dominant_player/widgets/keyChart/key_chart_provider.dart';
-import 'package:dominant_player/widgets/keyChart/key_chart_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,7 +37,7 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-const String _statsKey = 'stats_key';
+const String _statsKey = 'main_stats_key';
 
 final mainProvider = StateNotifierProvider<MainNotifier, MainState>((ref) {
   String? json = prefs.getString(_statsKey);
@@ -156,7 +154,6 @@ class MainNotifier extends StateNotifier<MainState> {
       state = state.copyWith(current: currentPrice);
     });
 
-    ref.read(keyChartProvider(KeyChartState(title: '123', kPeriod: 5)));
     Future.wait([_fetchSpyPrice(), fetchCurrentMonth(ref)]);
 
     loading = false;
