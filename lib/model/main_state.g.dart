@@ -1,62 +1,64 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'spy_state.dart';
+part of 'main_state.dart';
 
 // **************************************************************************
 // CopyWithGenerator
 // **************************************************************************
 
-abstract class _$SpyStateCWProxy {
-  SpyState autoNotice(bool autoNotice);
+abstract class _$MainStateCWProxy {
+  MainState autoNotice(bool autoNotice);
 
-  SpyState noticeDis(int noticeDis);
+  MainState noticeDis(int noticeDis);
 
-  SpyState current(int? current);
+  MainState current(int? current);
 
-  SpyState spyExpand(bool spyExpand);
+  MainState spyExpand(bool spyExpand);
 
-  SpyState sensitivitySpaceExpand(bool sensitivitySpaceExpand);
+  MainState sensitivitySpaceExpand(bool sensitivitySpaceExpand);
 
-  SpyState keyValuesExpand(bool keyValuesExpand);
+  MainState keyValuesExpand(bool keyValuesExpand);
 
-  SpyState daySpy(Spy daySpy);
+  MainState daySpy(Spy daySpy);
 
-  SpyState nightSpy(Spy nightSpy);
+  MainState nightSpy(Spy nightSpy);
 
-  SpyState sensitivitySpaceWidgetIndex(
+  MainState sensitivitySpaceWidgetIndex(
       List<SensitivitySpaceType> sensitivitySpaceWidgetIndex);
 
-  SpyState daySensitivitySpaceExpand(bool daySensitivitySpaceExpand);
+  MainState daySensitivitySpaceExpand(bool daySensitivitySpaceExpand);
 
-  SpyState daySensitivitySpace15(SensitivitySpace daySensitivitySpace15);
+  MainState daySensitivitySpace15(SensitivitySpace daySensitivitySpace15);
 
-  SpyState daySensitivitySpace30(SensitivitySpace daySensitivitySpace30);
+  MainState daySensitivitySpace30(SensitivitySpace daySensitivitySpace30);
 
-  SpyState nightSensitivitySpaceExpand(bool nightSensitivitySpaceExpand);
+  MainState nightSensitivitySpaceExpand(bool nightSensitivitySpaceExpand);
 
-  SpyState nightSensitivitySpace15(SensitivitySpace nightSensitivitySpace15);
+  MainState nightSensitivitySpace15(SensitivitySpace nightSensitivitySpace15);
 
-  SpyState nightSensitivitySpace30(SensitivitySpace nightSensitivitySpace30);
+  MainState nightSensitivitySpace30(SensitivitySpace nightSensitivitySpace30);
 
-  SpyState considerKeyValue(Map<String, bool> considerKeyValue);
+  MainState considerKeyValue(Map<String, bool> considerKeyValue);
 
-  SpyState customizeSensitivitySpaceExpand(
+  MainState customizeSensitivitySpaceExpand(
       bool customizeSensitivitySpaceExpand);
 
-  SpyState customizeSensitivitySpaces(
+  MainState customizeSensitivitySpaces(
       List<CustomizeSensitivitySpace> customizeSensitivitySpaces);
 
-  SpyState customizeValuesExpand(bool customizeValuesExpand);
+  MainState customizeValuesExpand(bool customizeValuesExpand);
 
-  SpyState customizeValues(List<CustomizeValue> customizeValues);
+  MainState customizeValues(List<CustomizeValue> customizeValues);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `SpyState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  MainState keyChartNoticeExpand(bool keyChartNoticeExpand);
+
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `MainState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
   /// ```dart
-  /// SpyState(...).copyWith(id: 12, name: "My name")
+  /// MainState(...).copyWith(id: 12, name: "My name")
   /// ````
-  SpyState call({
+  MainState call({
     bool? autoNotice,
     int? noticeDis,
     int? current,
@@ -77,101 +79,106 @@ abstract class _$SpyStateCWProxy {
     List<CustomizeSensitivitySpace>? customizeSensitivitySpaces,
     bool? customizeValuesExpand,
     List<CustomizeValue>? customizeValues,
+    bool? keyChartNoticeExpand,
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfSpyState.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfSpyState.copyWith.fieldName(...)`
-class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
-  const _$SpyStateCWProxyImpl(this._value);
+/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfMainState.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfMainState.copyWith.fieldName(...)`
+class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
+  const _$MainStateCWProxyImpl(this._value);
 
-  final SpyState _value;
-
-  @override
-  SpyState autoNotice(bool autoNotice) => this(autoNotice: autoNotice);
+  final MainState _value;
 
   @override
-  SpyState noticeDis(int noticeDis) => this(noticeDis: noticeDis);
+  MainState autoNotice(bool autoNotice) => this(autoNotice: autoNotice);
 
   @override
-  SpyState current(int? current) => this(current: current);
+  MainState noticeDis(int noticeDis) => this(noticeDis: noticeDis);
 
   @override
-  SpyState spyExpand(bool spyExpand) => this(spyExpand: spyExpand);
+  MainState current(int? current) => this(current: current);
 
   @override
-  SpyState sensitivitySpaceExpand(bool sensitivitySpaceExpand) =>
+  MainState spyExpand(bool spyExpand) => this(spyExpand: spyExpand);
+
+  @override
+  MainState sensitivitySpaceExpand(bool sensitivitySpaceExpand) =>
       this(sensitivitySpaceExpand: sensitivitySpaceExpand);
 
   @override
-  SpyState keyValuesExpand(bool keyValuesExpand) =>
+  MainState keyValuesExpand(bool keyValuesExpand) =>
       this(keyValuesExpand: keyValuesExpand);
 
   @override
-  SpyState daySpy(Spy daySpy) => this(daySpy: daySpy);
+  MainState daySpy(Spy daySpy) => this(daySpy: daySpy);
 
   @override
-  SpyState nightSpy(Spy nightSpy) => this(nightSpy: nightSpy);
+  MainState nightSpy(Spy nightSpy) => this(nightSpy: nightSpy);
 
   @override
-  SpyState sensitivitySpaceWidgetIndex(
+  MainState sensitivitySpaceWidgetIndex(
           List<SensitivitySpaceType> sensitivitySpaceWidgetIndex) =>
       this(sensitivitySpaceWidgetIndex: sensitivitySpaceWidgetIndex);
 
   @override
-  SpyState daySensitivitySpaceExpand(bool daySensitivitySpaceExpand) =>
+  MainState daySensitivitySpaceExpand(bool daySensitivitySpaceExpand) =>
       this(daySensitivitySpaceExpand: daySensitivitySpaceExpand);
 
   @override
-  SpyState daySensitivitySpace15(SensitivitySpace daySensitivitySpace15) =>
+  MainState daySensitivitySpace15(SensitivitySpace daySensitivitySpace15) =>
       this(daySensitivitySpace15: daySensitivitySpace15);
 
   @override
-  SpyState daySensitivitySpace30(SensitivitySpace daySensitivitySpace30) =>
+  MainState daySensitivitySpace30(SensitivitySpace daySensitivitySpace30) =>
       this(daySensitivitySpace30: daySensitivitySpace30);
 
   @override
-  SpyState nightSensitivitySpaceExpand(bool nightSensitivitySpaceExpand) =>
+  MainState nightSensitivitySpaceExpand(bool nightSensitivitySpaceExpand) =>
       this(nightSensitivitySpaceExpand: nightSensitivitySpaceExpand);
 
   @override
-  SpyState nightSensitivitySpace15(SensitivitySpace nightSensitivitySpace15) =>
+  MainState nightSensitivitySpace15(SensitivitySpace nightSensitivitySpace15) =>
       this(nightSensitivitySpace15: nightSensitivitySpace15);
 
   @override
-  SpyState nightSensitivitySpace30(SensitivitySpace nightSensitivitySpace30) =>
+  MainState nightSensitivitySpace30(SensitivitySpace nightSensitivitySpace30) =>
       this(nightSensitivitySpace30: nightSensitivitySpace30);
 
   @override
-  SpyState considerKeyValue(Map<String, bool> considerKeyValue) =>
+  MainState considerKeyValue(Map<String, bool> considerKeyValue) =>
       this(considerKeyValue: considerKeyValue);
 
   @override
-  SpyState customizeSensitivitySpaceExpand(
+  MainState customizeSensitivitySpaceExpand(
           bool customizeSensitivitySpaceExpand) =>
       this(customizeSensitivitySpaceExpand: customizeSensitivitySpaceExpand);
 
   @override
-  SpyState customizeSensitivitySpaces(
+  MainState customizeSensitivitySpaces(
           List<CustomizeSensitivitySpace> customizeSensitivitySpaces) =>
       this(customizeSensitivitySpaces: customizeSensitivitySpaces);
 
   @override
-  SpyState customizeValuesExpand(bool customizeValuesExpand) =>
+  MainState customizeValuesExpand(bool customizeValuesExpand) =>
       this(customizeValuesExpand: customizeValuesExpand);
 
   @override
-  SpyState customizeValues(List<CustomizeValue> customizeValues) =>
+  MainState customizeValues(List<CustomizeValue> customizeValues) =>
       this(customizeValues: customizeValues);
 
   @override
+  MainState keyChartNoticeExpand(bool keyChartNoticeExpand) =>
+      this(keyChartNoticeExpand: keyChartNoticeExpand);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `SpyState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  @override
+
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `MainState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
   /// ```dart
-  /// SpyState(...).copyWith(id: 12, name: "My name")
+  /// MainState(...).copyWith(id: 12, name: "My name")
   /// ````
-  SpyState call({
+  MainState call({
     Object? autoNotice = const $CopyWithPlaceholder(),
     Object? noticeDis = const $CopyWithPlaceholder(),
     Object? current = const $CopyWithPlaceholder(),
@@ -192,8 +199,9 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
     Object? customizeSensitivitySpaces = const $CopyWithPlaceholder(),
     Object? customizeValuesExpand = const $CopyWithPlaceholder(),
     Object? customizeValues = const $CopyWithPlaceholder(),
+    Object? keyChartNoticeExpand = const $CopyWithPlaceholder(),
   }) {
-    return SpyState(
+    return MainState(
       autoNotice:
           autoNotice == const $CopyWithPlaceholder() || autoNotice == null
               ? _value.autoNotice
@@ -300,14 +308,20 @@ class _$SpyStateCWProxyImpl implements _$SpyStateCWProxy {
           ? _value.customizeValues
           // ignore: cast_nullable_to_non_nullable
           : customizeValues as List<CustomizeValue>,
+      keyChartNoticeExpand:
+          keyChartNoticeExpand == const $CopyWithPlaceholder() ||
+                  keyChartNoticeExpand == null
+              ? _value.keyChartNoticeExpand
+              // ignore: cast_nullable_to_non_nullable
+              : keyChartNoticeExpand as bool,
     );
   }
 }
 
-extension $SpyStateCopyWith on SpyState {
-  /// Returns a callable class that can be used as follows: `instanceOfSpyState.copyWith(...)` or like so:`instanceOfSpyState.copyWith.fieldName(...)`.
+extension $MainStateCopyWith on MainState {
+  /// Returns a callable class that can be used as follows: `instanceOfMainState.copyWith(...)` or like so:`instanceOfMainState.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
-  _$SpyStateCWProxy get copyWith => _$SpyStateCWProxyImpl(this);
+  _$MainStateCWProxy get copyWith => _$MainStateCWProxyImpl(this);
 }
 
 abstract class _$SpyCWProxy {
@@ -612,10 +626,10 @@ extension $CustomizeValueCopyWith on CustomizeValue {
 // JsonSerializableGenerator
 // **************************************************************************
 
-SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
+MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
       autoNotice: json['autoNotice'] as bool? ?? true,
-      noticeDis: json['noticeDis'] as int? ?? 10,
-      current: json['current'] as int?,
+      noticeDis: (json['noticeDis'] as num?)?.toInt() ?? 10,
+      current: (json['current'] as num?)?.toInt(),
       spyExpand: json['spyExpand'] as bool? ?? true,
       sensitivitySpaceExpand: json['sensitivitySpaceExpand'] as bool? ?? true,
       keyValuesExpand: json['keyValuesExpand'] as bool? ?? true,
@@ -652,9 +666,10 @@ SpyState _$SpyStateFromJson(Map<String, dynamic> json) => SpyState(
               ?.map((e) => CustomizeValue.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      keyChartNoticeExpand: json['keyChartNoticeExpand'] as bool? ?? true,
     );
 
-Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
+Map<String, dynamic> _$MainStateToJson(MainState instance) => <String, dynamic>{
       'autoNotice': instance.autoNotice,
       'noticeDis': instance.noticeDis,
       'current': instance.current,
@@ -680,6 +695,7 @@ Map<String, dynamic> _$SpyStateToJson(SpyState instance) => <String, dynamic>{
       'customizeValues':
           instance.customizeValues.map((e) => e.toJson()).toList(),
       'considerKeyValue': instance.considerKeyValue,
+      'keyChartNoticeExpand': instance.keyChartNoticeExpand,
     };
 
 const _$SensitivitySpaceTypeEnumMap = {
@@ -691,8 +707,8 @@ const _$SensitivitySpaceTypeEnumMap = {
 
 Spy _$SpyFromJson(Map<String, dynamic> json) => Spy(
       isDay: json['isDay'] as bool,
-      high: json['high'] as int?,
-      low: json['low'] as int?,
+      high: (json['high'] as num?)?.toInt(),
+      low: (json['low'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$SpyToJson(Spy instance) => <String, dynamic>{
@@ -703,10 +719,10 @@ Map<String, dynamic> _$SpyToJson(Spy instance) => <String, dynamic>{
 
 SensitivitySpace _$SensitivitySpaceFromJson(Map<String, dynamic> json) =>
     SensitivitySpace(
-      longHigh: json['longHigh'] as int?,
-      longLow: json['longLow'] as int?,
-      shortHigh: json['shortHigh'] as int?,
-      shortLow: json['shortLow'] as int?,
+      longHigh: (json['longHigh'] as num?)?.toInt(),
+      longLow: (json['longLow'] as num?)?.toInt(),
+      shortHigh: (json['shortHigh'] as num?)?.toInt(),
+      shortLow: (json['shortLow'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$SensitivitySpaceToJson(SensitivitySpace instance) =>
@@ -720,8 +736,8 @@ Map<String, dynamic> _$SensitivitySpaceToJson(SensitivitySpace instance) =>
 CustomizeSensitivitySpace _$CustomizeSensitivitySpaceFromJson(
         Map<String, dynamic> json) =>
     CustomizeSensitivitySpace(
-      high: json['high'] as int?,
-      low: json['low'] as int?,
+      high: (json['high'] as num?)?.toInt(),
+      low: (json['low'] as num?)?.toInt(),
       direction: $enumDecode(_$DirectionEnumMap, json['direction']),
       title: json['title'] as String,
     );

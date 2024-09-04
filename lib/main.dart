@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:dominant_player/main_provider.dart';
-import 'package:dominant_player/model/spy_state.dart';
+import 'package:dominant_player/model/main_state.dart';
 import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
@@ -43,7 +43,7 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState with TickerProviderStateMixin {
-  SpyState get _state => ref.read(mainProvider);
+  MainState get _state => ref.read(mainProvider);
 
   MainNotifier get _mainNotifier => ref.read(mainProvider.notifier);
 
@@ -87,6 +87,18 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     parent: _keyValuesAnimationController,
     curve: Curves.fastEaseInToSlowEaseOut,
   );
+  late final AnimationController _keyChartNoticeAnimationController =
+  AnimationController(
+    value: _state.keyChartNoticeExpand ? 1 : 0,
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+  late final ReverseAnimation _keyChartNoticeExpandAnimation =
+  ReverseAnimation(_keyChartNoticeAnimationController);
+  late final Animation<double> _keyChartNoticeCollapseAnimation = CurvedAnimation(
+    parent: _keyChartNoticeAnimationController,
+    curve: Curves.fastEaseInToSlowEaseOut,
+  );
 
   @override
   void initState() {
@@ -99,6 +111,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     _spyAnimationController.dispose();
     _sensitivitySpaceAnimationController.dispose();
     _keyValuesAnimationController.dispose();
+    _keyChartNoticeAnimationController.dispose();
     super.dispose();
   }
 
@@ -118,6 +131,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
               _spy,
               _sensitivitySpace,
               _keyValueList,
+              _keyChartNotice,
             ],
           ),
         ),
@@ -219,6 +233,24 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           onTap: () {
             _mainNotifier.keyValuesExpand(!_state.keyValuesExpand);
             _keyValuesAnimationController.forward();
+          },
+        ),
+        InkWell(
+          child: SizeTransition(
+            sizeFactor: _keyChartNoticeExpandAnimation,
+            axis: Axis.vertical,
+            child: SizeTransition(
+              sizeFactor: _keyChartNoticeExpandAnimation,
+              axis: Axis.horizontal,
+              child: ColoredBox(
+                color: Colors.orange.shade300,
+                child: verticalText('關鍵K棒'),
+              ),
+            ),
+          ),
+          onTap: () {
+            _mainNotifier.keyChartNoticeExpand(!_state.keyChartNoticeExpand);
+            _keyChartNoticeAnimationController.forward();
           },
         ),
       ],
@@ -1235,6 +1267,54 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     );
     return SizeTransition(
       sizeFactor: _keyValuesCollapseAnimation,
+      axis: Axis.horizontal,
+      child: content,
+    );
+  }
+
+  Widget get _keyChartNotice {
+    if(kIsWeb) return const SizedBox();
+
+    Widget content = Container(
+      constraints: BoxConstraints(minWidth: infoW * 3),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          title('關鍵K棒提醒', line: false),
+        ],
+      ),
+    );
+    content = Stack(
+      children: [
+        // 標題的底色
+        Positioned(
+            left: 0,
+            right: 0,
+            child: ColoredBox(
+              color: Colors.orange.shade300,
+              child: SizedBox(
+                height: textH,
+                width: double.infinity,
+              ),
+            )),
+        content,
+        Positioned(
+          right: 0,
+          top: 0,
+          child: IconButton(
+            onPressed: () {
+              _mainNotifier.keyValuesExpand(!_state.keyChartNoticeExpand);
+              _keyChartNoticeAnimationController.reverse();
+            },
+            icon:
+            const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
+          ),
+        )
+      ],
+    );
+    return SizeTransition(
+      sizeFactor: _keyChartNoticeCollapseAnimation,
       axis: Axis.horizontal,
       child: content,
     );

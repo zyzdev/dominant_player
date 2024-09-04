@@ -1,19 +1,19 @@
-import 'package:dominant_player/model/txf_info.dart';
-import 'package:dominant_player/provider/current_month_provider.dart';
 import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:dominant_player/service/rest_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final keyKProvider =
-    StateNotifierProvider.family<KeyKStateNotifier, KeyKState, KeyKState>(
-  (ref, keyKState) {
-    return KeyKStateNotifier(keyKState, ref);
+import 'key_chart_state.dart';
+
+final keyChartProvider =
+    StateNotifierProvider.family<KeyChartStateNotifier, KeyChartState, KeyChartState>(
+  (ref, keyChartState) {
+    return KeyChartStateNotifier(keyChartState, ref);
   },
 );
 
-class KeyKStateNotifier extends StateNotifier<KeyKState> {
-  KeyKStateNotifier(super.state, StateNotifierProviderRef ref) {
+class KeyChartStateNotifier extends StateNotifier<KeyChartState> {
+  KeyChartStateNotifier(super.state, StateNotifierProviderRef ref) {
     ref.listen(currentMonthSymbolIdProvider, (previous, currentMonthSymbolID) {
       if(currentMonthSymbolID.isEmpty) return;
       _currentMonthSymbolID = currentMonthSymbolID;
@@ -47,17 +47,4 @@ class KeyKStateNotifier extends StateNotifier<KeyKState> {
     nowYMD.add(const Duration(hours: 13, minutes: 45)); // 15:00
     return now.isAfter(dayStartTime) && now.isBefore(dayEndTime);
   }
-}
-
-class KeyKState {
-  /// 關鍵K棒標題
-  final String title;
-
-  /// 關鍵K棒的週期
-  final int kPeriod;
-
-  KeyKState({
-    required this.title,
-    required this.kPeriod,
-  });
 }

@@ -9,13 +9,14 @@ import 'package:dominant_player/provider/current_price_provider.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/service/spy_info.dart';
-import 'package:dominant_player/widgets/keyK/key_k_provider.dart';
+import 'package:dominant_player/widgets/keyChart/key_chart_provider.dart';
+import 'package:dominant_player/widgets/keyChart/key_chart_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'model/spy_state.dart';
+import 'model/main_state.dart';
 import 'provider/current_month_provider.dart';
 
 SharedPreferences? _prefs;
@@ -40,17 +41,17 @@ class MyHttpOverrides extends HttpOverrides {
 
 const String _statsKey = 'stats_key';
 
-final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
+final mainProvider = StateNotifierProvider<MainNotifier, MainState>((ref) {
   String? json = prefs.getString(_statsKey);
-  late SpyState state;
+  late MainState state;
   try {
     if (json != null) {
-      state = SpyState.fromJson(jsonDecode(json));
+      state = MainState.fromJson(jsonDecode(json));
     } else {
-      state = SpyState.init();
+      state = MainState.init();
     }
   } catch (e, stack) {
-    state = SpyState.init();
+    state = MainState.init();
 
     debugPrint(e.toString());
     debugPrint(stack.toString());
@@ -59,8 +60,8 @@ final mainProvider = StateNotifierProvider<MainNotifier, SpyState>((ref) {
   return MainNotifier(state, ref);
 });
 
-class MainNotifier extends StateNotifier<SpyState> {
-  MainNotifier(SpyState state, StateNotifierProviderRef ref) : super(state) {
+class MainNotifier extends StateNotifier<MainState> {
+  MainNotifier(MainState state, StateNotifierProviderRef ref) : super(state) {
     if (!kIsWeb) _initFetch(ref);
     currentController.text = state.current?.toString() ?? '';
     daySpyHighController.text = state.daySpy.high?.toString() ?? '';
@@ -155,7 +156,7 @@ class MainNotifier extends StateNotifier<SpyState> {
       state = state.copyWith(current: currentPrice);
     });
 
-    ref.read(keyKProvider(KeyKState(title: '123', kPeriod: 5)));
+    ref.read(keyChartProvider(KeyChartState(title: '123', kPeriod: 5)));
     Future.wait([_fetchSpyPrice(), fetchCurrentMonth(ref)]);
 
     loading = false;
@@ -240,6 +241,11 @@ class MainNotifier extends StateNotifier<SpyState> {
   /// 關鍵價位列表，是否展開
   void keyValuesExpand(bool expand) {
     state = state.copyWith(keyValuesExpand: expand);
+  }
+
+  /// 關鍵，是否展開
+  void keyChartNoticeExpand(bool expand) {
+    state = state.copyWith(keyChartNoticeExpand: expand);
   }
 
   final TextEditingController daySpyHighController = TextEditingController();
@@ -634,7 +640,7 @@ class MainNotifier extends StateNotifier<SpyState> {
   }
 
   @override
-  set state(SpyState state) {
+  set state(MainState state) {
     super.state = state;
     updateKeyValues();
     prefs.setString(_statsKey, jsonEncode(state.toJson()));
