@@ -93,7 +93,7 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<ChartDataResponse> getPerMinutePriceInfo(String symbolID) async {
+  Future<ChartDataResponse> getCurrentChartInfo(String symbolID) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};

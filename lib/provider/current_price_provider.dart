@@ -1,3 +1,4 @@
+import 'package:dominant_player/provider/current_chart_data_provider.dart';
 import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:dominant_player/service/rest_client.dart';
@@ -20,5 +21,13 @@ Future<void> fetchCurrentPrice(StateNotifierProviderRef ref) async {
   int? oldPrice = ref.read(currentPriceProvider);
   if (oldPrice != price) {
     ref.read(currentPriceProvider.notifier).update((state) => price);
+    // 更新走勢資料
+    final newState =
+        ref.read(currentChartProvider).updateTick(response.rtData.ticks[1]);
+    if (newState != null) {
+      ref.read(currentChartProvider.notifier).update((state) {
+        return newState;
+      });
+    }
   }
 }

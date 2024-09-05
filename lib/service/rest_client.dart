@@ -20,7 +20,7 @@ abstract class RestClient {
   Future<ProductMonthsInfoResponse> getProductMonthsInfo(@Body() TxfRequest request);
 
   @POST('futures/api/getChartData1M')
-  Future<ChartDataResponse> getPerMinutePriceInfo(@Field('SymbolID') String symbolID);
+  Future<ChartDataResponse> getCurrentChartInfo(@Field('SymbolID') String symbolID);
 
   @POST('futures/api/getChartData1M_mem')
   Future<CurrentPriceResponse> getCurrentPrice(@Field('SymbolID') String symbolID);

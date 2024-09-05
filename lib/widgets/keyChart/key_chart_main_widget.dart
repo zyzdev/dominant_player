@@ -17,7 +17,7 @@ class _KeyChartMainWidgetState extends ConsumerState {
   Widget build(BuildContext context) {
     final state = ref.watch(keyChartMainWidgetProvider);
     Widget content = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (state.isEmpty)
           Container(
@@ -27,7 +27,7 @@ class _KeyChartMainWidgetState extends ConsumerState {
               style: titleST,
             ),
           ),
-        ...state.map((e) => KeyChartWidget(state: e)),
+        ...[for(int i = 0; i < state.length; i++) KeyChartWidget(index: i)],
         const SizedBox(height: 16),
         OutlinedButton.icon(
           icon: const Icon(
@@ -48,7 +48,7 @@ class _KeyChartMainWidgetState extends ConsumerState {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300, width: 1)
+          border: Border.all(color: Colors.grey.shade300, width: 1)
       ),
       child: content,);
   }

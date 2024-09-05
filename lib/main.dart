@@ -919,6 +919,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                                   const EdgeInsets.symmetric(horizontal: 16),
                               child: Stack(
                                 children: [
+                                  // 留下最小寬度
+                                  SizedBox(width: infoW),
                                   // 用Text把widget的寬度長出來
                                   // 以讓textField可以到最寬
                                   Padding(
@@ -1764,6 +1766,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Stack(
                         children: [
+                          // 留下最小寬度
+                          SizedBox(width: infoW),
                           // 用Text把widget的寬度長出來
                           // 以讓textField可以到最寬
                           Padding(

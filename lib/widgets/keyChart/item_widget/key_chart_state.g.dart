@@ -11,6 +11,8 @@ abstract class _$KeyChartStateCWProxy {
 
   KeyChartState kPeriod(int? kPeriod);
 
+  KeyChartState notice(bool notice);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `KeyChartState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -20,6 +22,7 @@ abstract class _$KeyChartStateCWProxy {
   KeyChartState call({
     String? title,
     int? kPeriod,
+    bool? notice,
   });
 }
 
@@ -36,6 +39,9 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
   KeyChartState kPeriod(int? kPeriod) => this(kPeriod: kPeriod);
 
   @override
+  KeyChartState notice(bool notice) => this(notice: notice);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `KeyChartState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -46,6 +52,7 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
   KeyChartState call({
     Object? title = const $CopyWithPlaceholder(),
     Object? kPeriod = const $CopyWithPlaceholder(),
+    Object? notice = const $CopyWithPlaceholder(),
   }) {
     return KeyChartState(
       title: title == const $CopyWithPlaceholder() || title == null
@@ -56,6 +63,10 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
           ? _value.kPeriod
           // ignore: cast_nullable_to_non_nullable
           : kPeriod as int?,
+      notice: notice == const $CopyWithPlaceholder() || notice == null
+          ? _value.notice
+          // ignore: cast_nullable_to_non_nullable
+          : notice as bool,
     );
   }
 }
@@ -74,10 +85,12 @@ KeyChartState _$KeyChartStateFromJson(Map<String, dynamic> json) =>
     KeyChartState(
       title: json['title'] as String,
       kPeriod: (json['kPeriod'] as num?)?.toInt(),
+      notice: json['notice'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$KeyChartStateToJson(KeyChartState instance) =>
     <String, dynamic>{
       'title': instance.title,
       'kPeriod': instance.kPeriod,
+      'notice': instance.notice,
     };

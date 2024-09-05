@@ -13,9 +13,12 @@ class KeyChartState {
   /// 關鍵K棒的週期
   final int? kPeriod;
 
+  final bool notice;
+
   KeyChartState({
     required this.title,
     this.kPeriod,
+    this.notice = true,
   });
 
   factory KeyChartState.fromJson(Map<String, dynamic> json) =>

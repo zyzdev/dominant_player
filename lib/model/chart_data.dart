@@ -24,7 +24,7 @@ class ChartDataResponse {
 }
 
 @JsonSerializable(explicitToJson: true)
-class RtData {
+class RtData with ChartUtil{
   @JsonKey(name: 'SpotID')
   final String? spotID;
   @JsonKey(name: 'SymbolID')
@@ -41,13 +41,6 @@ class RtData {
   final List<String> field;
   @JsonKey(name: 'Ticks')
   final List<List<String>> ticks;
-
-  String time(List<String> tick) => tick[0];
-  String open(List<String> tick) => tick[1];
-  String high(List<String> tick) => tick[2];
-  String low(List<String> tick) => tick[3];
-  String close(List<String> tick) => tick[4];
-  String volume(List<String> tick) => tick[5];
   RtData({
     required this.spotID,
     required this.symbolID,
@@ -228,4 +221,14 @@ class Quote {
   factory Quote.fromJson(Map<String, dynamic> json) => _$QuoteFromJson(json);
 
   Map<String, dynamic> toJson() => _$QuoteToJson(this);
+}
+
+
+mixin ChartUtil {
+  String time(List<String> tick) => tick[0];
+  String open(List<String> tick) => tick[1];
+  String high(List<String> tick) => tick[2];
+  String low(List<String> tick) => tick[3];
+  String close(List<String> tick) => tick[4];
+  String volume(List<String> tick) => tick[5];
 }
