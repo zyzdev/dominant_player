@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:dominant_player/model/key_value.dart';
 import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:dominant_player/provider/current_price_provider.dart';
+import 'package:dominant_player/provider/current_tick_provider.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/service/spy_info.dart';
@@ -145,7 +146,7 @@ class MainNotifier extends StateNotifier<MainState> {
       fetchCurrentMonthSymbolID(ref);
     });
     ref.listen(currentMonthSymbolIdProvider, (previous, currentSymbolId) {
-      fetchCurrentPrice(ref);
+      fetchCurrentTick(ref);
     });
     ref.listen(currentPriceProvider, (previous, currentPrice) {
       currentController.text = currentPrice?.toString() ?? '';

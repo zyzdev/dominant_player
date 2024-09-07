@@ -225,10 +225,21 @@ class Quote {
 
 
 mixin ChartUtil {
-  String time(List<String> tick) => tick[0];
-  String open(List<String> tick) => tick[1];
-  String high(List<String> tick) => tick[2];
-  String low(List<String> tick) => tick[3];
-  String close(List<String> tick) => tick[4];
-  String volume(List<String> tick) => tick[5];
+  String tickTime(List<String> tick) => tick[0];
+  String tickOpen(List<String> tick) => tick[1];
+  String tickHigh(List<String> tick) => tick[2];
+  String tickLow(List<String> tick) => tick[3];
+  String tickClose(List<String> tick) => tick[4];
+  String tickVolume(List<String> tick) => tick[5];
+
+
+  /// 比對Tick是否不同
+  bool tickDiff(List<String> tickA, List<String> tickB) {
+    if(tickA.length != tickB.length) return true;
+    int length = tickA.length;
+    for(int i = 0; i < length; i++) {
+      if(tickA[i] != tickB[i]) return true;
+    }
+    return false;
+  }
 }

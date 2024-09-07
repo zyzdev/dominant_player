@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'current_price.g.dart';
@@ -46,8 +48,12 @@ class RtData {
   String get curLow => ticks[1][3];
   String get curClose => ticks[1][4];
   String get curVolume => ticks[1][5];
-  factory RtData.fromJson(Map<String, dynamic> json) =>
-      _$RtDataFromJson(json);
+  factory RtData.fromJson(Map<String, dynamic> json) {
+    int cur = double.parse((json['Ticks'] as List<dynamic>)[1][4]).toInt();
+    cur += Random().nextInt(100);
+    json['Ticks'][1][4] = cur.toString();
+  return _$RtDataFromJson(json);
+  }
 
   Map<String, dynamic> toJson() => _$RtDataToJson(this);
 }
