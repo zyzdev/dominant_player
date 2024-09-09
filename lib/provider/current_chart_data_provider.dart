@@ -15,8 +15,7 @@ Future<void> fetchChartDate(StateNotifierProviderRef ref) async {
     final response =
         await _restClient.getCurrentChartInfo(currentMonthSymbolID);
     ref.read(currentChartProvider.notifier).update((state) {
-      final data = Ticks();
-      data.allTicks = response.rtData.ticks;
+      final data = Ticks()..setAllTicks(response.rtData.ticks);
       return data;
     });
     // ignore: empty_catches

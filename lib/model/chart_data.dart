@@ -226,20 +226,37 @@ class Quote {
 
 mixin ChartUtil {
   String tickTime(List<String> tick) => tick[0];
-  String tickOpen(List<String> tick) => tick[1];
-  String tickHigh(List<String> tick) => tick[2];
-  String tickLow(List<String> tick) => tick[3];
-  String tickClose(List<String> tick) => tick[4];
+  String tickOpen(List<String> tick) => tick[1].split('.')[0];
+  String tickHigh(List<String> tick) => tick[2].split('.')[0];
+  String tickLow(List<String> tick) => tick[3].split('.')[0];
+  String tickClose(List<String> tick) => tick[4].split('.')[0];
   String tickVolume(List<String> tick) => tick[5];
 
 
-  /// 比對Tick是否不同
-  bool tickDiff(List<String> tickA, List<String> tickB) {
+  /// 比對Tick value是否不同
+  /// 不包含時間
+  bool tickValuesDiff(List<String> tickA, List<String> tickB) {
     if(tickA.length != tickB.length) return true;
     int length = tickA.length;
-    for(int i = 0; i < length; i++) {
+    if(tickTimeDiff(tickA, tickB)) return true;
+    for(int i = 1; i < length; i++) {
       if(tickA[i] != tickB[i]) return true;
     }
     return false;
+  }
+
+  bool tickTimeDiff(List<String> tickA, List<String> tickB) {
+    String timeA = tickTime(tickA);
+    String timeB = tickTime(tickB);
+    int ha = double.parse(timeA.substring(0, 2)).toInt();
+    int ma = double.parse(timeA.substring(2, 4)).toInt();
+    int sa = double.parse(timeA.substring(4)).toInt();
+    int minuteA = ha * 60 + ma;
+    int hb = double.parse(timeB.substring(0, 2)).toInt();
+    int mb = double.parse(timeB.substring(2, 4)).toInt();
+    int sb = double.parse(timeB.substring(4)).toInt();
+    int minuteB = hb * 60 + mb;
+    if (minuteB > minuteA) return true;
+    return sa != sb;
   }
 }
