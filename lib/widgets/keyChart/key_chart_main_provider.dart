@@ -64,6 +64,34 @@ class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
     this.state = List.of(this.state);
   }
 
+  /// 是否考慮成交量
+  void setVolume(bool notice, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(considerVolume: notice);
+    this.state = List.of(this.state);
+  }
+
+  /// 成交量的數值
+  void setVolumeValue(int volume, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(keyVolume: volume);
+    this.state = List.of(this.state);
+  }
+
+  /// 是否考慮收長上影
+  void setCloseWithLongUpperShadow(bool notice, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(closeWithLongUpperShadow: notice);
+    this.state = List.of(this.state);
+  }
+
+  /// 是否考慮收長下影
+  void setCloseWithLongLowerShadow(bool notice, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(closeWithLongLowerShadow: notice);
+    this.state = List.of(this.state);
+  }
+
   void addKeyChart() {
     const String defTitle = '關鍵x分K棒';
     String title = defTitle;

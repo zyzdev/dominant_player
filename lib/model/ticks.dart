@@ -23,30 +23,6 @@ class Ticks with ChartUtil {
 
   String get curVolume => allTicks.last[5];
 
-
-  // true 代表要新增
-  bool? addOrReplace(List<String> newTick) {
-    if(allTicks.isEmpty) return null;
-    String timeA = tickTime(allTicks.last);
-    String timeB = tickTime(newTick);
-    int ha = double.parse(timeA.substring(0, 2)).toInt();
-    int ma = double.parse(timeA.substring(2, 4)).toInt();
-    int sa = double.parse(timeA.substring(4)).toInt();
-    int minuteA = ha * 60 + ma;
-    int hb = double.parse(timeB.substring(0, 2)).toInt();
-    int mb = double.parse(timeB.substring(2, 4)).toInt();
-    int sb = double.parse(timeB.substring(4)).toInt();
-    int minuteB = hb * 60 + mb;
-    // 分鐘比較大，要新增
-    if (minuteB > minuteA) return true;
-    // 秒數不同，要取代
-    if(sb > sa) return false;
-    // 數值不同，要取代
-    if(tickValuesDiff(allTicks.last, newTick)) return false;
-
-    return null;
-  }
-
   Ticks? updateTick(List<String> tick) {
     if (allTicks.isEmpty) {
       return null;
@@ -54,7 +30,7 @@ class Ticks with ChartUtil {
 
 
     // 新增還是取代最後一筆
-    bool? add = addOrReplace(tick);
+    bool? add = addOrReplace(allTicks, tick);
     if (add == true) {
       allTicks.add(tick);
     } else if(add == false){

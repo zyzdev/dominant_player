@@ -628,8 +628,8 @@ extension $CustomizeValueCopyWith on CustomizeValue {
 
 MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
       autoNotice: json['autoNotice'] as bool? ?? true,
-      noticeDis: (json['noticeDis'] as num?)?.toInt() ?? 10,
-      current: (json['current'] as num?)?.toInt(),
+      noticeDis: json['noticeDis'] as int? ?? 10,
+      current: json['current'] as int?,
       spyExpand: json['spyExpand'] as bool? ?? true,
       sensitivitySpaceExpand: json['sensitivitySpaceExpand'] as bool? ?? true,
       keyValuesExpand: json['keyValuesExpand'] as bool? ?? true,
@@ -707,8 +707,8 @@ const _$SensitivitySpaceTypeEnumMap = {
 
 Spy _$SpyFromJson(Map<String, dynamic> json) => Spy(
       isDay: json['isDay'] as bool,
-      high: (json['high'] as num?)?.toInt(),
-      low: (json['low'] as num?)?.toInt(),
+      high: json['high'] as int?,
+      low: json['low'] as int?,
     );
 
 Map<String, dynamic> _$SpyToJson(Spy instance) => <String, dynamic>{
@@ -719,10 +719,10 @@ Map<String, dynamic> _$SpyToJson(Spy instance) => <String, dynamic>{
 
 SensitivitySpace _$SensitivitySpaceFromJson(Map<String, dynamic> json) =>
     SensitivitySpace(
-      longHigh: (json['longHigh'] as num?)?.toInt(),
-      longLow: (json['longLow'] as num?)?.toInt(),
-      shortHigh: (json['shortHigh'] as num?)?.toInt(),
-      shortLow: (json['shortLow'] as num?)?.toInt(),
+      longHigh: json['longHigh'] as int?,
+      longLow: json['longLow'] as int?,
+      shortHigh: json['shortHigh'] as int?,
+      shortLow: json['shortLow'] as int?,
     );
 
 Map<String, dynamic> _$SensitivitySpaceToJson(SensitivitySpace instance) =>
@@ -736,8 +736,8 @@ Map<String, dynamic> _$SensitivitySpaceToJson(SensitivitySpace instance) =>
 CustomizeSensitivitySpace _$CustomizeSensitivitySpaceFromJson(
         Map<String, dynamic> json) =>
     CustomizeSensitivitySpace(
-      high: (json['high'] as num?)?.toInt(),
-      low: (json['low'] as num?)?.toInt(),
+      high: json['high'] as int?,
+      low: json['low'] as int?,
       direction: $enumDecode(_$DirectionEnumMap, json['direction']),
       title: json['title'] as String,
     );

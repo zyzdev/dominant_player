@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:dominant_player/model/chart_info.dart';
-import 'package:dominant_player/provider/chart_info_provider.dart';
+import 'package:dominant_player/model/real_time_chart_info.dart';
+import 'package:dominant_player/provider/real_time_chart_info_provider.dart';
 import 'package:dominant_player/provider/is_add_new_tick_provider.dart';
 import 'package:dominant_player/widgets/keyChart/item_widget/key_chart_state.dart';
 import 'package:dominant_player/widgets/keyChart/key_chart_main_provider.dart';
@@ -26,18 +27,21 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
   KeyChartMainWidgetNotifier get _notifier =>
       ref.read(keyChartMainWidgetProvider.notifier);
 
-  ChartInfo get _chartInfo => ref.read(chartInfoProvider(_state.kPeriod!));
+  RealTimeChartInfo get _realTimeChartInfo =>
+      ref.read(realTimeChartInfoProvider(_state.kPeriod!));
 
   bool get _dataIsReady {
-    return _state.kPeriod != null && _chartInfo.allTicks.isNotEmpty;
+    return _state.kPeriod != null && _realTimeChartInfo.allTicks.isNotEmpty;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_state.kPeriod != null) ref.watch(chartInfoProvider(_state.kPeriod!));
+    if (_state.kPeriod != null)
+      ref.watch(realTimeChartInfoProvider(_state.kPeriod!));
     ref.listen(isAddNewTickProvider, (previous, next) {
       print(previous);
       print(next);
+      _state.shouldNotice(_realTimeChartInfo.getLastFinishChartInfo());
     });
 
     _kChartSizeFactor = 5 / (_state.kPeriod ?? 1);
@@ -122,11 +126,27 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
               const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: valuesInfo,
+                child: valuesInfo(_realTimeChartInfo.allChartInfo.last),
               ),
               const SizedBox(height: 16),
-              chart,
-              const SizedBox(height: 16),
+              chart(_realTimeChartInfo.allChartInfo.last),
+              //charts,
+              //const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: valuesInfo(_realTimeChartInfo
+                    .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),
+              ),
+              chart(_realTimeChartInfo
+                  .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),
+              Wrap(
+                spacing: 16,
+                children: [
+                  considerVolume,
+                  considerCloseWithLongUpperShadow,
+                  considerCloseWithLongLowerShadow,
+                ],
+              )
             ],
           ],
         ),
@@ -161,11 +181,11 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
   double _kChartSizeFactor = 0;
   static const double _kChartWidth = 30;
 
-  Widget get valuesInfo {
-    int closeToOpenDis = _chartInfo.closeToOpenDis;
-    Color valueColor = closeToOpenDis > 0
+  Widget valuesInfo(ChartInfo chartInfo) {
+    int closeToOpen = chartInfo.closeToOpen;
+    Color valueColor = closeToOpen > 0
         ? winColor
-        : closeToOpenDis < 0
+        : closeToOpen < 0
             ? loseColor
             : Colors.black;
 
@@ -187,22 +207,34 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
     return Wrap(
       spacing: 8,
       children: [
-        tile('開', _chartInfo.open.toString()),
-        tile('高', _chartInfo.high.toString()),
-        tile('低', _chartInfo.low.toString()),
-        tile('收', _chartInfo.close.toString()),
-        tile('量', _chartInfo.volume.toString()),
+        tile('開', chartInfo.open.toString()),
+        tile('高', chartInfo.high.toString()),
+        tile('中', chartInfo.middle.toString()),
+        tile('低', chartInfo.low.toString()),
+        tile('收', chartInfo.close.toString()),
+        tile('量', chartInfo.volume.toString()),
       ],
     );
   }
 
-  Widget get chart {
-    int highToOpenDis = _chartInfo.high - _chartInfo.open;
-    int  lowToOpenDis = _chartInfo.open - _chartInfo.low;
+  Widget get charts {
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 250, maxWidth: 400),
+      child: ListView(
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        children: _realTimeChartInfo.allChartInfo.map((e) => chart(e)).toList(),
+      ),
+    );
+  }
+
+  Widget chart(ChartInfo chartInfo) {
+    int highToOpenDis = chartInfo.highToOpenDis;
+    int lowToOpenDis = chartInfo.lowToOpenDis;
     // +1是因為open位置的高度
     double kChartHeight =
         max(highToOpenDis, lowToOpenDis).abs() * _kChartSizeFactor * 2 + 1;
-    int closeToOpenDis = _chartInfo.closeToOpenDis;
+    int closeToOpen = chartInfo.closeToOpen;
 
     late double kChartUpperHeight;
     late double kChartLowerHeight;
@@ -211,35 +243,33 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
     // 如果超過，就要用比例來給
     if (kChartHeight > _kChartMaxH) {
       if (highToOpenDis > lowToOpenDis) {
-        kChartUpperHeight = (_kChartMaxH - 1) * highToOpenDis / _chartInfo.distance;
-        kChartLowerHeight =(_kChartMaxH - 1) - kChartUpperHeight;
+        kChartUpperHeight =
+            (_kChartMaxH - 1) * highToOpenDis / chartInfo.distance;
+        kChartLowerHeight = (_kChartMaxH - 1) - kChartUpperHeight;
       } else {
-        kChartLowerHeight =(_kChartMaxH - 1) * lowToOpenDis / _chartInfo.distance;
-        kChartUpperHeight = (_kChartMaxH - 1)  - kChartLowerHeight;
+        kChartLowerHeight =
+            (_kChartMaxH - 1) * lowToOpenDis / chartInfo.distance;
+        kChartUpperHeight = (_kChartMaxH - 1) - kChartLowerHeight;
       }
-      print('highToCloseDis:$highToOpenDis, lowToCloseDis:$lowToOpenDis');
-      print('kChartUpperHeight:$kChartUpperHeight, kChartLowerHeight:$kChartLowerHeight');
       kChartHeight = _kChartMaxH;
     } else {
-      kChartUpperHeight = _chartInfo.distance.abs() * _kChartSizeFactor;
+      kChartUpperHeight = highToOpenDis * _kChartSizeFactor;
       kChartLowerHeight = kChartUpperHeight;
     }
 
-
-    double kChartUpperSquareHeight = closeToOpenDis > 0
-        ? kChartUpperHeight * closeToOpenDis / highToOpenDis
+    double kChartUpperSquareHeight = closeToOpen > 0
+        ? kChartUpperHeight * closeToOpen.abs() / highToOpenDis
         : 0;
-    double kChartLowerSquareHeight = closeToOpenDis < 0
-        ? kChartLowerHeight * closeToOpenDis.abs() / lowToOpenDis
+    double kChartLowerSquareHeight = closeToOpen < 0
+        ? kChartLowerHeight * closeToOpen.abs() / lowToOpenDis
         : 0;
     double kChartUpperShadowHeight =
         kChartUpperHeight - kChartUpperSquareHeight;
     double kChartLowerShadowHeight =
         kChartLowerHeight - kChartLowerSquareHeight;
-
-    Color kChartColor = closeToOpenDis > 0
+    Color kChartColor = closeToOpen > 0
         ? winColor
-        : closeToOpenDis < 0
+        : closeToOpen < 0
             ? loseColor
             : Colors.black;
     return Column(
@@ -288,5 +318,78 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
         ),
       ],
     );
+  }
+
+  Widget get considerVolume {
+    return Row(
+      children: [
+        _checkbox(
+          _state.considerVolume,
+          (notice) {
+            if (notice == null) return;
+            _notifier.setVolume(notice, _state);
+          },
+        ),
+        Text(
+          '成交量:',
+          style: infoST,
+        ),
+        textField(
+          keyboardType: const TextInputType.numberWithOptions(),
+          onChanged: (value) {
+            _notifier.setVolumeValue(double.parse(value).toInt(), _state);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget get considerCloseWithLongUpperShadow {
+    return Row(
+      children: [
+        _checkbox(
+          _state.closeWithLongUpperShadow,
+          (notice) {
+            if (notice == null) return;
+            _notifier.setCloseWithLongUpperShadow(notice, _state);
+          },
+        ),
+        Text(
+          '收長上影:',
+          style: infoST,
+        ),
+      ],
+    );
+  }
+
+  Widget get considerCloseWithLongLowerShadow {
+    return Row(
+      children: [
+        _checkbox(
+          _state.closeWithLongLowerShadow,
+          (notice) {
+            if (notice == null) return;
+            _notifier.setCloseWithLongLowerShadow(notice, _state);
+          },
+        ),
+        Text(
+          '收長下影:',
+          style: infoST,
+        ),
+      ],
+    );
+  }
+
+  Widget _checkbox(bool? selected, ValueChanged<bool?>? onChanged) {
+    Widget content = Checkbox(
+      activeColor: Colors.blue,
+      side: const BorderSide(
+        color: Colors.grey,
+        width: 1,
+      ),
+      value: selected,
+      onChanged: onChanged,
+    );
+    return Transform.scale(scale: 0.7, child: content);
   }
 }

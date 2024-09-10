@@ -215,11 +215,10 @@ class TxfRequest {
 
   /// 現價
   factory TxfRequest.current([String month = '']) {
-    // 判斷使用日盤還是夜盤
+    // 判斷使用日盤還是夜盤，時區必須一致
     final now = DateTime.now().toUtc().add(const Duration(hours: 8));
-    final nowYMD = DateTime(now.year, now.month, now.day);
-    DateTime dayStartTime = nowYMD.add(const Duration(hours: 8, minutes: 45)); // 8:45
-    DateTime dayEndTime = nowYMD.add(const Duration(hours: 15, minutes: 00)); // 15:00
+    DateTime dayStartTime = DateTime(now.year, now.month, now.day, 8, 45).toUtc().add(const Duration(hours: 8)); // 8:45
+    DateTime dayEndTime = DateTime(now.year, now.month, now.day, 15, 0).toUtc().add(const Duration(hours: 8)); //  15:00
     bool useDay = now.isAfter(dayStartTime) && now.isBefore(dayEndTime);
     return useDay ? TxfRequest.dayExpireMonth(month) : TxfRequest.nightExpireMonth(month);
   }

@@ -26,7 +26,7 @@ Future<void> fetchCurrentMonthSymbolID(StateNotifierProviderRef ref) async {
     late Duration delay;
     if (isDay) {
       // 日盤等收盤就可以更新
-      delay = DateTime(now.year, now.month, now.day, 13, 45).difference(now);
+      delay = DateTime(now.year, now.month, now.day, 13, 45).toUtc().add(const Duration(hours: 8)).difference(now);
     } else {
       // 夜盤等收盤就可以更新
       late DateTime dis;
