@@ -75,17 +75,17 @@ Future<void> notificationInit() async {
 }
 
 int _notificationCnt = 0;
-Future<void> sendNotification(String msg) async {
-  const DarwinNotificationDetails macosNotificationDetails =
+Future<void> sendNotification(String subtitle, String msg) async {
+  DarwinNotificationDetails macosNotificationDetails =
       DarwinNotificationDetails(
-    subtitle: '接近關鍵價位！',
+    subtitle: subtitle,
   );
 
-  const NotificationDetails notificationDetails =
+  NotificationDetails notificationDetails =
       NotificationDetails(macOS: macosNotificationDetails);
   flutterLocalNotificationsPlugin.show(
     _notificationCnt ++,
-    '接近關鍵價位！',
+    subtitle,
     msg,
     notificationDetails,
   );

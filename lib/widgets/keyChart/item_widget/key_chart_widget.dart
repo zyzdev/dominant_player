@@ -4,11 +4,13 @@ import 'package:dominant_player/model/chart_info.dart';
 import 'package:dominant_player/model/real_time_chart_info.dart';
 import 'package:dominant_player/provider/real_time_chart_info_provider.dart';
 import 'package:dominant_player/provider/is_add_new_tick_provider.dart';
+import 'package:dominant_player/widgets/keyChart/item_widget/key_chart_controller.dart';
 import 'package:dominant_player/widgets/keyChart/item_widget/key_chart_state.dart';
 import 'package:dominant_player/widgets/keyChart/key_chart_main_provider.dart';
 import 'package:dominant_player/widgets/style.dart';
 import 'package:dominant_player/widgets/widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class KeyChartWidget extends ConsumerStatefulWidget {
@@ -36,12 +38,11 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_state.kPeriod != null)
+    if (_state.kPeriod != null) {
       ref.watch(realTimeChartInfoProvider(_state.kPeriod!));
+    }
     ref.listen(isAddNewTickProvider, (previous, next) {
-      print(previous);
-      print(next);
-      _state.shouldNotice(_realTimeChartInfo.getLastFinishChartInfo());
+      if (_state.notice) _state.shouldNotice(_realTimeChartInfo);
     });
 
     _kChartSizeFactor = 5 / (_state.kPeriod ?? 1);
@@ -107,6 +108,7 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
                   textField(
                     init: _state.kPeriod,
                     hint: '請輸入分鐘',
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     onChanged: (value) {
                       _notifier.setPeriod(value, _state);
                     },
@@ -129,24 +131,27 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
                 child: valuesInfo(_realTimeChartInfo.allChartInfo.last),
               ),
               const SizedBox(height: 16),
-              chart(_realTimeChartInfo.allChartInfo.last),
+              //chart(_realTimeChartInfo.allChartInfo.last),
               //charts,
               //const SizedBox(height: 16),
-              Padding(
+/*              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: valuesInfo(_realTimeChartInfo
                     .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),
               ),
               chart(_realTimeChartInfo
-                  .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),
+                  .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),*/
               Wrap(
                 spacing: 16,
                 children: [
                   considerVolume,
                   considerCloseWithLongUpperShadow,
                   considerCloseWithLongLowerShadow,
+                  considerPeak,
+                  considerValley,
                 ],
-              )
+              ),
+              const SizedBox(height: 16),
             ],
           ],
         ),
@@ -213,6 +218,32 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
         tile('低', chartInfo.low.toString()),
         tile('收', chartInfo.close.toString()),
         tile('量', chartInfo.volume.toString()),
+        Row(
+          children: [
+            chartInfo.closeToOpen < 0
+                ? Icon(
+                    Icons.arrow_drop_down,
+                    color: loseColor,
+                    size: 20,
+                  )
+                : chartInfo.closeToOpen > 0
+                    ? Icon(
+                        Icons.arrow_drop_up,
+                        color: winColor,
+                        size: 20,
+                      )
+                    : const SizedBox(),
+            Text(
+              '${chartInfo.closeToOpen > 0 ? '+' : ''}${chartInfo.closeToOpen}',
+              style: captionST.copyWith(
+                  color: closeToOpen > 0
+                      ? winColor
+                      : closeToOpen < 0
+                          ? loseColor
+                          : Colors.black),
+            )
+          ],
+        )
       ],
     );
   }
@@ -336,8 +367,10 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
         ),
         textField(
           keyboardType: const TextInputType.numberWithOptions(),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          init: _state.keyVolume,
           onChanged: (value) {
-            _notifier.setVolumeValue(double.parse(value).toInt(), _state);
+            _notifier.setVolumeValue(double.tryParse(value)?.toInt(), _state);
           },
         ),
       ],
@@ -355,7 +388,7 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
           },
         ),
         Text(
-          '收長上影:',
+          '收長上影',
           style: infoST,
         ),
       ],
@@ -373,9 +406,62 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
           },
         ),
         Text(
-          '收長下影:',
+          '收長下影',
           style: infoST,
         ),
+      ],
+    );
+  }
+
+  Widget get considerPeak {
+    return Row(
+      children: [
+        _checkbox(
+          _state.peak,
+          (notice) {
+            if (notice == null) return;
+            _notifier.setPeak(notice, _state);
+          },
+        ),
+        Text(
+          'A轉:',
+          style: infoST,
+        ),
+        textField(
+          hint: 'K棒數量',
+          keyboardType: const TextInputType.numberWithOptions(),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: (value) {
+            _notifier.setPeakInPeriod(double.tryParse(value)?.toInt(), _state);
+          },
+        )
+      ],
+    );
+  }
+
+  Widget get considerValley {
+    return Row(
+      children: [
+        _checkbox(
+          _state.valley,
+          (notice) {
+            if (notice == null) return;
+            _notifier.setValley(notice, _state);
+          },
+        ),
+        Text(
+          'V轉:',
+          style: infoST,
+        ),
+        textField(
+          hint: 'K棒數量',
+          keyboardType: const TextInputType.numberWithOptions(),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: (value) {
+            _notifier.setValleyInPeriod(
+                double.tryParse(value)?.toInt(), _state);
+          },
+        )
       ],
     );
   }

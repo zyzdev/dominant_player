@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'chart_data.g.dart';
@@ -281,4 +284,12 @@ mixin ChartUtil {
 
     return null;
   }
+
+   String fineTuneTime(String time) {
+     final f = NumberFormat("00");
+     int h = double.parse(time.substring(0, 2)).toInt();
+     int m = max(0, double.parse(time.substring(2, 4)).toInt() - 1);
+     int s = double.parse(time.substring(4)).toInt();
+     return '${f.format(h)}${f.format(m)}${f.format(s)}';
+   }
 }

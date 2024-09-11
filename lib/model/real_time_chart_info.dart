@@ -45,6 +45,8 @@ class RealTimeChartInfo with ChartUtil {
       int volume = considerTicks
           .map((e) => double.parse(e[5]).toInt())
           .reduce((value, element) => value + element);
+
+      // start time & end time 都減一分鐘
       return ChartInfo(
         period: xPeriod,
         open: open,
@@ -52,8 +54,8 @@ class RealTimeChartInfo with ChartUtil {
         close: close,
         low: low,
         volume: volume,
-        startTime: considerTicks.first[0],
-        endTime: considerTicks.last[0],
+        startTime: fineTuneTime(considerTicks.first[0]),
+        endTime: fineTuneTime(considerTicks.last[0]),
       );
     }
 

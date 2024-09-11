@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:dominant_player/widgets/style.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
 Widget title(
   dynamic text, {
@@ -135,6 +136,7 @@ Widget textField({
   required ValueChanged<String> onChanged,
   TextEditingController? controller,
   TextInputType? keyboardType = TextInputType.number,
+  List<TextInputFormatter> inputFormatters = const [],
   double? width,
   String? hint = '請輸入',
   String? error,
@@ -143,6 +145,7 @@ Widget textField({
     constraints: BoxConstraints(maxWidth: width ?? infoW, maxHeight: textH),
     alignment: Alignment.bottomCenter,
     child: TextFormField(
+      inputFormatters: inputFormatters,
       initialValue: init?.toString(),
       controller: controller,
       textAlign: TextAlign.center,

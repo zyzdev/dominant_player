@@ -96,7 +96,7 @@ class MainNotifier extends StateNotifier<MainState> {
   final List<String> _justNotificationKeyValues = [];
 
   Future<void> _shouldNotice() async {
-    if (state.current == null || kIsWeb) return;
+    if (state.current == null || kIsWeb || !state.autoNotice) return;
     // 找尋需要推播的關鍵價
     String msg = '\n';
     keyValues
@@ -112,7 +112,7 @@ class MainNotifier extends StateNotifier<MainState> {
     if (msg.trim().isNotEmpty) {
       // 移除最後一個換行符號
       msg = '現價：${state.current}\n${msg.trim()}';
-      sendNotification(msg);
+      sendNotification('接近關鍵價位！', msg);
     }
     // 移除剛推播過，但已離現價較遠的關鍵價
     keyValues

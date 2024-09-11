@@ -72,7 +72,7 @@ class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
   }
 
   /// 成交量的數值
-  void setVolumeValue(int volume, KeyChartState state) {
+  void setVolumeValue(int? volume, KeyChartState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(keyVolume: volume);
     this.state = List.of(this.state);
@@ -89,6 +89,38 @@ class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
   void setCloseWithLongLowerShadow(bool notice, KeyChartState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(closeWithLongLowerShadow: notice);
+    this.state = List.of(this.state);
+  }
+
+  /// 是否考慮山峰轉折
+  void setPeak(bool notice, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(peak: notice);
+    this.state = List.of(this.state);
+  }
+
+  /// 山峰轉折考慮的K棒數量
+  /// 如果[period] = 5, 這代表會考慮前五跟K棒的收盤價，且前一根收盤價必須為最高
+  /// 當前K棒的收盤價比前跟低，代表轉折點發生
+  void setPeakInPeriod(int? period, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(peakInPeriod: period);
+    this.state = List.of(this.state);
+  }
+
+  /// 是否考慮山谷轉折
+  void setValley(bool notice, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(valley: notice);
+    this.state = List.of(this.state);
+  }
+
+  /// 山峰轉折考慮的K棒數量
+  /// 如果[period] = 5, 這代表會考慮前五跟K棒的收盤價，且前一根收盤價必須為最高
+  /// 當前K棒的收盤價比前跟低，代表轉折點發生
+  void setValleyInPeriod(int? period, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(valleyInPeriod: period);
     this.state = List.of(this.state);
   }
 
