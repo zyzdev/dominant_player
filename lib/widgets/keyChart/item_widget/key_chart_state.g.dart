@@ -19,15 +19,33 @@ abstract class _$KeyChartStateCWProxy {
 
   KeyChartState closeWithLongUpperShadow(bool closeWithLongUpperShadow);
 
+  KeyChartState andOrCloseWithLongLowerShadow(
+      bool andOrCloseWithLongLowerShadow);
+
   KeyChartState closeWithLongLowerShadow(bool closeWithLongLowerShadow);
 
-  KeyChartState peakInPeriod(int peakInPeriod);
+  KeyChartState andOrCloseWithLongUpperShadow(
+      bool andOrCloseWithLongUpperShadow);
 
-  KeyChartState peak(bool peak);
+  KeyChartState aTurnInPeriod(int? aTurnInPeriod);
 
-  KeyChartState valleyInPeriod(int valleyInPeriod);
+  KeyChartState aTurn(bool aTurn);
 
-  KeyChartState valley(bool valley);
+  KeyChartState andOrATurn(bool andOrATurn);
+
+  KeyChartState vTurnInPeriod(int? vTurnInPeriod);
+
+  KeyChartState vTurn(bool vTurn);
+
+  KeyChartState andOrVTurn(bool andOrVTurn);
+
+  KeyChartState longAttack(bool longAttack);
+
+  KeyChartState longAttackPoint(int? longAttackPoint);
+
+  KeyChartState shortAttack(bool shortAttack);
+
+  KeyChartState shortAttackPoint(int? shortAttackPoint);
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `KeyChartState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -42,11 +60,19 @@ abstract class _$KeyChartStateCWProxy {
     int? keyVolume,
     bool? considerVolume,
     bool? closeWithLongUpperShadow,
+    bool? andOrCloseWithLongLowerShadow,
     bool? closeWithLongLowerShadow,
-    int? peakInPeriod,
-    bool? peak,
-    int? valleyInPeriod,
-    bool? valley,
+    bool? andOrCloseWithLongUpperShadow,
+    int? aTurnInPeriod,
+    bool? aTurn,
+    bool? andOrATurn,
+    int? vTurnInPeriod,
+    bool? vTurn,
+    bool? andOrVTurn,
+    bool? longAttack,
+    int? longAttackPoint,
+    bool? shortAttack,
+    int? shortAttackPoint,
   });
 }
 
@@ -77,22 +103,52 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
       this(closeWithLongUpperShadow: closeWithLongUpperShadow);
 
   @override
+  KeyChartState andOrCloseWithLongLowerShadow(
+          bool andOrCloseWithLongLowerShadow) =>
+      this(andOrCloseWithLongLowerShadow: andOrCloseWithLongLowerShadow);
+
+  @override
   KeyChartState closeWithLongLowerShadow(bool closeWithLongLowerShadow) =>
       this(closeWithLongLowerShadow: closeWithLongLowerShadow);
 
   @override
-  KeyChartState peakInPeriod(int peakInPeriod) =>
-      this(peakInPeriod: peakInPeriod);
+  KeyChartState andOrCloseWithLongUpperShadow(
+          bool andOrCloseWithLongUpperShadow) =>
+      this(andOrCloseWithLongUpperShadow: andOrCloseWithLongUpperShadow);
 
   @override
-  KeyChartState peak(bool peak) => this(peak: peak);
+  KeyChartState aTurnInPeriod(int? aTurnInPeriod) =>
+      this(aTurnInPeriod: aTurnInPeriod);
 
   @override
-  KeyChartState valleyInPeriod(int valleyInPeriod) =>
-      this(valleyInPeriod: valleyInPeriod);
+  KeyChartState aTurn(bool aTurn) => this(aTurn: aTurn);
 
   @override
-  KeyChartState valley(bool valley) => this(valley: valley);
+  KeyChartState andOrATurn(bool andOrATurn) => this(andOrATurn: andOrATurn);
+
+  @override
+  KeyChartState vTurnInPeriod(int? vTurnInPeriod) =>
+      this(vTurnInPeriod: vTurnInPeriod);
+
+  @override
+  KeyChartState vTurn(bool vTurn) => this(vTurn: vTurn);
+
+  @override
+  KeyChartState andOrVTurn(bool andOrVTurn) => this(andOrVTurn: andOrVTurn);
+
+  @override
+  KeyChartState longAttack(bool longAttack) => this(longAttack: longAttack);
+
+  @override
+  KeyChartState longAttackPoint(int? longAttackPoint) =>
+      this(longAttackPoint: longAttackPoint);
+
+  @override
+  KeyChartState shortAttack(bool shortAttack) => this(shortAttack: shortAttack);
+
+  @override
+  KeyChartState shortAttackPoint(int? shortAttackPoint) =>
+      this(shortAttackPoint: shortAttackPoint);
 
   @override
 
@@ -109,11 +165,19 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
     Object? keyVolume = const $CopyWithPlaceholder(),
     Object? considerVolume = const $CopyWithPlaceholder(),
     Object? closeWithLongUpperShadow = const $CopyWithPlaceholder(),
+    Object? andOrCloseWithLongLowerShadow = const $CopyWithPlaceholder(),
     Object? closeWithLongLowerShadow = const $CopyWithPlaceholder(),
-    Object? peakInPeriod = const $CopyWithPlaceholder(),
-    Object? peak = const $CopyWithPlaceholder(),
-    Object? valleyInPeriod = const $CopyWithPlaceholder(),
-    Object? valley = const $CopyWithPlaceholder(),
+    Object? andOrCloseWithLongUpperShadow = const $CopyWithPlaceholder(),
+    Object? aTurnInPeriod = const $CopyWithPlaceholder(),
+    Object? aTurn = const $CopyWithPlaceholder(),
+    Object? andOrATurn = const $CopyWithPlaceholder(),
+    Object? vTurnInPeriod = const $CopyWithPlaceholder(),
+    Object? vTurn = const $CopyWithPlaceholder(),
+    Object? andOrVTurn = const $CopyWithPlaceholder(),
+    Object? longAttack = const $CopyWithPlaceholder(),
+    Object? longAttackPoint = const $CopyWithPlaceholder(),
+    Object? shortAttack = const $CopyWithPlaceholder(),
+    Object? shortAttackPoint = const $CopyWithPlaceholder(),
   }) {
     return KeyChartState(
       title: title == const $CopyWithPlaceholder() || title == null
@@ -143,30 +207,68 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
               ? _value.closeWithLongUpperShadow
               // ignore: cast_nullable_to_non_nullable
               : closeWithLongUpperShadow as bool,
+      andOrCloseWithLongLowerShadow:
+          andOrCloseWithLongLowerShadow == const $CopyWithPlaceholder() ||
+                  andOrCloseWithLongLowerShadow == null
+              ? _value.andOrCloseWithLongLowerShadow
+              // ignore: cast_nullable_to_non_nullable
+              : andOrCloseWithLongLowerShadow as bool,
       closeWithLongLowerShadow:
           closeWithLongLowerShadow == const $CopyWithPlaceholder() ||
                   closeWithLongLowerShadow == null
               ? _value.closeWithLongLowerShadow
               // ignore: cast_nullable_to_non_nullable
               : closeWithLongLowerShadow as bool,
-      peakInPeriod:
-          peakInPeriod == const $CopyWithPlaceholder() || peakInPeriod == null
-              ? _value.peakInPeriod
+      andOrCloseWithLongUpperShadow:
+          andOrCloseWithLongUpperShadow == const $CopyWithPlaceholder() ||
+                  andOrCloseWithLongUpperShadow == null
+              ? _value.andOrCloseWithLongUpperShadow
               // ignore: cast_nullable_to_non_nullable
-              : peakInPeriod as int,
-      peak: peak == const $CopyWithPlaceholder() || peak == null
-          ? _value.peak
+              : andOrCloseWithLongUpperShadow as bool,
+      aTurnInPeriod: aTurnInPeriod == const $CopyWithPlaceholder()
+          ? _value.aTurnInPeriod
           // ignore: cast_nullable_to_non_nullable
-          : peak as bool,
-      valleyInPeriod: valleyInPeriod == const $CopyWithPlaceholder() ||
-              valleyInPeriod == null
-          ? _value.valleyInPeriod
+          : aTurnInPeriod as int?,
+      aTurn: aTurn == const $CopyWithPlaceholder() || aTurn == null
+          ? _value.aTurn
           // ignore: cast_nullable_to_non_nullable
-          : valleyInPeriod as int,
-      valley: valley == const $CopyWithPlaceholder() || valley == null
-          ? _value.valley
+          : aTurn as bool,
+      andOrATurn:
+          andOrATurn == const $CopyWithPlaceholder() || andOrATurn == null
+              ? _value.andOrATurn
+              // ignore: cast_nullable_to_non_nullable
+              : andOrATurn as bool,
+      vTurnInPeriod: vTurnInPeriod == const $CopyWithPlaceholder()
+          ? _value.vTurnInPeriod
           // ignore: cast_nullable_to_non_nullable
-          : valley as bool,
+          : vTurnInPeriod as int?,
+      vTurn: vTurn == const $CopyWithPlaceholder() || vTurn == null
+          ? _value.vTurn
+          // ignore: cast_nullable_to_non_nullable
+          : vTurn as bool,
+      andOrVTurn:
+          andOrVTurn == const $CopyWithPlaceholder() || andOrVTurn == null
+              ? _value.andOrVTurn
+              // ignore: cast_nullable_to_non_nullable
+              : andOrVTurn as bool,
+      longAttack:
+          longAttack == const $CopyWithPlaceholder() || longAttack == null
+              ? _value.longAttack
+              // ignore: cast_nullable_to_non_nullable
+              : longAttack as bool,
+      longAttackPoint: longAttackPoint == const $CopyWithPlaceholder()
+          ? _value.longAttackPoint
+          // ignore: cast_nullable_to_non_nullable
+          : longAttackPoint as int?,
+      shortAttack:
+          shortAttack == const $CopyWithPlaceholder() || shortAttack == null
+              ? _value.shortAttack
+              // ignore: cast_nullable_to_non_nullable
+              : shortAttack as bool,
+      shortAttackPoint: shortAttackPoint == const $CopyWithPlaceholder()
+          ? _value.shortAttackPoint
+          // ignore: cast_nullable_to_non_nullable
+          : shortAttackPoint as int?,
     );
   }
 }
@@ -190,12 +292,22 @@ KeyChartState _$KeyChartStateFromJson(Map<String, dynamic> json) =>
       considerVolume: json['considerVolume'] as bool? ?? false,
       closeWithLongUpperShadow:
           json['closeWithLongUpperShadow'] as bool? ?? false,
+      andOrCloseWithLongLowerShadow:
+          json['andOrCloseWithLongLowerShadow'] as bool? ?? false,
       closeWithLongLowerShadow:
           json['closeWithLongLowerShadow'] as bool? ?? false,
-      peakInPeriod: json['peakInPeriod'] as int? ?? 10,
-      peak: json['peak'] as bool? ?? false,
-      valleyInPeriod: json['valleyInPeriod'] as int? ?? 10,
-      valley: json['valley'] as bool? ?? false,
+      andOrCloseWithLongUpperShadow:
+          json['andOrCloseWithLongUpperShadow'] as bool? ?? false,
+      aTurnInPeriod: json['aTurnInPeriod'] as int? ?? 10,
+      aTurn: json['aTurn'] as bool? ?? false,
+      andOrATurn: json['andOrATurn'] as bool? ?? false,
+      vTurnInPeriod: json['vTurnInPeriod'] as int? ?? 10,
+      vTurn: json['vTurn'] as bool? ?? false,
+      andOrVTurn: json['andOrVTurn'] as bool? ?? false,
+      longAttack: json['longAttack'] as bool? ?? false,
+      longAttackPoint: json['longAttackPoint'] as int? ?? 20,
+      shortAttack: json['shortAttack'] as bool? ?? false,
+      shortAttackPoint: json['shortAttackPoint'] as int? ?? 20,
     );
 
 Map<String, dynamic> _$KeyChartStateToJson(KeyChartState instance) =>
@@ -205,10 +317,18 @@ Map<String, dynamic> _$KeyChartStateToJson(KeyChartState instance) =>
       'notice': instance.notice,
       'keyVolume': instance.keyVolume,
       'considerVolume': instance.considerVolume,
+      'andOrCloseWithLongUpperShadow': instance.andOrCloseWithLongUpperShadow,
       'closeWithLongUpperShadow': instance.closeWithLongUpperShadow,
+      'andOrCloseWithLongLowerShadow': instance.andOrCloseWithLongLowerShadow,
       'closeWithLongLowerShadow': instance.closeWithLongLowerShadow,
-      'peakInPeriod': instance.peakInPeriod,
-      'peak': instance.peak,
-      'valleyInPeriod': instance.valleyInPeriod,
-      'valley': instance.valley,
+      'andOrATurn': instance.andOrATurn,
+      'aTurnInPeriod': instance.aTurnInPeriod,
+      'aTurn': instance.aTurn,
+      'andOrVTurn': instance.andOrVTurn,
+      'vTurnInPeriod': instance.vTurnInPeriod,
+      'vTurn': instance.vTurn,
+      'longAttack': instance.longAttack,
+      'longAttackPoint': instance.longAttackPoint,
+      'shortAttack': instance.shortAttack,
+      'shortAttackPoint': instance.shortAttackPoint,
     };

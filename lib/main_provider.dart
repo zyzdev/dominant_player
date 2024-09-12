@@ -87,7 +87,6 @@ class MainNotifier extends StateNotifier<MainState> {
       int? newDis = int.tryParse(_noticeDis?.toString() ?? '');
       if (newDis == state.noticeDis) return;
       state = state.copyWith(noticeDis: newDis);
-      noticeDisController.text = newDis?.toString() ?? '';
       _shouldNotice();
     });
   }
@@ -148,7 +147,8 @@ class MainNotifier extends StateNotifier<MainState> {
     ref.listen(currentMonthSymbolIdProvider, (previous, currentSymbolId) {
       fetchCurrentTick(ref);
     });
-    ref.listen(currentPriceProvider, (previous, currentPrice) {
+    ref.listen<int?>(currentPriceProvider, (previous, currentPrice) {
+      if(currentPrice == null) return;
       currentController.text = currentPrice?.toString() ?? '';
       updateKeyValues();
       _shouldNotice();

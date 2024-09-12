@@ -92,35 +92,63 @@ class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
     this.state = List.of(this.state);
   }
 
-  /// 是否考慮山峰轉折
-  void setPeak(bool notice, KeyChartState state) {
+  /// 是否考慮A轉
+  void setATurn(bool notice, KeyChartState state) {
     int index = this.state.indexOf(state);
-    this.state[index] = state.copyWith(peak: notice);
+    this.state[index] = state.copyWith(aTurn: notice);
     this.state = List.of(this.state);
   }
 
-  /// 山峰轉折考慮的K棒數量
+  /// A轉考慮的K棒數量
   /// 如果[period] = 5, 這代表會考慮前五跟K棒的收盤價，且前一根收盤價必須為最高
   /// 當前K棒的收盤價比前跟低，代表轉折點發生
-  void setPeakInPeriod(int? period, KeyChartState state) {
+  void setATurnInPeriod(int? period, KeyChartState state) {
     int index = this.state.indexOf(state);
-    this.state[index] = state.copyWith(peakInPeriod: period);
+    this.state[index] = state.copyWith(aTurnInPeriod: period);
     this.state = List.of(this.state);
   }
 
-  /// 是否考慮山谷轉折
-  void setValley(bool notice, KeyChartState state) {
+  /// 是否考慮V轉
+  void setVTurn(bool notice, KeyChartState state) {
     int index = this.state.indexOf(state);
-    this.state[index] = state.copyWith(valley: notice);
+    this.state[index] = state.copyWith(vTurn: notice);
     this.state = List.of(this.state);
   }
 
-  /// 山峰轉折考慮的K棒數量
+  /// V轉考慮的K棒數量
   /// 如果[period] = 5, 這代表會考慮前五跟K棒的收盤價，且前一根收盤價必須為最高
   /// 當前K棒的收盤價比前跟低，代表轉折點發生
-  void setValleyInPeriod(int? period, KeyChartState state) {
+  void setVTurnInPeriod(int? period, KeyChartState state) {
     int index = this.state.indexOf(state);
-    this.state[index] = state.copyWith(valleyInPeriod: period);
+    this.state[index] = state.copyWith(vTurnInPeriod: period);
+    this.state = List.of(this.state);
+  }
+
+  /// 是否考慮多方攻擊
+  void setLongAttack(bool notice, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(longAttack: notice);
+    this.state = List.of(this.state);
+  }
+
+  /// 多方攻擊的點數，預設20
+  void setLongAttackPoint(int? period, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(longAttackPoint: period);
+    this.state = List.of(this.state);
+  }
+
+  /// 是否考慮空方攻擊
+  void setShortAttack(bool notice, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(shortAttack: notice);
+    this.state = List.of(this.state);
+  }
+
+  /// 空方攻擊的點數，預設20
+  void setShortAttackPoint(int? period, KeyChartState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(shortAttackPoint: period);
     this.state = List.of(this.state);
   }
 

@@ -26,16 +26,23 @@ class KeyChartState {
   final bool andOrCloseWithLongLowerShadow;
   final bool closeWithLongLowerShadow;
 
-  /// 在[peakInPeriod]K棒裡面的A轉
-  final bool andOrPeak;
-  final int? peakInPeriod;
-  final bool peak;
+  /// 在[aTurnInPeriod]K棒裡面的A轉
+  final bool andOrATurn;
+  final int? aTurnInPeriod;
+  final bool aTurn;
 
-  /// 在[valleyInPeriod]K棒裡面的V轉
-  final bool andOrValley;
-  final int? valleyInPeriod;
-  final bool valley;
+  /// 在[vTurnInPeriod]K棒裡面的V轉
+  final bool andOrVTurn;
+  final int? vTurnInPeriod;
+  final bool vTurn;
 
+  /// 多方攻擊
+  final bool longAttack;
+  final int? longAttackPoint;
+
+  /// 空方攻擊
+  final bool shortAttack;
+  final int? shortAttackPoint;
   KeyChartState({
     required this.title,
     this.kPeriod,
@@ -46,12 +53,16 @@ class KeyChartState {
     this.andOrCloseWithLongLowerShadow = false,
     this.closeWithLongLowerShadow = false,
     this.andOrCloseWithLongUpperShadow = false,
-    this.peakInPeriod = 10,
-    this.peak = false,
-    this.andOrPeak = false,
-    this.valleyInPeriod = 10,
-    this.valley = false,
-    this.andOrValley = false,
+    this.aTurnInPeriod = 10,
+    this.aTurn = false,
+    this.andOrATurn = false,
+    this.vTurnInPeriod = 10,
+    this.vTurn = false,
+    this.andOrVTurn = false,
+    this.longAttack = false,
+    this.longAttackPoint = 20,
+    this.shortAttack = false,
+    this.shortAttackPoint = 20,
   });
 
   factory KeyChartState.fromJson(Map<String, dynamic> json) =>

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/main_state.dart';
 import 'package:dominant_player/service/notification.dart';
@@ -5,6 +7,7 @@ import 'package:dominant_player/widgets/keyChart/key_chart_main_widget.dart';
 import 'package:dominant_player/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -12,8 +15,8 @@ import 'package:window_manager/window_manager.dart';
 import 'model/key_value.dart';
 
 Future<void> main() async {
-  if (!kIsWeb) {
-    WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) {
     // Must add this line.
     await windowManager.ensureInitialized();
     windowManager.waitUntilReadyToShow(
@@ -22,6 +25,9 @@ Future<void> main() async {
         windowManager.setTitle('絕對主力邏輯助手');
       },
     );
+  }
+  if(Platform.isAndroid || Platform.isIOS) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
   await init();
   runApp(
@@ -57,7 +63,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       ReverseAnimation(_spyCollapseAnimation);
   late final Animation<double> _spyCollapseAnimation = CurvedAnimation(
     parent: _spyAnimationController,
-    curve: Curves.fastEaseInToSlowEaseOut,
+    curve: Curves.fastLinearToSlowEaseIn,
   );
 
   late final AnimationController _sensitivitySpaceAnimationController =
@@ -71,7 +77,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   late final Animation<double> _sensitivitySpaceCollapseAnimation =
       CurvedAnimation(
     parent: _sensitivitySpaceAnimationController,
-    curve: Curves.fastEaseInToSlowEaseOut,
+    curve: Curves.fastLinearToSlowEaseIn,
   );
 
   late final AnimationController _keyValuesAnimationController =
@@ -84,7 +90,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       ReverseAnimation(_keyValuesAnimationController);
   late final Animation<double> _keyValuesCollapseAnimation = CurvedAnimation(
     parent: _keyValuesAnimationController,
-    curve: Curves.fastEaseInToSlowEaseOut,
+    curve: Curves.fastLinearToSlowEaseIn,
   );
   late final AnimationController _keyChartNoticeAnimationController =
   AnimationController(
@@ -96,7 +102,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   ReverseAnimation(_keyChartNoticeAnimationController);
   late final Animation<double> _keyChartNoticeCollapseAnimation = CurvedAnimation(
     parent: _keyChartNoticeAnimationController,
-    curve: Curves.fastEaseInToSlowEaseOut,
+    curve: Curves.fastLinearToSlowEaseIn,
   );
 
   @override
@@ -259,7 +265,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   Widget get _spy {
     // 計算數值最大寬度
     double valueMaxWidth =
-        _mainNotifier.spyValues(_state.daySpy).map((e) => e.value).fold(
+        _mainNotifier.spyValues(_state.daySpy).map((e) => e.value).fold<double>(
               infoW,
               (previousValue, element) {
                 double width = textSize(element.toString(), titleST).width;
@@ -441,7 +447,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   }
 
   Widget get _sensitivitySpace {
-    Widget content = ValueListenableBuilder(
+    Widget content = ValueListenableBuilder<double>(
       valueListenable: _sensitivitySpaceWidth,
       builder: (context, width, child) {
         Widget content = ReorderableWrap(
@@ -1060,7 +1066,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             .map(
           (e) => e.value,
         )
-            .fold(
+            .fold<double>(
           titleW,
           (previousValue, element) {
             double width = textSize(element.toString(), titleST).width;
@@ -1074,7 +1080,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             .map(
           (e) => e.value - (_state.current ?? 0),
         )
-            .fold(
+            .fold<double>(
           infoW,
           (previousValue, element) {
             double width = textSize(element.toString(), infoST).width;

@@ -36,13 +36,30 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
     return _state.kPeriod != null && _realTimeChartInfo.allTicks.isNotEmpty;
   }
 
+  late final TextEditingController volumeController =
+      TextEditingController(text: _state.keyVolume?.toString() ?? '');
+  late final TextEditingController aTurnInPeriodController =
+      TextEditingController(text: _state.aTurnInPeriod?.toString() ?? '');
+  late final TextEditingController vTurnInPeriodController =
+      TextEditingController(text: _state.vTurnInPeriod?.toString() ?? '');
+
+  late final TextEditingController longAttackPointController =
+      TextEditingController(text: _state.longAttackPoint?.toString() ?? '');
+  late final TextEditingController shortAttackPointController =
+      TextEditingController(text: _state.shortAttackPoint?.toString() ?? '');
+
   @override
   Widget build(BuildContext context) {
     if (_state.kPeriod != null) {
       ref.watch(realTimeChartInfoProvider(_state.kPeriod!));
     }
     ref.listen(isAddNewTickProvider, (previous, next) {
-      if (_state.notice) _state.shouldNotice(_realTimeChartInfo);
+      if (_state.notice) {
+        _state.shouldNotice(
+          _realTimeChartInfo,
+          context,
+        );
+      }
     });
 
     _kChartSizeFactor = 5 / (_state.kPeriod ?? 1);
@@ -143,15 +160,25 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
                   .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),*/
               Wrap(
                 spacing: 16,
+                runAlignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   considerVolume,
-                  considerCloseWithLongUpperShadow,
-                  considerCloseWithLongLowerShadow,
-                  considerPeak,
+                  considerATurn,
                   considerValley,
                 ],
               ),
-              const SizedBox(height: 16),
+              Wrap(
+                spacing: 16,
+                runAlignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  considerLongAttack,
+                  considerShortAttack,
+                  considerCloseWithLongUpperShadow,
+                  considerCloseWithLongLowerShadow,
+                ],
+              ),
             ],
           ],
         ),
@@ -172,6 +199,7 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
       ],
     );
     return Container(
+      padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
             border: Border(
           bottom: BorderSide(color: Colors.grey.shade300, width: 1),
@@ -210,7 +238,8 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
     }
 
     return Wrap(
-      spacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 12,
       children: [
         tile('開', chartInfo.open.toString()),
         tile('高', chartInfo.high.toString()),
@@ -353,6 +382,7 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
 
   Widget get considerVolume {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         _checkbox(
           _state.considerVolume,
@@ -361,14 +391,19 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
             _notifier.setVolume(notice, _state);
           },
         ),
-        Text(
-          '成交量:',
-          style: infoST,
+        GestureDetector(
+          onTap: () {
+            _notifier.setVolume(!_state.considerVolume, _state);
+          },
+          child: Text(
+            '成交量:',
+            style: infoST,
+          ),
         ),
         textField(
+          controller: volumeController,
           keyboardType: const TextInputType.numberWithOptions(),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          init: _state.keyVolume,
           onChanged: (value) {
             _notifier.setVolumeValue(double.tryParse(value)?.toInt(), _state);
           },
@@ -379,6 +414,7 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
 
   Widget get considerCloseWithLongUpperShadow {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         _checkbox(
           _state.closeWithLongUpperShadow,
@@ -387,9 +423,15 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
             _notifier.setCloseWithLongUpperShadow(notice, _state);
           },
         ),
-        Text(
-          '收長上影',
-          style: infoST,
+        GestureDetector(
+          onTap: () {
+            _notifier.setCloseWithLongUpperShadow(
+                !_state.closeWithLongUpperShadow, _state);
+          },
+          child: Text(
+            '收長上影',
+            style: infoST,
+          ),
         ),
       ],
     );
@@ -397,6 +439,7 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
 
   Widget get considerCloseWithLongLowerShadow {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         _checkbox(
           _state.closeWithLongLowerShadow,
@@ -405,34 +448,47 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
             _notifier.setCloseWithLongLowerShadow(notice, _state);
           },
         ),
-        Text(
-          '收長下影',
-          style: infoST,
+        GestureDetector(
+          onTap: () {
+            _notifier.setCloseWithLongLowerShadow(
+                !_state.closeWithLongLowerShadow, _state);
+          },
+          child: Text(
+            '收長下影',
+            style: infoST,
+          ),
         ),
       ],
     );
   }
 
-  Widget get considerPeak {
+  Widget get considerATurn {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         _checkbox(
-          _state.peak,
+          _state.aTurn,
           (notice) {
             if (notice == null) return;
-            _notifier.setPeak(notice, _state);
+            _notifier.setATurn(notice, _state);
           },
         ),
-        Text(
-          'A轉:',
-          style: infoST,
+        GestureDetector(
+          onTap: () {
+            _notifier.setATurn(!_state.aTurn, _state);
+          },
+          child: Text(
+            'A轉:',
+            style: infoST,
+          ),
         ),
         textField(
+          controller: aTurnInPeriodController,
           hint: 'K棒數量',
           keyboardType: const TextInputType.numberWithOptions(),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) {
-            _notifier.setPeakInPeriod(double.tryParse(value)?.toInt(), _state);
+            _notifier.setATurnInPeriod(double.tryParse(value)?.toInt(), _state);
           },
         )
       ],
@@ -441,24 +497,98 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
 
   Widget get considerValley {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         _checkbox(
-          _state.valley,
+          _state.vTurn,
           (notice) {
             if (notice == null) return;
-            _notifier.setValley(notice, _state);
+            _notifier.setVTurn(notice, _state);
           },
         ),
-        Text(
-          'V轉:',
-          style: infoST,
+        GestureDetector(
+          onTap: () {
+            _notifier.setVTurn(!_state.vTurn, _state);
+          },
+          child: Text(
+            'V轉:',
+            style: infoST,
+          ),
         ),
         textField(
+          controller: vTurnInPeriodController,
           hint: 'K棒數量',
           keyboardType: const TextInputType.numberWithOptions(),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) {
-            _notifier.setValleyInPeriod(
+            _notifier.setVTurnInPeriod(double.tryParse(value)?.toInt(), _state);
+          },
+        )
+      ],
+    );
+  }
+
+  Widget get considerLongAttack {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _checkbox(
+          _state.longAttack,
+          (notice) {
+            if (notice == null) return;
+            _notifier.setLongAttack(notice, _state);
+          },
+        ),
+        GestureDetector(
+          onTap: () {
+            _notifier.setLongAttack(!_state.longAttack, _state);
+          },
+          child: Text(
+            '多方攻擊:',
+            style: infoST,
+          ),
+        ),
+        textField(
+          controller: longAttackPointController,
+          hint: '攻擊點數',
+          keyboardType: const TextInputType.numberWithOptions(),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: (value) {
+            _notifier.setLongAttackPoint(
+                double.tryParse(value)?.toInt(), _state);
+          },
+        )
+      ],
+    );
+  }
+
+  Widget get considerShortAttack {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _checkbox(
+          _state.shortAttack,
+          (notice) {
+            if (notice == null) return;
+            _notifier.setShortAttack(notice, _state);
+          },
+        ),
+        GestureDetector(
+          onTap: () {
+            _notifier.setShortAttack(!_state.shortAttack, _state);
+          },
+          child: Text(
+            '空方攻擊:',
+            style: infoST,
+          ),
+        ),
+        textField(
+          controller: shortAttackPointController,
+          hint: '攻擊點數',
+          keyboardType: const TextInputType.numberWithOptions(),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: (value) {
+            _notifier.setShortAttackPoint(
                 double.tryParse(value)?.toInt(), _state);
           },
         )
