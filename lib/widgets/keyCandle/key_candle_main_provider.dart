@@ -6,56 +6,56 @@ import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'item_widget/key_chart_state.dart';
+import 'item_widget/key_candle_state.dart';
 
 const String _statsKey = 'key_char_stats_key';
 
-final keyChartMainWidgetProvider =
-    StateNotifierProvider<KeyChartMainWidgetNotifier, List<KeyChartState>>(
+final keyCandleMainWidgetProvider =
+    StateNotifierProvider<KeyCandleMainWidgetNotifier, List<KeyCandleState>>(
         (ref) {
   String? json = prefs.getString(_statsKey);
-  late List<KeyChartState> state;
+  late List<KeyCandleState> state;
   try {
     if (json != null) {
       state = (jsonDecode(json) as List<dynamic>)
-          .map((e) => KeyChartState.fromJson(e))
+          .map((e) => KeyCandleState.fromJson(e))
           .toList();
     } else {
-      state = [KeyChartState(title: '關鍵x分K棒')];
+      state = [KeyCandleState(title: '關鍵x分K棒')];
     }
   } catch (e, stack) {
-    state = [KeyChartState(title: '關鍵x分K棒')];
+    state = [KeyCandleState(title: '關鍵x分K棒')];
 
     debugPrint(e.toString());
     debugPrint(stack.toString());
   }
 
-  return KeyChartMainWidgetNotifier(state, ref);
+  return KeyCandleMainWidgetNotifier(state, ref);
 });
 
-class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
-  KeyChartMainWidgetNotifier(super.state, StateNotifierProviderRef ref) {
+class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
+  KeyCandleMainWidgetNotifier(super.state, StateNotifierProviderRef ref) {
     ref.listen(currentMonthSymbolIdProvider, (previous, next) {
       fetchChartDate(ref);
     });
   }
 
   /// 是否提醒
-  void setNotice(bool notice, KeyChartState state) {
+  void setNotice(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(notice: notice);
     this.state = List.of(this.state);
   }
 
   /// 標題
-  void setTitle(String title, KeyChartState state) {
+  void setTitle(String title, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(title: title);
     this.state = List.of(this.state);
   }
 
   /// K棒週期
-  void setPeriod(String period, KeyChartState state) {
+  void setPeriod(String period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     int? p = double.tryParse(period)?.toInt();
     if (p == null) return;
@@ -65,35 +65,35 @@ class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
   }
 
   /// 是否考慮成交量
-  void setVolume(bool notice, KeyChartState state) {
+  void setVolume(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(considerVolume: notice);
     this.state = List.of(this.state);
   }
 
   /// 成交量的數值
-  void setVolumeValue(int? volume, KeyChartState state) {
+  void setVolumeValue(int? volume, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(keyVolume: volume);
     this.state = List.of(this.state);
   }
 
   /// 是否考慮收長上影
-  void setCloseWithLongUpperShadow(bool notice, KeyChartState state) {
+  void setCloseWithLongUpperShadow(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(closeWithLongUpperShadow: notice);
     this.state = List.of(this.state);
   }
 
   /// 是否考慮收長下影
-  void setCloseWithLongLowerShadow(bool notice, KeyChartState state) {
+  void setCloseWithLongLowerShadow(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(closeWithLongLowerShadow: notice);
     this.state = List.of(this.state);
   }
 
   /// 是否考慮A轉
-  void setATurn(bool notice, KeyChartState state) {
+  void setATurn(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(aTurn: notice);
     this.state = List.of(this.state);
@@ -102,14 +102,14 @@ class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
   /// A轉考慮的K棒數量
   /// 如果[period] = 5, 這代表會考慮前五跟K棒的收盤價，且前一根收盤價必須為最高
   /// 當前K棒的收盤價比前跟低，代表轉折點發生
-  void setATurnInPeriod(int? period, KeyChartState state) {
+  void setATurnInPeriod(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(aTurnInPeriod: period);
     this.state = List.of(this.state);
   }
 
   /// 是否考慮V轉
-  void setVTurn(bool notice, KeyChartState state) {
+  void setVTurn(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(vTurn: notice);
     this.state = List.of(this.state);
@@ -118,35 +118,35 @@ class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
   /// V轉考慮的K棒數量
   /// 如果[period] = 5, 這代表會考慮前五跟K棒的收盤價，且前一根收盤價必須為最高
   /// 當前K棒的收盤價比前跟低，代表轉折點發生
-  void setVTurnInPeriod(int? period, KeyChartState state) {
+  void setVTurnInPeriod(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(vTurnInPeriod: period);
     this.state = List.of(this.state);
   }
 
   /// 是否考慮多方攻擊
-  void setLongAttack(bool notice, KeyChartState state) {
+  void setLongAttack(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(longAttack: notice);
     this.state = List.of(this.state);
   }
 
   /// 多方攻擊的點數，預設20
-  void setLongAttackPoint(int? period, KeyChartState state) {
+  void setLongAttackPoint(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(longAttackPoint: period);
     this.state = List.of(this.state);
   }
 
   /// 是否考慮空方攻擊
-  void setShortAttack(bool notice, KeyChartState state) {
+  void setShortAttack(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(shortAttack: notice);
     this.state = List.of(this.state);
   }
 
   /// 空方攻擊的點數，預設20
-  void setShortAttackPoint(int? period, KeyChartState state) {
+  void setShortAttackPoint(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(shortAttackPoint: period);
     this.state = List.of(this.state);
@@ -161,23 +161,23 @@ class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
       cnt++;
       title = '$defTitle$cnt';
     }
-    state.add(KeyChartState(title: title));
+    state.add(KeyCandleState(title: title));
     state = List.of(state);
   }
 
-  void updateKeyChart(KeyChartState state, KeyChartState newState) {
+  void updateKeyChart(KeyCandleState state, KeyCandleState newState) {
     int index = this.state.indexOf(state);
     this.state[index] = newState;
     this.state = this.state.toList();
   }
 
-  void removeKeyChart(KeyChartState state) {
+  void removeKeyChart(KeyCandleState state) {
     this.state.remove(state);
     this.state = List.of(this.state);
   }
 
   /// 自定義關鍵K棒名稱，是否重複
-  bool isKeyChartTitleDuplicate(String title, [KeyChartState? except]) {
+  bool isKeyChartTitleDuplicate(String title, [KeyCandleState? except]) {
     List<String> allTitle = state
         .where((element) => element != except)
         .map((e) => e.title)
@@ -186,7 +186,7 @@ class KeyChartMainWidgetNotifier extends StateNotifier<List<KeyChartState>> {
   }
 
   @override
-  set state(List<KeyChartState> state) {
+  set state(List<KeyCandleState> state) {
     super.state = state;
     prefs.setString(_statsKey, jsonEncode(state));
   }

@@ -133,6 +133,7 @@ Widget outline(Widget content,
 
 Widget textField({
   dynamic init,
+  Key? key,
   required ValueChanged<String> onChanged,
   TextEditingController? controller,
   TextInputType? keyboardType = TextInputType.number,
@@ -140,11 +141,15 @@ Widget textField({
   double? width,
   String? hint = '請輸入',
   String? error,
+  FormFieldValidator<String>? validator,
 }) {
   return Container(
+    key: key,
     constraints: BoxConstraints(maxWidth: width ?? infoW, maxHeight: textH),
     alignment: Alignment.bottomCenter,
     child: TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: validator,
       inputFormatters: inputFormatters,
       initialValue: init?.toString(),
       controller: controller,

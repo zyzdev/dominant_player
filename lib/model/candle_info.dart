@@ -1,6 +1,4 @@
-import 'dart:math';
-
-class ChartInfo {
+class CandleInfo {
 
   /// K棒週期
   final int period;
@@ -26,6 +24,8 @@ class ChartInfo {
   late int closeToOpen = close - open;
   /// K棒長度
   late int distance = high - low;
+  /// K棒實體長度
+  late final int bodyLength = closeToOpen.abs();
 
   /// 高點到開盤的長度
   late int highToOpenDis = high - open;
@@ -37,16 +37,16 @@ class ChartInfo {
   late int lowToCloseDis = close - low;
 
   /// 上影線長度
-  late int upperShadowDis = min(highToCloseDis, highToOpenDis);
+  late int upperShadowDis = high - close;
   /// 下影線長度
-  late int lowerShadowDis = min(lowToCloseDis, lowToOpenDis);
+  late int lowerShadowDis = close - low;
 
   /// 是否收長上影
-  late bool isCloseWithLongUpperShadow = upperShadowDis > 0 && distance / 2 > 0 && upperShadowDis >= distance / 2;
+  late bool isCloseWithLongUpperShadow = upperShadowDis > bodyLength * 2;
   /// 是否收長下影
-  late bool isCloseWithLongLowerShadow = lowerShadowDis > 0 && distance / 2 > 0 && lowerShadowDis >= distance / 2;
+  late bool isCloseWithLongLowerShadow = lowerShadowDis > bodyLength * 2;
 
-  ChartInfo({
+  CandleInfo({
     required this.period,
     required this.open,
     required this.high,
@@ -59,6 +59,6 @@ class ChartInfo {
 
   @override
   String toString() {
-    return 'ChartInfo{period: $period, open: $open, high: $high, close: $close, low: $low, middle: $middle, volume: $volume, startTime: $startTime, endTime: $endTime, closeToOpen: $closeToOpen, distance: $distance, highToOpenDis: $highToOpenDis, lowToOpenDis: $lowToOpenDis, highToCloseDis: $highToCloseDis, lowToCloseDis: $lowToCloseDis, upperShadowDis: $upperShadowDis, lowerShadowDis: $lowerShadowDis}';
+    return 'CandleInfo{period: $period, open: $open, high: $high, close: $close, low: $low, middle: $middle, volume: $volume, startTime: $startTime, endTime: $endTime, closeToOpen: $closeToOpen, distance: $distance, highToOpenDis: $highToOpenDis, lowToOpenDis: $lowToOpenDis, highToCloseDis: $highToCloseDis, lowToCloseDis: $lowToCloseDis, upperShadowDis: $upperShadowDis, lowerShadowDis: $lowerShadowDis}';
   }
 }

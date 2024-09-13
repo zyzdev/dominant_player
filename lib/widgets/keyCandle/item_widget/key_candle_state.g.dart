@@ -1,59 +1,59 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'key_chart_state.dart';
+part of 'key_candle_state.dart';
 
 // **************************************************************************
 // CopyWithGenerator
 // **************************************************************************
 
-abstract class _$KeyChartStateCWProxy {
-  KeyChartState title(String title);
+abstract class _$KeyCandleStateCWProxy {
+  KeyCandleState title(String title);
 
-  KeyChartState kPeriod(int? kPeriod);
+  KeyCandleState kPeriod(int? kPeriod);
 
-  KeyChartState notice(bool notice);
+  KeyCandleState notice(bool notice);
 
-  KeyChartState keyVolume(int? keyVolume);
+  KeyCandleState keyVolume(int? keyVolume);
 
-  KeyChartState considerVolume(bool considerVolume);
+  KeyCandleState considerVolume(bool considerVolume);
 
-  KeyChartState closeWithLongUpperShadow(bool closeWithLongUpperShadow);
+  KeyCandleState closeWithLongUpperShadow(bool closeWithLongUpperShadow);
 
-  KeyChartState andOrCloseWithLongLowerShadow(
+  KeyCandleState andOrCloseWithLongLowerShadow(
       bool andOrCloseWithLongLowerShadow);
 
-  KeyChartState closeWithLongLowerShadow(bool closeWithLongLowerShadow);
+  KeyCandleState closeWithLongLowerShadow(bool closeWithLongLowerShadow);
 
-  KeyChartState andOrCloseWithLongUpperShadow(
+  KeyCandleState andOrCloseWithLongUpperShadow(
       bool andOrCloseWithLongUpperShadow);
 
-  KeyChartState aTurnInPeriod(int? aTurnInPeriod);
+  KeyCandleState aTurnInPeriod(int? aTurnInPeriod);
 
-  KeyChartState aTurn(bool aTurn);
+  KeyCandleState aTurn(bool aTurn);
 
-  KeyChartState andOrATurn(bool andOrATurn);
+  KeyCandleState andOrATurn(bool andOrATurn);
 
-  KeyChartState vTurnInPeriod(int? vTurnInPeriod);
+  KeyCandleState vTurnInPeriod(int? vTurnInPeriod);
 
-  KeyChartState vTurn(bool vTurn);
+  KeyCandleState vTurn(bool vTurn);
 
-  KeyChartState andOrVTurn(bool andOrVTurn);
+  KeyCandleState andOrVTurn(bool andOrVTurn);
 
-  KeyChartState longAttack(bool longAttack);
+  KeyCandleState longAttack(bool longAttack);
 
-  KeyChartState longAttackPoint(int? longAttackPoint);
+  KeyCandleState longAttackPoint(int? longAttackPoint);
 
-  KeyChartState shortAttack(bool shortAttack);
+  KeyCandleState shortAttack(bool shortAttack);
 
-  KeyChartState shortAttackPoint(int? shortAttackPoint);
+  KeyCandleState shortAttackPoint(int? shortAttackPoint);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `KeyChartState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `KeyCandleState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
   /// ```dart
-  /// KeyChartState(...).copyWith(id: 12, name: "My name")
+  /// KeyCandleState(...).copyWith(id: 12, name: "My name")
   /// ````
-  KeyChartState call({
+  KeyCandleState call({
     String? title,
     int? kPeriod,
     bool? notice,
@@ -76,89 +76,90 @@ abstract class _$KeyChartStateCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfKeyChartState.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfKeyChartState.copyWith.fieldName(...)`
-class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
-  const _$KeyChartStateCWProxyImpl(this._value);
+/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfKeyCandleState.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfKeyCandleState.copyWith.fieldName(...)`
+class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
+  const _$KeyCandleStateCWProxyImpl(this._value);
 
-  final KeyChartState _value;
-
-  @override
-  KeyChartState title(String title) => this(title: title);
+  final KeyCandleState _value;
 
   @override
-  KeyChartState kPeriod(int? kPeriod) => this(kPeriod: kPeriod);
+  KeyCandleState title(String title) => this(title: title);
 
   @override
-  KeyChartState notice(bool notice) => this(notice: notice);
+  KeyCandleState kPeriod(int? kPeriod) => this(kPeriod: kPeriod);
 
   @override
-  KeyChartState keyVolume(int? keyVolume) => this(keyVolume: keyVolume);
+  KeyCandleState notice(bool notice) => this(notice: notice);
 
   @override
-  KeyChartState considerVolume(bool considerVolume) =>
+  KeyCandleState keyVolume(int? keyVolume) => this(keyVolume: keyVolume);
+
+  @override
+  KeyCandleState considerVolume(bool considerVolume) =>
       this(considerVolume: considerVolume);
 
   @override
-  KeyChartState closeWithLongUpperShadow(bool closeWithLongUpperShadow) =>
+  KeyCandleState closeWithLongUpperShadow(bool closeWithLongUpperShadow) =>
       this(closeWithLongUpperShadow: closeWithLongUpperShadow);
 
   @override
-  KeyChartState andOrCloseWithLongLowerShadow(
+  KeyCandleState andOrCloseWithLongLowerShadow(
           bool andOrCloseWithLongLowerShadow) =>
       this(andOrCloseWithLongLowerShadow: andOrCloseWithLongLowerShadow);
 
   @override
-  KeyChartState closeWithLongLowerShadow(bool closeWithLongLowerShadow) =>
+  KeyCandleState closeWithLongLowerShadow(bool closeWithLongLowerShadow) =>
       this(closeWithLongLowerShadow: closeWithLongLowerShadow);
 
   @override
-  KeyChartState andOrCloseWithLongUpperShadow(
+  KeyCandleState andOrCloseWithLongUpperShadow(
           bool andOrCloseWithLongUpperShadow) =>
       this(andOrCloseWithLongUpperShadow: andOrCloseWithLongUpperShadow);
 
   @override
-  KeyChartState aTurnInPeriod(int? aTurnInPeriod) =>
+  KeyCandleState aTurnInPeriod(int? aTurnInPeriod) =>
       this(aTurnInPeriod: aTurnInPeriod);
 
   @override
-  KeyChartState aTurn(bool aTurn) => this(aTurn: aTurn);
+  KeyCandleState aTurn(bool aTurn) => this(aTurn: aTurn);
 
   @override
-  KeyChartState andOrATurn(bool andOrATurn) => this(andOrATurn: andOrATurn);
+  KeyCandleState andOrATurn(bool andOrATurn) => this(andOrATurn: andOrATurn);
 
   @override
-  KeyChartState vTurnInPeriod(int? vTurnInPeriod) =>
+  KeyCandleState vTurnInPeriod(int? vTurnInPeriod) =>
       this(vTurnInPeriod: vTurnInPeriod);
 
   @override
-  KeyChartState vTurn(bool vTurn) => this(vTurn: vTurn);
+  KeyCandleState vTurn(bool vTurn) => this(vTurn: vTurn);
 
   @override
-  KeyChartState andOrVTurn(bool andOrVTurn) => this(andOrVTurn: andOrVTurn);
+  KeyCandleState andOrVTurn(bool andOrVTurn) => this(andOrVTurn: andOrVTurn);
 
   @override
-  KeyChartState longAttack(bool longAttack) => this(longAttack: longAttack);
+  KeyCandleState longAttack(bool longAttack) => this(longAttack: longAttack);
 
   @override
-  KeyChartState longAttackPoint(int? longAttackPoint) =>
+  KeyCandleState longAttackPoint(int? longAttackPoint) =>
       this(longAttackPoint: longAttackPoint);
 
   @override
-  KeyChartState shortAttack(bool shortAttack) => this(shortAttack: shortAttack);
+  KeyCandleState shortAttack(bool shortAttack) =>
+      this(shortAttack: shortAttack);
 
   @override
-  KeyChartState shortAttackPoint(int? shortAttackPoint) =>
+  KeyCandleState shortAttackPoint(int? shortAttackPoint) =>
       this(shortAttackPoint: shortAttackPoint);
 
   @override
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `KeyChartState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `KeyCandleState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
   /// ```dart
-  /// KeyChartState(...).copyWith(id: 12, name: "My name")
+  /// KeyCandleState(...).copyWith(id: 12, name: "My name")
   /// ````
-  KeyChartState call({
+  KeyCandleState call({
     Object? title = const $CopyWithPlaceholder(),
     Object? kPeriod = const $CopyWithPlaceholder(),
     Object? notice = const $CopyWithPlaceholder(),
@@ -179,7 +180,7 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
     Object? shortAttack = const $CopyWithPlaceholder(),
     Object? shortAttackPoint = const $CopyWithPlaceholder(),
   }) {
-    return KeyChartState(
+    return KeyCandleState(
       title: title == const $CopyWithPlaceholder() || title == null
           ? _value.title
           // ignore: cast_nullable_to_non_nullable
@@ -273,18 +274,18 @@ class _$KeyChartStateCWProxyImpl implements _$KeyChartStateCWProxy {
   }
 }
 
-extension $KeyChartStateCopyWith on KeyChartState {
-  /// Returns a callable class that can be used as follows: `instanceOfKeyChartState.copyWith(...)` or like so:`instanceOfKeyChartState.copyWith.fieldName(...)`.
+extension $KeyCandleStateCopyWith on KeyCandleState {
+  /// Returns a callable class that can be used as follows: `instanceOfKeyCandleState.copyWith(...)` or like so:`instanceOfKeyCandleState.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
-  _$KeyChartStateCWProxy get copyWith => _$KeyChartStateCWProxyImpl(this);
+  _$KeyCandleStateCWProxy get copyWith => _$KeyCandleStateCWProxyImpl(this);
 }
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-KeyChartState _$KeyChartStateFromJson(Map<String, dynamic> json) =>
-    KeyChartState(
+KeyCandleState _$KeyCandleStateFromJson(Map<String, dynamic> json) =>
+    KeyCandleState(
       title: json['title'] as String,
       kPeriod: json['kPeriod'] as int?,
       notice: json['notice'] as bool? ?? true,
@@ -310,7 +311,7 @@ KeyChartState _$KeyChartStateFromJson(Map<String, dynamic> json) =>
       shortAttackPoint: json['shortAttackPoint'] as int? ?? 20,
     );
 
-Map<String, dynamic> _$KeyChartStateToJson(KeyChartState instance) =>
+Map<String, dynamic> _$KeyCandleStateToJson(KeyCandleState instance) =>
     <String, dynamic>{
       'title': instance.title,
       'kPeriod': instance.kPeriod,

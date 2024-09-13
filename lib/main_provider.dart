@@ -149,7 +149,7 @@ class MainNotifier extends StateNotifier<MainState> {
     });
     ref.listen<int?>(currentPriceProvider, (previous, currentPrice) {
       if(currentPrice == null) return;
-      currentController.text = currentPrice?.toString() ?? '';
+      currentController.text = currentPrice.toString();
       updateKeyValues();
       _shouldNotice();
       state = state.copyWith(current: currentPrice);

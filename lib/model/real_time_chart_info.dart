@@ -1,18 +1,18 @@
 import 'dart:math';
 
 import 'package:dominant_player/model/chart_data.dart';
-import 'package:dominant_player/model/chart_info.dart';
+import 'package:dominant_player/model/candle_info.dart';
 
 class RealTimeChartInfo with ChartUtil {
   RealTimeChartInfo(this.xPeriod, this.allTicks) {
-    _updateAllChartInfo();
-    _updateCurrentChartValues();
+    _updateAllCandleInfo();
+    _updateCurrentCandleValues();
   }
 
   final int xPeriod;
   final List<List<String>> allTicks;
 
-  final List<ChartInfo> allChartInfo = [];
+  final List<CandleInfo> allCandleInfo = [];
 
   int curOpen = 0;
   int curClose = 0;
@@ -24,8 +24,8 @@ class RealTimeChartInfo with ChartUtil {
   int curDistance = 0;
   int closeToOpenDis = 0;
 
-  void _updateAllChartInfo() {
-    ChartInfo getChartInfo(List<List<String>> considerTicks) {
+  void _updateAllCandleInfo() {
+    CandleInfo getCandleInfo(List<List<String>> considerTicks) {
       int open = double.parse(tickOpen(considerTicks.first)).toInt();
       int close = double.parse(tickClose(considerTicks.last)).toInt();
       int high = considerTicks.map((e) => double.parse(e[2]).toInt()).fold(
@@ -47,7 +47,7 @@ class RealTimeChartInfo with ChartUtil {
           .reduce((value, element) => value + element);
 
       // start time & end time 都減一分鐘
-      return ChartInfo(
+      return CandleInfo(
         period: xPeriod,
         open: open,
         high: high,
@@ -60,26 +60,26 @@ class RealTimeChartInfo with ChartUtil {
     }
 
     for (int i = 0; i < allTicks.length / xPeriod; i++) {
-      final chartInfo = getChartInfo(allTicks.sublist(
+      final chartInfo = getCandleInfo(allTicks.sublist(
           i * xPeriod, min((i + 1) * xPeriod, allTicks.length)));
-      allChartInfo.add(chartInfo);
+      allCandleInfo.add(chartInfo);
     }
   }
 
-  void _updateCurrentChartValues() {
+  void _updateCurrentCandleValues() {
     if (allTicks.isEmpty) return;
-    curOpen = allChartInfo.last.open;
-    curClose = allChartInfo.last.close;
-    curHigh = allChartInfo.last.high;
-    curLow = allChartInfo.last.low;
+    curOpen = allCandleInfo.last.open;
+    curClose = allCandleInfo.last.close;
+    curHigh = allCandleInfo.last.high;
+    curLow = allCandleInfo.last.low;
     curMiddle = (curHigh + curLow) / 2;
-    curVolume = allChartInfo.last.volume;
+    curVolume = allCandleInfo.last.volume;
     curDistance = max(0, curHigh - curLow);
     closeToOpenDis = curClose - curOpen;
   }
 
-  ChartInfo? getLastFinishChartInfo() {
-    if (allChartInfo.length > 1) return allChartInfo[allChartInfo.length - 2];
+  CandleInfo? getLastFinishCandleInfo() {
+    if (allCandleInfo.length > 1) return allCandleInfo[allCandleInfo.length - 2];
     return null;
   }
 

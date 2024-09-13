@@ -1,33 +1,35 @@
 import 'dart:math';
 
-import 'package:dominant_player/model/chart_info.dart';
+import 'package:dominant_player/model/candle_info.dart';
 import 'package:dominant_player/model/real_time_chart_info.dart';
 import 'package:dominant_player/provider/real_time_chart_info_provider.dart';
 import 'package:dominant_player/provider/is_add_new_tick_provider.dart';
-import 'package:dominant_player/widgets/keyChart/item_widget/key_chart_controller.dart';
-import 'package:dominant_player/widgets/keyChart/item_widget/key_chart_state.dart';
-import 'package:dominant_player/widgets/keyChart/key_chart_main_provider.dart';
+import 'package:dominant_player/widgets/keyCandle/item_widget/key_candle_controller.dart';
+import 'package:dominant_player/widgets/keyCandle/key_candle_main_provider.dart';
 import 'package:dominant_player/widgets/style.dart';
 import 'package:dominant_player/widgets/widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class KeyChartWidget extends ConsumerStatefulWidget {
+import 'key_candle_state.dart';
+
+class KeyCandleWidget extends ConsumerStatefulWidget {
   final int index;
 
-  const KeyChartWidget({required this.index, super.key});
+  const KeyCandleWidget({required this.index, super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _KeyChartWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _KeyCandleWidgetState();
 }
 
-class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
-  KeyChartState get _state =>
-      ref.read(keyChartMainWidgetProvider)[widget.index];
+class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
+  KeyCandleState get _state =>
+      ref.read(keyCandleMainWidgetProvider)[widget.index];
 
-  KeyChartMainWidgetNotifier get _notifier =>
-      ref.read(keyChartMainWidgetProvider.notifier);
+  KeyCandleMainWidgetNotifier get _notifier =>
+      ref.read(keyCandleMainWidgetProvider.notifier);
 
   RealTimeChartInfo get _realTimeChartInfo =>
       ref.read(realTimeChartInfoProvider(_state.kPeriod!));
@@ -109,16 +111,14 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
                         ),
                       ),
                       Positioned.fill(
-                          child: textField(
-                              init: _state.title,
-                              onChanged: (value) {
-                                _notifier.setTitle(value, _state);
-                              },
-                              keyboardType: TextInputType.text,
-                              error: _notifier.isKeyChartTitleDuplicate(
-                                      _state.title, _state)
-                                  ? '名稱請不要重複！'
-                                  : null))
+                        child: textField(
+                          init: _state.title,
+                          onChanged: (value) {
+                            _notifier.setTitle(value, _state);
+                          },
+                          keyboardType: TextInputType.text,
+                        ),
+                      )
                     ],
                   ),
                   const SizedBox(width: 12),
@@ -145,7 +145,7 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
               const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: valuesInfo(_realTimeChartInfo.allChartInfo.last),
+                child: valuesInfo(_realTimeChartInfo.allCandleInfo.last),
               ),
               const SizedBox(height: 16),
               //chart(_realTimeChartInfo.allChartInfo.last),
@@ -199,7 +199,7 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
       ],
     );
     return Container(
-      padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
             border: Border(
           bottom: BorderSide(color: Colors.grey.shade300, width: 1),
@@ -214,8 +214,8 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
   double _kChartSizeFactor = 0;
   static const double _kChartWidth = 30;
 
-  Widget valuesInfo(ChartInfo chartInfo) {
-    int closeToOpen = chartInfo.closeToOpen;
+  Widget valuesInfo(CandleInfo candleInfo) {
+    int closeToOpen = candleInfo.closeToOpen;
     Color valueColor = closeToOpen > 0
         ? winColor
         : closeToOpen < 0
@@ -241,21 +241,21 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: 12,
       children: [
-        tile('開', chartInfo.open.toString()),
-        tile('高', chartInfo.high.toString()),
-        tile('中', chartInfo.middle.toString()),
-        tile('低', chartInfo.low.toString()),
-        tile('收', chartInfo.close.toString()),
-        tile('量', chartInfo.volume.toString()),
+        tile('開', candleInfo.open.toString()),
+        tile('高', candleInfo.high.toString()),
+        tile('中', candleInfo.middle.toString()),
+        tile('低', candleInfo.low.toString()),
+        tile('收', candleInfo.close.toString()),
+        tile('量', candleInfo.volume.toString()),
         Row(
           children: [
-            chartInfo.closeToOpen < 0
+            candleInfo.closeToOpen < 0
                 ? Icon(
                     Icons.arrow_drop_down,
                     color: loseColor,
                     size: 20,
                   )
-                : chartInfo.closeToOpen > 0
+                : candleInfo.closeToOpen > 0
                     ? Icon(
                         Icons.arrow_drop_up,
                         color: winColor,
@@ -263,7 +263,7 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
                       )
                     : const SizedBox(),
             Text(
-              '${chartInfo.closeToOpen > 0 ? '+' : ''}${chartInfo.closeToOpen}',
+              '${candleInfo.closeToOpen > 0 ? '+' : ''}${candleInfo.closeToOpen}',
               style: captionST.copyWith(
                   color: closeToOpen > 0
                       ? winColor
@@ -283,18 +283,19 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
       child: ListView(
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
-        children: _realTimeChartInfo.allChartInfo.map((e) => chart(e)).toList(),
+        children:
+            _realTimeChartInfo.allCandleInfo.map((e) => chart(e)).toList(),
       ),
     );
   }
 
-  Widget chart(ChartInfo chartInfo) {
-    int highToOpenDis = chartInfo.highToOpenDis;
-    int lowToOpenDis = chartInfo.lowToOpenDis;
+  Widget chart(CandleInfo candleInfo) {
+    int highToOpenDis = candleInfo.highToOpenDis;
+    int lowToOpenDis = candleInfo.lowToOpenDis;
     // +1是因為open位置的高度
     double kChartHeight =
         max(highToOpenDis, lowToOpenDis).abs() * _kChartSizeFactor * 2 + 1;
-    int closeToOpen = chartInfo.closeToOpen;
+    int closeToOpen = candleInfo.closeToOpen;
 
     late double kChartUpperHeight;
     late double kChartLowerHeight;
@@ -304,11 +305,11 @@ class _KeyChartWidgetState extends ConsumerState<KeyChartWidget> {
     if (kChartHeight > _kChartMaxH) {
       if (highToOpenDis > lowToOpenDis) {
         kChartUpperHeight =
-            (_kChartMaxH - 1) * highToOpenDis / chartInfo.distance;
+            (_kChartMaxH - 1) * highToOpenDis / candleInfo.distance;
         kChartLowerHeight = (_kChartMaxH - 1) - kChartUpperHeight;
       } else {
         kChartLowerHeight =
-            (_kChartMaxH - 1) * lowToOpenDis / chartInfo.distance;
+            (_kChartMaxH - 1) * lowToOpenDis / candleInfo.distance;
         kChartUpperHeight = (_kChartMaxH - 1) - kChartLowerHeight;
       }
       kChartHeight = _kChartMaxH;

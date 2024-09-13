@@ -1,21 +1,22 @@
-import 'package:dominant_player/widgets/keyChart/item_widget/key_chart_widget.dart';
-import 'package:dominant_player/widgets/keyChart/key_chart_main_provider.dart';
 import 'package:dominant_player/widgets/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class KeyChartMainWidget extends ConsumerStatefulWidget {
-  const KeyChartMainWidget({super.key});
+import 'item_widget/key_candle_widget.dart';
+import 'key_candle_main_provider.dart';
+
+class KeyCandleMainWidget extends ConsumerStatefulWidget {
+  const KeyCandleMainWidget({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _KeyChartMainWidgetState();
+      _KeyCandleMainWidgetState();
 }
 
-class _KeyChartMainWidgetState extends ConsumerState {
+class _KeyCandleMainWidgetState extends ConsumerState {
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(keyChartMainWidgetProvider);
+    final state = ref.watch(keyCandleMainWidgetProvider);
     Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -27,7 +28,7 @@ class _KeyChartMainWidgetState extends ConsumerState {
               style: titleST,
             ),
           ),
-        ...[for(int i = 0; i < state.length; i++) KeyChartWidget(index: i)],
+        ...[for(int i = 0; i < state.length; i++) KeyCandleWidget(index: i)],
         const SizedBox(height: 16),
         OutlinedButton.icon(
           icon: const Icon(
@@ -35,7 +36,7 @@ class _KeyChartMainWidgetState extends ConsumerState {
             size: 20,
           ),
           onPressed: () {
-            ref.read(keyChartMainWidgetProvider.notifier).addKeyChart();
+            ref.read(keyCandleMainWidgetProvider.notifier).addKeyChart();
           },
           style: OutlinedButton.styleFrom(
               backgroundColor: Colors.white,
