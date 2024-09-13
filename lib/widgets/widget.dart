@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:dominant_player/widgets/style.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
 Widget title(
   dynamic text, {
@@ -128,6 +131,98 @@ Widget outline(Widget content,
       child: content,
     );
 
+Widget textField({
+  dynamic init,
+  Key? key,
+  required ValueChanged<String> onChanged,
+  TextEditingController? controller,
+  TextInputType? keyboardType = TextInputType.number,
+  List<TextInputFormatter> inputFormatters = const [],
+  double? width,
+  String? hint = '請輸入',
+  String? error,
+  FormFieldValidator<String>? validator,
+}) {
+  return Container(
+    key: key,
+    constraints: BoxConstraints(maxWidth: width ?? infoW, maxHeight: textH),
+    alignment: Alignment.bottomCenter,
+    child: TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: validator,
+      inputFormatters: inputFormatters,
+      initialValue: init?.toString(),
+      controller: controller,
+      textAlign: TextAlign.center,
+      keyboardType: keyboardType,
+      style: infoST,
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+          errorText: error,
+          hintText: hint,
+          hintStyle: infoST.copyWith(
+              fontSize: max(1, infoST.fontSize! - 4),
+              color: Colors.grey.withOpacity(0.75))),
+      onChanged: onChanged,
+    ),
+  );
+}
+
+
+Future<bool?> confirmDialog(String title,BuildContext context) async {
+  return showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(
+          "再次確認",
+          style: titleST,
+        ),
+        content: Text.rich(
+          TextSpan(style: infoST, children: [
+            const TextSpan(text: '您確定要刪除"'),
+            TextSpan(
+                text: title,
+                style: infoST.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.lightBlue,
+                )),
+            const TextSpan(text: '"嗎？'),
+          ]),
+          style: infoST,
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text(
+              "取消",
+              style: infoST,
+            ),
+            onPressed: () => Navigator.of(context).pop(), // 关闭对话框
+          ),
+          TextButton(
+            child: Text(
+              "刪除",
+              style: infoST.copyWith(color: Colors.red),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Size textSize(String text, TextStyle style) {
+  final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      maxLines: 1,
+      textDirection: TextDirection.ltr)
+    ..layout(minWidth: 0, maxWidth: double.infinity);
+  return textPainter.size;
+}
 bool _overFlow(double width, String text, TextStyle ts) {
   final tp = TextPainter(
       text: TextSpan(text: text, style: ts), textDirection: TextDirection.rtl)

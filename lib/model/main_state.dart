@@ -3,7 +3,7 @@ import 'package:dominant_player/model/key_value.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'spy_state.g.dart';
+part 'main_state.g.dart';
 
 /// 一股腦兒之SPY理論
 /// 【當日高點+當日低點 ÷ 2】＝中關(範圍)
@@ -20,8 +20,8 @@ part 'spy_state.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 @CopyWith()
-class SpyState {
-  SpyState({
+class MainState {
+  MainState({
     this.autoNotice = true,
     this.noticeDis = 10,
     this.current,
@@ -42,10 +42,11 @@ class SpyState {
     required this.customizeSensitivitySpaces,
     this.customizeValuesExpand = true,
     required this.customizeValues,
+    this.keyChartNoticeExpand = true,
   });
 
-  factory SpyState.init() {
-    return SpyState(
+  factory MainState.init() {
+    return MainState(
         daySpy: Spy(isDay: true),
         nightSpy: Spy(isDay: false),
         daySensitivitySpace15: SensitivitySpace(),
@@ -130,11 +131,15 @@ class SpyState {
 
   final Map<String, bool> considerKeyValue;
 
-  factory SpyState.fromJson(Map<String, dynamic> json) =>
-      _$SpyStateFromJson(json);
+  /// 關鍵K棒警示
+  /// 是否展開
+  final bool keyChartNoticeExpand;
+
+  factory MainState.fromJson(Map<String, dynamic> json) =>
+      _$MainStateFromJson(json);
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
-  Map<String, dynamic> toJson() => _$SpyStateToJson(this);
+  Map<String, dynamic> toJson() => _$MainStateToJson(this);
 }
 
 @JsonSerializable(explicitToJson: true)

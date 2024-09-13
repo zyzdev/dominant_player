@@ -59,15 +59,20 @@ Future<void> notificationInit() async {
 
   /// Note: permissions aren't requested here just to demonstrate that can be
   /// done later
-  final DarwinInitializationSettings initializationSettingsDarwin =
-      DarwinInitializationSettings(
+  final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
     requestSoundPermission: true,
     onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
     notificationCategories: darwinNotificationCategories,
   );
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/launcher_icon');
+  flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestNotificationsPermission();
   final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
     macOS: initializationSettingsDarwin,
   );
   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
@@ -75,23 +80,29 @@ Future<void> notificationInit() async {
 }
 
 int _notificationCnt = 0;
-Future<void> sendNotification(String msg) async {
-  const DarwinNotificationDetails macosNotificationDetails =
-      DarwinNotificationDetails(
-    subtitle: '接近關鍵價位！',
+
+Future<void> sendNotification(String subtitle, String msg) async {
+  DarwinNotificationDetails macosNotificationDetails = DarwinNotificationDetails(
+    subtitle: subtitle,
   );
 
-  const NotificationDetails notificationDetails =
-      NotificationDetails(macOS: macosNotificationDetails);
+  AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
+      subtitle, subtitle,
+      channelDescription: '$subtitle的推播',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker');
+
+  NotificationDetails notificationDetails =
+      NotificationDetails(macOS: macosNotificationDetails, android: androidNotificationDetails);
   flutterLocalNotificationsPlugin.show(
-    _notificationCnt ++,
-    '接近關鍵價位！',
+    _notificationCnt++,
+    subtitle,
     msg,
     notificationDetails,
   );
 }
 
-void _onDidReceiveLocalNotification(
-    int id, String? title, String? body, String? payload) async {}
+void _onDidReceiveLocalNotification(int id, String? title, String? body, String? payload) async {}
 
 void onDidReceiveNotificationResponse(NotificationResponse details) {}

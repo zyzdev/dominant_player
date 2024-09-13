@@ -1,11 +1,13 @@
-import 'dart:math';
+import 'dart:io';
 
 import 'package:dominant_player/main_provider.dart';
-import 'package:dominant_player/model/spy_state.dart';
+import 'package:dominant_player/model/main_state.dart';
 import 'package:dominant_player/service/notification.dart';
+import 'package:dominant_player/widgets/keyCandle/key_candle_main_widget.dart';
 import 'package:dominant_player/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -13,8 +15,8 @@ import 'package:window_manager/window_manager.dart';
 import 'model/key_value.dart';
 
 Future<void> main() async {
-  if (!kIsWeb) {
-    WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) {
     // Must add this line.
     await windowManager.ensureInitialized();
     windowManager.waitUntilReadyToShow(
@@ -23,6 +25,9 @@ Future<void> main() async {
         windowManager.setTitle('絕對主力邏輯助手');
       },
     );
+  }
+  if (Platform.isAndroid || Platform.isIOS) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
   await init();
   runApp(
@@ -43,7 +48,7 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState with TickerProviderStateMixin {
-  SpyState get _state => ref.read(mainProvider);
+  MainState get _state => ref.read(mainProvider);
 
   MainNotifier get _mainNotifier => ref.read(mainProvider.notifier);
 
@@ -54,29 +59,25 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     duration: const Duration(milliseconds: 300),
     vsync: this,
   );
-  late final ReverseAnimation _spyExpandAnimation =
-      ReverseAnimation(_spyCollapseAnimation);
+  late final ReverseAnimation _spyExpandAnimation = ReverseAnimation(_spyCollapseAnimation);
   late final Animation<double> _spyCollapseAnimation = CurvedAnimation(
     parent: _spyAnimationController,
-    curve: Curves.fastEaseInToSlowEaseOut,
+    curve: Curves.fastLinearToSlowEaseIn,
   );
 
-  late final AnimationController _sensitivitySpaceAnimationController =
-      AnimationController(
+  late final AnimationController _sensitivitySpaceAnimationController = AnimationController(
     value: _state.sensitivitySpaceExpand ? 1 : 0,
     duration: const Duration(milliseconds: 300),
     vsync: this,
   );
   late final ReverseAnimation _sensitivitySpaceExpandAnimation =
       ReverseAnimation(_sensitivitySpaceCollapseAnimation);
-  late final Animation<double> _sensitivitySpaceCollapseAnimation =
-      CurvedAnimation(
+  late final Animation<double> _sensitivitySpaceCollapseAnimation = CurvedAnimation(
     parent: _sensitivitySpaceAnimationController,
-    curve: Curves.fastEaseInToSlowEaseOut,
+    curve: Curves.fastLinearToSlowEaseIn,
   );
 
-  late final AnimationController _keyValuesAnimationController =
-      AnimationController(
+  late final AnimationController _keyValuesAnimationController = AnimationController(
     value: _state.keyValuesExpand ? 1 : 0,
     duration: const Duration(milliseconds: 300),
     vsync: this,
@@ -85,7 +86,18 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       ReverseAnimation(_keyValuesAnimationController);
   late final Animation<double> _keyValuesCollapseAnimation = CurvedAnimation(
     parent: _keyValuesAnimationController,
-    curve: Curves.fastEaseInToSlowEaseOut,
+    curve: Curves.fastLinearToSlowEaseIn,
+  );
+  late final AnimationController _keyChartNoticeAnimationController = AnimationController(
+    value: _state.keyChartNoticeExpand ? 1 : 0,
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+  late final ReverseAnimation _keyChartNoticeExpandAnimation =
+      ReverseAnimation(_keyChartNoticeAnimationController);
+  late final Animation<double> _keyChartNoticeCollapseAnimation = CurvedAnimation(
+    parent: _keyChartNoticeAnimationController,
+    curve: Curves.fastLinearToSlowEaseIn,
   );
 
   @override
@@ -99,6 +111,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     _spyAnimationController.dispose();
     _sensitivitySpaceAnimationController.dispose();
     _keyValuesAnimationController.dispose();
+    _keyChartNoticeAnimationController.dispose();
     super.dispose();
   }
 
@@ -118,6 +131,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
               _spy,
               _sensitivitySpace,
               _keyValueList,
+              _keyChartNotice,
             ],
           ),
         ),
@@ -198,8 +212,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             ),
           ),
           onTap: () {
-            _mainNotifier
-                .sensitivitySpaceExpand(!_state.sensitivitySpaceExpand);
+            _mainNotifier.sensitivitySpaceExpand(!_state.sensitivitySpaceExpand);
             _sensitivitySpaceAnimationController.forward();
           },
         ),
@@ -221,22 +234,39 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             _keyValuesAnimationController.forward();
           },
         ),
+        InkWell(
+          child: SizeTransition(
+            sizeFactor: _keyChartNoticeExpandAnimation,
+            axis: Axis.vertical,
+            child: SizeTransition(
+              sizeFactor: _keyChartNoticeExpandAnimation,
+              axis: Axis.horizontal,
+              child: ColoredBox(
+                color: Colors.orange.shade300,
+                child: verticalText('關鍵K棒'),
+              ),
+            ),
+          ),
+          onTap: () {
+            _mainNotifier.keyChartNoticeExpand(!_state.keyChartNoticeExpand);
+            _keyChartNoticeAnimationController.forward();
+          },
+        ),
       ],
     );
   }
 
   Widget get _spy {
     // 計算數值最大寬度
-    double valueMaxWidth =
-        _mainNotifier.spyValues(_state.daySpy).map((e) => e.value).fold(
-              infoW,
-              (previousValue, element) {
-                double width = textSize(element.toString(), titleST).width;
-                if (previousValue < width) return width;
-                return previousValue;
-              },
-            ) +
-            16;
+    double valueMaxWidth = _mainNotifier.spyValues(_state.daySpy).map((e) => e.value).fold<double>(
+          infoW,
+          (previousValue, element) {
+            double width = textSize(element.toString(), titleST).width;
+            if (previousValue < width) return width;
+            return previousValue;
+          },
+        ) +
+        16;
 
     Widget spyWidget(Spy spy) {
       final spyValues = _mainNotifier.spyValues(spy);
@@ -261,10 +291,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                           child: _checkbox(null),
                         )),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('日期', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('日期', line: false)],
                     ),
                   ],
                 ),
@@ -281,8 +308,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                   return;
                 }
                 String title = '${spy.isDay ? '日' : '夜'}盤，${e.key.title}';
-                _mainNotifier.considerKeyValue(
-                    title, !(_state.considerKeyValue[title] ?? true));
+                _mainNotifier.considerKeyValue(title, !(_state.considerKeyValue[title] ?? true));
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -295,12 +321,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                     border: e == spyValues.last
                         ? Border.all(color: Colors.grey.shade300, width: 1)
                         : Border(
-                            top: BorderSide(
-                                color: Colors.grey.shade300, width: 1),
-                            left: BorderSide(
-                                color: Colors.grey.shade300, width: 1),
-                            right: BorderSide(
-                                color: Colors.grey.shade300, width: 1),
+                            top: BorderSide(color: Colors.grey.shade300, width: 1),
+                            left: BorderSide(color: Colors.grey.shade300, width: 1),
+                            right: BorderSide(color: Colors.grey.shade300, width: 1),
                           )),
                 child: Stack(
                   children: [
@@ -309,16 +332,13 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                           top: 0,
                           bottom: 0,
                           left: 0,
-                          child: _checkbox(
-                              '${spy.isDay ? '日' : '夜'}盤，${e.key.title}')),
+                          child: _checkbox('${spy.isDay ? '日' : '夜'}盤，${e.key.title}')),
                     Row(
                       children: [
                         const SizedBox(width: 16),
                         title(e.key.title,
                             color:
-                                e.key == KeyValue.high || e.key == KeyValue.low
-                                    ? e.key.bg
-                                    : null,
+                                e.key == KeyValue.high || e.key == KeyValue.low ? e.key.bg : null,
                             line: false)
                       ],
                     )
@@ -395,8 +415,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
               _mainNotifier.spyExpand(!_state.spyExpand);
               _spyAnimationController.reverse();
             },
-            icon:
-                const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
+            icon: const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
           ),
         )
       ],
@@ -410,16 +429,15 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   }
 
   Widget get _sensitivitySpace {
-    Widget content = ValueListenableBuilder(
+    Widget content = ValueListenableBuilder<double>(
       valueListenable: _sensitivitySpaceWidth,
       builder: (context, width, child) {
         Widget content = ReorderableWrap(
           scrollPhysics: const NeverScrollableScrollPhysics(),
           direction: Axis.vertical,
           onReorder: _mainNotifier.exchangeSensitivitySpaceWidgetIndex,
-          children: _state.sensitivitySpaceWidgetIndex
-              .map((e) => _sensitivitySpaceWidget(e))
-              .toList(),
+          children:
+              _state.sensitivitySpaceWidgetIndex.map((e) => _sensitivitySpaceWidget(e)).toList(),
         );
 
         if (width == 0) {
@@ -461,12 +479,10 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           top: 0,
           child: IconButton(
             onPressed: () {
-              _mainNotifier
-                  .sensitivitySpaceExpand(!_state.sensitivitySpaceExpand);
+              _mainNotifier.sensitivitySpaceExpand(!_state.sensitivitySpaceExpand);
               _sensitivitySpaceAnimationController.reverse();
             },
-            icon:
-                const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
+            icon: const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
           ),
         )
       ],
@@ -595,12 +611,10 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             top: 0,
             child: IconButton(
               onPressed: () {
-                _mainNotifier.daySensitivitySpaceExpand(
-                    !_state.daySensitivitySpaceExpand);
+                _mainNotifier.daySensitivitySpaceExpand(!_state.daySensitivitySpaceExpand);
               },
-              icon: Icon(!_state.daySensitivitySpaceExpand
-                  ? Icons.arrow_drop_down
-                  : Icons.arrow_drop_up),
+              icon: Icon(
+                  !_state.daySensitivitySpaceExpand ? Icons.arrow_drop_down : Icons.arrow_drop_up),
             ),
           ),
         ],
@@ -704,8 +718,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             top: 0,
             child: IconButton(
               onPressed: () {
-                _mainNotifier.nightSensitivitySpaceExpand(
-                    !_state.nightSensitivitySpaceExpand);
+                _mainNotifier.nightSensitivitySpaceExpand(!_state.nightSensitivitySpaceExpand);
               },
               icon: Icon(!_state.nightSensitivitySpaceExpand
                   ? Icons.arrow_drop_down
@@ -726,11 +739,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
         child: Column(
           children: [
             SizedBox(width: _sensitivitySpaceWidth.value),
-            ..._state.customizeSensitivitySpaces.map((e) =>
-                customizeSensitivitySpace(
-                  bg: e.direction.isLong
-                      ? winColor.withOpacity(0.2)
-                      : loseColor.withOpacity(0.2),
+            ..._state.customizeSensitivitySpaces.map((e) => customizeSensitivitySpace(
+                  bg: e.direction.isLong ? winColor.withOpacity(0.2) : loseColor.withOpacity(0.2),
                   customizeSensitivitySpace: e,
                   highOnChange: _mainNotifier.setCustomizeSensitivitySpaceHigh,
                   lowOnChange: _mainNotifier.setCustomizeSensitivitySpaceLow,
@@ -770,8 +780,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                     side: BorderSide(width: 1.5, color: loseColor),
                   ),
                   onPressed: () {
-                    _mainNotifier
-                        .addCustomizeSensitivitySpace(Direction.customizeShort);
+                    _mainNotifier.addCustomizeSensitivitySpace(Direction.customizeShort);
                   },
                   label: Text(
                     '新增自定義空方邏輯',
@@ -826,8 +835,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             top: 0,
             child: IconButton(
               onPressed: () {
-                _mainNotifier.customizeSensitivitySpaceExpand(
-                    !_state.customizeSensitivitySpaceExpand);
+                _mainNotifier
+                    .customizeSensitivitySpaceExpand(!_state.customizeSensitivitySpaceExpand);
               },
               icon: Icon(!_state.customizeSensitivitySpaceExpand
                   ? Icons.arrow_drop_down
@@ -864,7 +873,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
-                                _confirmDialog(e.title).then((remove) {
+                                confirmDialog(e.title, context).then((remove) {
                                   if (remove == true) {
                                     _mainNotifier.removeCustomizeValue(e);
                                   }
@@ -884,36 +893,29 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                         Row(
                           children: [
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Stack(
                                 children: [
+                                  // 留下最小寬度
+                                  SizedBox(width: infoW),
                                   // 用Text把widget的寬度長出來
                                   // 以讓textField可以到最寬
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
                                     child: Text(
                                       e.title,
-                                      style: titleST.copyWith(
-                                          color:
-                                              Colors.black.withOpacity(0.01)),
+                                      style:
+                                          titleST.copyWith(color: Colors.black.withOpacity(0.01)),
                                     ),
                                   ),
                                   Positioned.fill(
                                       child: textField(
-                                          init: e.title,
-                                          onChanged: (value) {
-                                            _mainNotifier
-                                                .setCustomizeValueTitle(
-                                                    e, value);
-                                          },
-                                          keyboardType: TextInputType.text,
-                                          error: _mainNotifier
-                                                  .isCustomizeValueTitleDuplicate(
-                                                      e.title, e)
-                                              ? '名稱請不要重複！'
-                                              : null))
+                                    init: e.title,
+                                    onChanged: (value) {
+                                      _mainNotifier.setCustomizeValueTitle(e, value);
+                                    },
+                                    keyboardType: TextInputType.text,
+                                  ))
                                 ],
                               ),
                             ),
@@ -929,13 +931,11 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                       ],
                     );
                     return Container(
-                        constraints: BoxConstraints(
-                            minWidth: _sensitivitySpaceWidth.value),
+                        constraints: BoxConstraints(minWidth: _sensitivitySpaceWidth.value),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
                             border: Border(
-                          bottom:
-                              BorderSide(color: Colors.grey.shade300, width: 1),
+                          bottom: BorderSide(color: Colors.grey.shade300, width: 1),
                         )),
                         child: content);
                   }).toList()
@@ -1002,12 +1002,10 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             top: 0,
             child: IconButton(
               onPressed: () {
-                _mainNotifier
-                    .customizeValueExpand(!_state.customizeValuesExpand);
+                _mainNotifier.customizeValueExpand(!_state.customizeValuesExpand);
               },
-              icon: Icon(!_state.customizeValuesExpand
-                  ? Icons.arrow_drop_down
-                  : Icons.arrow_drop_up),
+              icon:
+                  Icon(!_state.customizeValuesExpand ? Icons.arrow_drop_down : Icons.arrow_drop_up),
             ),
           ),
         ],
@@ -1018,16 +1016,14 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   Widget get _keyValueList {
     final keyValues = _mainNotifier.keyValues;
     String maxLengthTitle = keyValues.fold('', (previousValue, element) {
-      return element.key.length > previousValue.length
-          ? element.key
-          : previousValue;
+      return element.key.length > previousValue.length ? element.key : previousValue;
     });
 
     double maxValueWidth = keyValues
             .map(
           (e) => e.value,
         )
-            .fold(
+            .fold<double>(
           titleW,
           (previousValue, element) {
             double width = textSize(element.toString(), titleST).width;
@@ -1041,7 +1037,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             .map(
           (e) => e.value - (_state.current ?? 0),
         )
-            .fold(
+            .fold<double>(
           infoW,
           (previousValue, element) {
             double width = textSize(element.toString(), infoST).width;
@@ -1050,8 +1046,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           },
         ) +
         16;
-    int indexOfCurrent = keyValues
-        .indexWhere((element) => element.key == KeyValue.current.title);
+    int indexOfCurrent = keyValues.indexWhere((element) => element.key == KeyValue.current.title);
     Widget content = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1088,8 +1083,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             children: [
               if (keyValues.isEmpty)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
                     '請先輸入關鍵價位（現價、高點、低點、靈敏度空間高低點）',
                     style: titleST,
@@ -1112,10 +1106,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                             ? currentIsNull
                                 ? Colors.transparent
                                 : indexDis > 0
-                                    ? winColor
-                                        .withOpacity(0.4 - indexDis.abs() * 0.1)
-                                    : loseColor
-                                        .withOpacity(0.4 - indexDis.abs() * 0.1)
+                                    ? winColor.withOpacity(0.4 - indexDis.abs() * 0.1)
+                                    : loseColor.withOpacity(0.4 - indexDis.abs() * 0.1)
                             : Colors.transparent;
 
                 Widget content = Row(
@@ -1123,8 +1115,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                     Stack(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 0, horizontal: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                           child: title(
                             maxLengthTitle,
                             color: Colors.black.withOpacity(0.01),
@@ -1178,9 +1169,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                               ),
                             )
                           : info(
-                              _state.current == null
-                                  ? ''
-                                  : '${valueDis > 0 ? '+' : ''}$valueDis',
+                              _state.current == null ? '' : '${valueDis > 0 ? '+' : ''}$valueDis',
                               color: valueDis > 0
                                   ? winColor
                                   : valueDis < 0
@@ -1227,14 +1216,61 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
               _mainNotifier.keyValuesExpand(!_state.keyValuesExpand);
               _keyValuesAnimationController.reverse();
             },
-            icon:
-                const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
+            icon: const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
           ),
         )
       ],
     );
     return SizeTransition(
       sizeFactor: _keyValuesCollapseAnimation,
+      axis: Axis.horizontal,
+      child: content,
+    );
+  }
+
+  Widget get _keyChartNotice {
+    if (kIsWeb) return const SizedBox();
+
+    Widget content = Container(
+      constraints: BoxConstraints(minWidth: infoW * 3),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          title('關鍵K棒提醒', line: false),
+          const KeyCandleMainWidget(),
+        ],
+      ),
+    );
+    content = Stack(
+      children: [
+        // 標題的底色
+        Positioned(
+            left: 0,
+            right: 0,
+            child: ColoredBox(
+              color: Colors.orange.shade300,
+              child: SizedBox(
+                height: textH,
+                width: double.infinity,
+              ),
+            )),
+        content,
+        Positioned(
+          right: 0,
+          top: 0,
+          child: IconButton(
+            onPressed: () {
+              _mainNotifier.keyValuesExpand(!_state.keyChartNoticeExpand);
+              _keyChartNoticeAnimationController.reverse();
+            },
+            icon: const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
+          ),
+        )
+      ],
+    );
+    return SizeTransition(
+      sizeFactor: _keyChartNoticeCollapseAnimation,
       axis: Axis.horizontal,
       child: content,
     );
@@ -1295,8 +1331,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             GestureDetector(
               onTap: () {
                 if (_state.considerKeyValue[attackKeyValue.title] != null) {
-                  _mainNotifier.considerKeyValue(attackKeyValue.title,
-                      !_state.considerKeyValue[attackKeyValue.title]!);
+                  _mainNotifier.considerKeyValue(
+                      attackKeyValue.title, !_state.considerKeyValue[attackKeyValue.title]!);
                 }
               },
               child: Container(
@@ -1307,16 +1343,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                 )),
                 child: Stack(
                   children: [
-                    Positioned(
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        child: _checkbox(attackKeyValue.title)),
+                    Positioned(top: 0, bottom: 0, left: 0, child: _checkbox(attackKeyValue.title)),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('攻擊', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('攻擊', line: false)],
                     )
                   ],
                 ),
@@ -1331,25 +1360,18 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             GestureDetector(
               onTap: () {
                 if (_state.considerKeyValue[middleKeyValue.title] != null) {
-                  _mainNotifier.considerKeyValue(middleKeyValue.title,
-                      !_state.considerKeyValue[middleKeyValue.title]!);
+                  _mainNotifier.considerKeyValue(
+                      middleKeyValue.title, !_state.considerKeyValue[middleKeyValue.title]!);
                 }
               },
               child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300, width: 1)),
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.grey.shade300, width: 1)),
                 child: Stack(
                   children: [
-                    Positioned(
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        child: _checkbox(middleKeyValue.title)),
+                    Positioned(top: 0, bottom: 0, left: 0, child: _checkbox(middleKeyValue.title)),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('中關', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('中關', line: false)],
                     )
                   ],
                 ),
@@ -1364,8 +1386,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             GestureDetector(
               onTap: () {
                 if (_state.considerKeyValue[defenseKeyValue.title] != null) {
-                  _mainNotifier.considerKeyValue(defenseKeyValue.title,
-                      !_state.considerKeyValue[defenseKeyValue.title]!);
+                  _mainNotifier.considerKeyValue(
+                      defenseKeyValue.title, !_state.considerKeyValue[defenseKeyValue.title]!);
                 }
               },
               child: Container(
@@ -1376,16 +1398,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                 )),
                 child: Stack(
                   children: [
-                    Positioned(
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        child: _checkbox(defenseKeyValue.title)),
+                    Positioned(top: 0, bottom: 0, left: 0, child: _checkbox(defenseKeyValue.title)),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('防守', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('防守', line: false)],
                     )
                   ],
                 ),
@@ -1404,12 +1419,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
-          bottom: bottomLine
-              ? BorderSide(color: Colors.grey.shade300, width: 1)
-              : BorderSide.none,
-          top: topLine
-              ? BorderSide(color: Colors.grey.shade300, width: 1)
-              : BorderSide.none,
+          bottom: bottomLine ? BorderSide(color: Colors.grey.shade300, width: 1) : BorderSide.none,
+          top: topLine ? BorderSide(color: Colors.grey.shade300, width: 1) : BorderSide.none,
         ),
       ),
       child: Container(
@@ -1422,26 +1433,19 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
               child: title(direction.typeName, line: false),
             ),
             hAndL(
-              high: direction.isLong
-                  ? sensitivitySpace.longHigh
-                  : sensitivitySpace.shortHigh,
-              low: direction.isLong
-                  ? sensitivitySpace.longLow
-                  : sensitivitySpace.shortLow,
+              high: direction.isLong ? sensitivitySpace.longHigh : sensitivitySpace.shortHigh,
+              low: direction.isLong ? sensitivitySpace.longLow : sensitivitySpace.shortLow,
               highOnChange: highOnChange,
               lowOnChange: lowOnChange,
             ),
             amd(
                 long: direction.isLong,
-                attack: direction.isLong
-                    ? sensitivitySpace.longAttack
-                    : sensitivitySpace.shortAttack,
-                middle: direction.isLong
-                    ? sensitivitySpace.longMiddle
-                    : sensitivitySpace.shortMiddle,
-                defense: direction.isLong
-                    ? sensitivitySpace.longDefense
-                    : sensitivitySpace.shortDefense,
+                attack:
+                    direction.isLong ? sensitivitySpace.longAttack : sensitivitySpace.shortAttack,
+                middle:
+                    direction.isLong ? sensitivitySpace.longMiddle : sensitivitySpace.shortMiddle,
+                defense:
+                    direction.isLong ? sensitivitySpace.longDefense : sensitivitySpace.shortDefense,
                 attackKeyValue: attackKeyValue,
                 middleKeyValue: middleKeyValue,
                 defenseKeyValue: defenseKeyValue,
@@ -1455,11 +1459,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   Widget customizeSensitivitySpace({
     required Color bg,
     required CustomizeSensitivitySpace customizeSensitivitySpace,
-    required Function(
-            CustomizeSensitivitySpace customizeSensitivitySpace, String value)
+    required Function(CustomizeSensitivitySpace customizeSensitivitySpace, String value)
         highOnChange,
-    required Function(
-            CustomizeSensitivitySpace customizeSensitivitySpace, String value)
+    required Function(CustomizeSensitivitySpace customizeSensitivitySpace, String value)
         lowOnChange,
     bool topLine = false,
     bool bottomLine = true,
@@ -1467,11 +1469,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     Widget hAndL({
       required int? high,
       required int? low,
-      required Function(
-              CustomizeSensitivitySpace customizeSensitivitySpace, String value)
+      required Function(CustomizeSensitivitySpace customizeSensitivitySpace, String value)
           highOnChange,
-      required Function(
-              CustomizeSensitivitySpace customizeSensitivitySpace, String value)
+      required Function(CustomizeSensitivitySpace customizeSensitivitySpace, String value)
           lowOnChange,
     }) =>
         Column(
@@ -1514,11 +1514,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           children: [
             GestureDetector(
               onTap: () {
-                _mainNotifier.considerKeyValue(
-                    customizeSensitivitySpace.attackKeyTitle,
-                    !(_state.considerKeyValue[
-                            customizeSensitivitySpace.attackKeyTitle] ??
-                        true));
+                _mainNotifier.considerKeyValue(customizeSensitivitySpace.attackKeyTitle,
+                    !(_state.considerKeyValue[customizeSensitivitySpace.attackKeyTitle] ?? true));
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -1532,20 +1529,15 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                         top: 0,
                         bottom: 0,
                         left: 0,
-                        child: _checkbox(
-                            customizeSensitivitySpace.attackKeyTitle)),
+                        child: _checkbox(customizeSensitivitySpace.attackKeyTitle)),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('攻擊', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('攻擊', line: false)],
                     )
                   ],
                 ),
               ),
             ),
-            info(customizeSensitivitySpace.attack,
-                width: infoW, leftLine: false, rightLine: false),
+            info(customizeSensitivitySpace.attack, width: infoW, leftLine: false, rightLine: false),
           ],
         ),
         Row(
@@ -1553,11 +1545,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           children: [
             GestureDetector(
               onTap: () {
-                _mainNotifier.considerKeyValue(
-                    customizeSensitivitySpace.middleKeyTitle,
-                    !(_state.considerKeyValue[
-                            customizeSensitivitySpace.middleKeyTitle] ??
-                        true));
+                _mainNotifier.considerKeyValue(customizeSensitivitySpace.middleKeyTitle,
+                    !(_state.considerKeyValue[customizeSensitivitySpace.middleKeyTitle] ?? true));
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -1571,20 +1560,15 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                         top: 0,
                         bottom: 0,
                         left: 0,
-                        child: _checkbox(
-                            customizeSensitivitySpace.middleKeyTitle)),
+                        child: _checkbox(customizeSensitivitySpace.middleKeyTitle)),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('中關', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('中關', line: false)],
                     )
                   ],
                 ),
               ),
             ),
-            info(customizeSensitivitySpace.middle,
-                width: infoW, leftLine: false, rightLine: false),
+            info(customizeSensitivitySpace.middle, width: infoW, leftLine: false, rightLine: false),
           ],
         ),
         Row(
@@ -1592,11 +1576,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           children: [
             GestureDetector(
               onTap: () {
-                _mainNotifier.considerKeyValue(
-                    customizeSensitivitySpace.defenseKeyTitle,
-                    !(_state.considerKeyValue[
-                            customizeSensitivitySpace.defenseKeyTitle] ??
-                        true));
+                _mainNotifier.considerKeyValue(customizeSensitivitySpace.defenseKeyTitle,
+                    !(_state.considerKeyValue[customizeSensitivitySpace.defenseKeyTitle] ?? true));
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -1610,13 +1591,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                         top: 0,
                         bottom: 0,
                         left: 0,
-                        child: _checkbox(
-                            customizeSensitivitySpace.defenseKeyTitle)),
+                        child: _checkbox(customizeSensitivitySpace.defenseKeyTitle)),
                     Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        title('防守', line: false)
-                      ],
+                      children: [const SizedBox(width: 16), title('防守', line: false)],
                     )
                   ],
                 ),
@@ -1628,9 +1605,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
         ),
       ];
       return Column(
-        children: customizeSensitivitySpace.direction.isLong
-            ? children
-            : children.reversed.toList(),
+        children:
+            customizeSensitivitySpace.direction.isLong ? children : children.reversed.toList(),
       );
     }
 
@@ -1639,12 +1615,8 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
-          top: topLine
-              ? BorderSide(color: Colors.grey.shade300, width: 1)
-              : BorderSide.none,
-          bottom: bottomLine
-              ? BorderSide(color: Colors.grey.shade300, width: 1)
-              : BorderSide.none,
+          top: topLine ? BorderSide(color: Colors.grey.shade300, width: 1) : BorderSide.none,
+          bottom: bottomLine ? BorderSide(color: Colors.grey.shade300, width: 1) : BorderSide.none,
         ),
       ),
       child: ColoredBox(
@@ -1659,11 +1631,10 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        _confirmDialog(customizeSensitivitySpace.title)
-                            .then((remove) {
+                        confirmDialog(customizeSensitivitySpace.title, context).then((remove) {
                           if (remove == true) {
-                            _mainNotifier.removeCustomizeSensitivitySpace(
-                                customizeSensitivitySpace);
+                            _mainNotifier
+                                .removeCustomizeSensitivitySpace(customizeSensitivitySpace);
                           }
                         });
                       },
@@ -1684,39 +1655,39 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Stack(
                         children: [
+                          // 留下最小寬度
+                          SizedBox(width: infoW),
                           // 用Text把widget的寬度長出來
                           // 以讓textField可以到最寬
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: Text(
                               customizeSensitivitySpace.title,
-                              style: titleST.copyWith(
-                                  color: Colors.black12.withOpacity(0.01)),
+                              style: titleST.copyWith(color: Colors.black12.withOpacity(0.01)),
                             ),
                           ),
                           Positioned.fill(
                               child: textField(
-                                  init: customizeSensitivitySpace.title,
-                                  onChanged: (value) {
-                                    _mainNotifier
-                                        .setCustomizeSensitivitySpaceTitle(
-                                            customizeSensitivitySpace, value);
-                                  },
-                                  keyboardType: TextInputType.text,
-                                  error: _mainNotifier
-                                          .isCustomizeSensitivitySpaceTitleDuplicate(
-                                              customizeSensitivitySpace.title,
-                                              customizeSensitivitySpace)
-                                      ? '名稱請不要重複！'
-                                      : null))
+                            init: customizeSensitivitySpace.title,
+                            onChanged: (value) {
+                              _mainNotifier.setCustomizeSensitivitySpaceTitle(
+                                  customizeSensitivitySpace, value);
+                            },
+                            keyboardType: TextInputType.text,
+                            validator: (value) {
+                              return _mainNotifier.isCustomizeSensitivitySpaceTitleDuplicate(
+                                      customizeSensitivitySpace.title, customizeSensitivitySpace)
+                                  ? '名稱勿重複！'
+                                  : null;
+                            },
+                          ))
                         ],
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(12),
                       child: ToggleSwitch(
-                        initialLabelIndex:
-                            customizeSensitivitySpace.direction.isLong ? 0 : 1,
+                        initialLabelIndex: customizeSensitivitySpace.direction.isLong ? 0 : 1,
                         totalSwitches: 2,
                         cornerRadius: 20.0,
                         fontSize: 12,
@@ -1733,9 +1704,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
                         onToggle: (index) {
                           _mainNotifier.setCustomizeSensitivitySpaceDirection(
                               customizeSensitivitySpace,
-                              index == 0
-                                  ? Direction.customizeLong
-                                  : Direction.customizeShort);
+                              index == 0 ? Direction.customizeLong : Direction.customizeShort);
                         },
                       ),
                     )
@@ -1749,41 +1718,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
               highOnChange: highOnChange,
               lowOnChange: lowOnChange,
             ),
-            amd(
-                customizeSensitivitySpace: customizeSensitivitySpace,
-                infoW: infoW * 1.15)
+            amd(customizeSensitivitySpace: customizeSensitivitySpace, infoW: infoW * 1.15)
           ],
         ),
-      ),
-    );
-  }
-
-  Widget textField({
-    dynamic init,
-    required ValueChanged<String> onChanged,
-    TextEditingController? controller,
-    TextInputType? keyboardType = TextInputType.number,
-    double? width,
-    String? hint = '請輸入',
-    String? error,
-  }) {
-    return Container(
-      constraints: BoxConstraints(maxWidth: width ?? infoW, maxHeight: textH),
-      alignment: Alignment.bottomCenter,
-      child: TextFormField(
-        initialValue: init?.toString(),
-        controller: controller,
-        textAlign: TextAlign.center,
-        keyboardType: keyboardType,
-        style: infoST,
-        textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-            errorText: error,
-            hintText: hint,
-            hintStyle: infoST.copyWith(
-                fontSize: max(1, infoST.fontSize! - 4),
-                color: Colors.grey.withOpacity(0.75))),
-        onChanged: onChanged,
       ),
     );
   }
@@ -1795,8 +1732,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
         color: Colors.grey,
         width: 1,
       ),
-      value:
-          keyValue != null ? _state.considerKeyValue[keyValue] ?? true : false,
+      value: keyValue != null ? _state.considerKeyValue[keyValue] ?? true : false,
       onChanged: (bool? enable) {
         if (keyValue == null) return;
         if (enable == null) return;
@@ -1804,61 +1740,6 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       },
     );
     return Transform.scale(scale: 0.7, child: content);
-  }
-
-  Future<bool?> _confirmDialog(String title) async {
-    return showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "再次確認",
-            style: titleST,
-          ),
-          content: Text.rich(
-            TextSpan(style: infoST, children: [
-              const TextSpan(text: '您確定要刪除"'),
-              TextSpan(
-                  text: title,
-                  style: infoST.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.lightBlue,
-                  )),
-              const TextSpan(text: '"嗎？'),
-            ]),
-            style: infoST,
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                "取消",
-                style: infoST,
-              ),
-              onPressed: () => Navigator.of(context).pop(), // 关闭对话框
-            ),
-            TextButton(
-              child: Text(
-                "刪除",
-                style: infoST.copyWith(color: Colors.red),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Size textSize(String text, TextStyle style) {
-    final TextPainter textPainter = TextPainter(
-        text: TextSpan(text: text, style: style),
-        maxLines: 1,
-        textDirection: TextDirection.ltr)
-      ..layout(minWidth: 0, maxWidth: double.infinity);
-    return textPainter.size;
   }
 }
 

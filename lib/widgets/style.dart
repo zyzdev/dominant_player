@@ -13,7 +13,7 @@ double  defFontSize = _defFontSize;
 
 TextStyle get titleST => TextStyle(fontWeight: FontWeight.bold, fontSize: defFontSize);
 TextStyle get infoST => TextStyle(fontWeight: FontWeight.normal, fontSize: defFontSize);
-
+TextStyle get captionST => TextStyle(fontWeight: FontWeight.bold, fontSize: defFontSize - 2);
 Color winColor = Colors.red;
 Color loseColor = Colors.green;
 Color infoColor = Colors.grey;
