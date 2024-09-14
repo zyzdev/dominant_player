@@ -1,8 +1,10 @@
 import 'package:dominant_player/model/candle_info.dart';
 import 'package:dominant_player/model/real_time_chart_info.dart';
 import 'package:dominant_player/service/notification.dart';
+import 'package:dominant_player/widgets/notification_wall/notification_wall_provider.dart';
 import 'package:dominant_player/widgets/style.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'key_candle_state.dart';
@@ -13,6 +15,7 @@ extension KeyChartStateController on KeyCandleState {
   void shouldNotice(
     RealTimeChartInfo realTimeChartInfo,
     BuildContext context,
+      WidgetRef ref,
   ) {
     CandleInfo? candleInfo = realTimeChartInfo.getLastFinishCandleInfo();
     if (candleInfo == null) return;
@@ -126,7 +129,7 @@ extension KeyChartStateController on KeyCandleState {
     if (msg.isNotEmpty) {
       String time = DateFormat('HH:mm')
           .format(DateTime.now().toUtc().add(const Duration(hours: 8)));
-      sendNotification('關鍵K棒提醒！', msg);
+      //ref.read(notificationStateProvider.notifier).pushNotification('關鍵K棒提醒！', msg);
       final snackBar = SnackBar(
         duration: const Duration(minutes: 3),
         showCloseIcon: true,

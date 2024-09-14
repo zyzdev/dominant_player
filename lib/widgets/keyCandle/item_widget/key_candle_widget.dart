@@ -60,6 +60,7 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
         _state.shouldNotice(
           _realTimeChartInfo,
           context,
+          ref,
         );
       }
     });

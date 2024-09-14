@@ -43,6 +43,7 @@ class MainState {
     this.customizeValuesExpand = true,
     required this.customizeValues,
     this.keyChartNoticeExpand = true,
+    this.notificationWallExpand = true,
   });
 
   factory MainState.init() {
@@ -135,6 +136,9 @@ class MainState {
   /// 是否展開
   final bool keyChartNoticeExpand;
 
+  /// 推播牆
+  /// 是否展開
+  final bool notificationWallExpand;
   factory MainState.fromJson(Map<String, dynamic> json) =>
       _$MainStateFromJson(json);
 
