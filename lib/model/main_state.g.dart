@@ -52,6 +52,8 @@ abstract class _$MainStateCWProxy {
 
   MainState keyChartNoticeExpand(bool keyChartNoticeExpand);
 
+  MainState notificationWallExpand(bool notificationWallExpand);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `MainState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -80,6 +82,7 @@ abstract class _$MainStateCWProxy {
     bool? customizeValuesExpand,
     List<CustomizeValue>? customizeValues,
     bool? keyChartNoticeExpand,
+    bool? notificationWallExpand,
   });
 }
 
@@ -171,6 +174,10 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
       this(keyChartNoticeExpand: keyChartNoticeExpand);
 
   @override
+  MainState notificationWallExpand(bool notificationWallExpand) =>
+      this(notificationWallExpand: notificationWallExpand);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `MainState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -200,6 +207,7 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
     Object? customizeValuesExpand = const $CopyWithPlaceholder(),
     Object? customizeValues = const $CopyWithPlaceholder(),
     Object? keyChartNoticeExpand = const $CopyWithPlaceholder(),
+    Object? notificationWallExpand = const $CopyWithPlaceholder(),
   }) {
     return MainState(
       autoNotice:
@@ -314,6 +322,12 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
               ? _value.keyChartNoticeExpand
               // ignore: cast_nullable_to_non_nullable
               : keyChartNoticeExpand as bool,
+      notificationWallExpand:
+          notificationWallExpand == const $CopyWithPlaceholder() ||
+                  notificationWallExpand == null
+              ? _value.notificationWallExpand
+              // ignore: cast_nullable_to_non_nullable
+              : notificationWallExpand as bool,
     );
   }
 }
@@ -667,6 +681,7 @@ MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
               .toList() ??
           [],
       keyChartNoticeExpand: json['keyChartNoticeExpand'] as bool? ?? true,
+      notificationWallExpand: json['notificationWallExpand'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$MainStateToJson(MainState instance) => <String, dynamic>{
@@ -696,6 +711,7 @@ Map<String, dynamic> _$MainStateToJson(MainState instance) => <String, dynamic>{
           instance.customizeValues.map((e) => e.toJson()).toList(),
       'considerKeyValue': instance.considerKeyValue,
       'keyChartNoticeExpand': instance.keyChartNoticeExpand,
+      'notificationWallExpand': instance.notificationWallExpand,
     };
 
 const _$SensitivitySpaceTypeEnumMap = {

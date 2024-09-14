@@ -4,6 +4,7 @@ import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/main_state.dart';
 import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/widgets/keyCandle/key_candle_main_widget.dart';
+import 'package:dominant_player/widgets/notification_wall/notification_wall_widgat.dart';
 import 'package:dominant_player/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -100,6 +101,18 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     curve: Curves.fastLinearToSlowEaseIn,
   );
 
+  late final AnimationController _notificationWallAnimationController = AnimationController(
+    value: _state.notificationWallExpand ? 1 : 0,
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+  late final ReverseAnimation _notificationWallExpandAnimation =
+  ReverseAnimation(_notificationWallAnimationController);
+  late final Animation<double> _notificationWallCollapseAnimation = CurvedAnimation(
+    parent: _notificationWallAnimationController,
+    curve: Curves.fastLinearToSlowEaseIn,
+  );
+
   @override
   void initState() {
     notificationInit();
@@ -112,6 +125,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     _sensitivitySpaceAnimationController.dispose();
     _keyValuesAnimationController.dispose();
     _keyChartNoticeAnimationController.dispose();
+    _notificationWallAnimationController.dispose();
     super.dispose();
   }
 
@@ -132,6 +146,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
               _sensitivitySpace,
               _keyValueList,
               _keyChartNotice,
+              _notificationWall,
             ],
           ),
         ),
@@ -250,6 +265,24 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
           onTap: () {
             _mainNotifier.keyChartNoticeExpand(!_state.keyChartNoticeExpand);
             _keyChartNoticeAnimationController.forward();
+          },
+        ),
+        InkWell(
+          child: SizeTransition(
+            sizeFactor: _notificationWallExpandAnimation,
+            axis: Axis.vertical,
+            child: SizeTransition(
+              sizeFactor: _notificationWallExpandAnimation,
+              axis: Axis.horizontal,
+              child: ColoredBox(
+                color: Colors.redAccent.shade200,
+                child: verticalText('推播提醒牆'),
+              ),
+            ),
+          ),
+          onTap: () {
+            _mainNotifier.notificationWallExpand(!_state.notificationWallExpand);
+            _notificationWallAnimationController.forward();
           },
         ),
       ],
@@ -1271,6 +1304,54 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     );
     return SizeTransition(
       sizeFactor: _keyChartNoticeCollapseAnimation,
+      axis: Axis.horizontal,
+      child: content,
+    );
+  }
+
+  Widget get _notificationWall {
+    if (kIsWeb) return const SizedBox();
+
+    Widget content = Container(
+      constraints: BoxConstraints(minWidth: infoW * 3),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          title('推播牆', line: false),
+          const NotificationWallWidget(),
+        ],
+      ),
+    );
+    content = Stack(
+      children: [
+        // 標題的底色
+        Positioned(
+            left: 0,
+            right: 0,
+            child: ColoredBox(
+              color: Colors.redAccent.shade200,
+              child: SizedBox(
+                height: textH,
+                width: double.infinity,
+              ),
+            )),
+        content,
+        Positioned(
+          right: 0,
+          top: 0,
+          child: IconButton(
+            onPressed: () {
+              _mainNotifier.notificationWallExpand(!_state.notificationWallExpand);
+              _notificationWallAnimationController.reverse();
+            },
+            icon: const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
+          ),
+        )
+      ],
+    );
+    return SizeTransition(
+      sizeFactor: _notificationWallCollapseAnimation,
       axis: Axis.horizontal,
       child: content,
     );
