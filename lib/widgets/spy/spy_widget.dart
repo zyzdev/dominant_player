@@ -24,7 +24,6 @@ class _SpyWidgetState extends ConsumerState {
   @override
   Widget build(BuildContext context) {
     ref.watch(spyStateNotificationProvider);
-    ref.watch(mainProvider.select((value) => value.considerKeyValue));
     return _spy;
   }
 
