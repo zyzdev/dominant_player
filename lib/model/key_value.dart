@@ -1,3 +1,8 @@
+import 'dart:ui';
+
+import 'package:dominant_player/widgets/style.dart';
+import 'package:flutter/material.dart';
+
 enum KeyValue {
   current,
   high,
@@ -118,6 +123,39 @@ extension KeyValueName on KeyValue {
         return '夜盤，30分空方最大邏輯，中關';
       case KeyValue.nightShortDefense30:
         return '夜盤，30分空方最大邏輯，防守';
+    }
+  }
+}
+
+extension KeyValueBackgroundColor on KeyValue {
+  Color get bg {
+    switch (this) {
+      case KeyValue.current:
+        return noteColor;
+      case KeyValue.high:
+        return winColor;
+      case KeyValue.low:
+        return loseColor;
+      case KeyValue.highCost:
+        return winColor.withOpacity(0.2);
+      case KeyValue.middleCost:
+        return noteColor.withOpacity(0.2);
+      case KeyValue.lowCost:
+        return loseColor.withOpacity(0.2);
+      case KeyValue.superPress:
+        return winColor.withOpacity(0.5);
+      case KeyValue.absolutePress:
+        return winColor.withOpacity(0.3);
+      case KeyValue.nestPress:
+        return winColor.withOpacity(0.1);
+      case KeyValue.nestSupport:
+        return loseColor.withOpacity(0.1);
+      case KeyValue.absoluteSupport:
+        return loseColor.withOpacity(0.3);
+      case KeyValue.superSupport:
+        return loseColor.withOpacity(0.5);
+      default:
+        return Colors.transparent;
     }
   }
 }

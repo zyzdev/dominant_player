@@ -19,10 +19,6 @@ abstract class _$MainStateCWProxy {
 
   MainState keyValuesExpand(bool keyValuesExpand);
 
-  MainState daySpy(Spy daySpy);
-
-  MainState nightSpy(Spy nightSpy);
-
   MainState sensitivitySpaceWidgetIndex(
       List<SensitivitySpaceType> sensitivitySpaceWidgetIndex);
 
@@ -67,8 +63,6 @@ abstract class _$MainStateCWProxy {
     bool? spyExpand,
     bool? sensitivitySpaceExpand,
     bool? keyValuesExpand,
-    Spy? daySpy,
-    Spy? nightSpy,
     List<SensitivitySpaceType>? sensitivitySpaceWidgetIndex,
     bool? daySensitivitySpaceExpand,
     SensitivitySpace? daySensitivitySpace15,
@@ -111,12 +105,6 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
   @override
   MainState keyValuesExpand(bool keyValuesExpand) =>
       this(keyValuesExpand: keyValuesExpand);
-
-  @override
-  MainState daySpy(Spy daySpy) => this(daySpy: daySpy);
-
-  @override
-  MainState nightSpy(Spy nightSpy) => this(nightSpy: nightSpy);
 
   @override
   MainState sensitivitySpaceWidgetIndex(
@@ -192,8 +180,6 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
     Object? spyExpand = const $CopyWithPlaceholder(),
     Object? sensitivitySpaceExpand = const $CopyWithPlaceholder(),
     Object? keyValuesExpand = const $CopyWithPlaceholder(),
-    Object? daySpy = const $CopyWithPlaceholder(),
-    Object? nightSpy = const $CopyWithPlaceholder(),
     Object? sensitivitySpaceWidgetIndex = const $CopyWithPlaceholder(),
     Object? daySensitivitySpaceExpand = const $CopyWithPlaceholder(),
     Object? daySensitivitySpace15 = const $CopyWithPlaceholder(),
@@ -238,14 +224,6 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
           ? _value.keyValuesExpand
           // ignore: cast_nullable_to_non_nullable
           : keyValuesExpand as bool,
-      daySpy: daySpy == const $CopyWithPlaceholder() || daySpy == null
-          ? _value.daySpy
-          // ignore: cast_nullable_to_non_nullable
-          : daySpy as Spy,
-      nightSpy: nightSpy == const $CopyWithPlaceholder() || nightSpy == null
-          ? _value.nightSpy
-          // ignore: cast_nullable_to_non_nullable
-          : nightSpy as Spy,
       sensitivitySpaceWidgetIndex:
           sensitivitySpaceWidgetIndex == const $CopyWithPlaceholder() ||
                   sensitivitySpaceWidgetIndex == null
@@ -336,77 +314,6 @@ extension $MainStateCopyWith on MainState {
   /// Returns a callable class that can be used as follows: `instanceOfMainState.copyWith(...)` or like so:`instanceOfMainState.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
   _$MainStateCWProxy get copyWith => _$MainStateCWProxyImpl(this);
-}
-
-abstract class _$SpyCWProxy {
-  Spy isDay(bool isDay);
-
-  Spy high(int? high);
-
-  Spy low(int? low);
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Spy(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
-  ///
-  /// Usage
-  /// ```dart
-  /// Spy(...).copyWith(id: 12, name: "My name")
-  /// ````
-  Spy call({
-    bool? isDay,
-    int? high,
-    int? low,
-  });
-}
-
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfSpy.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfSpy.copyWith.fieldName(...)`
-class _$SpyCWProxyImpl implements _$SpyCWProxy {
-  const _$SpyCWProxyImpl(this._value);
-
-  final Spy _value;
-
-  @override
-  Spy isDay(bool isDay) => this(isDay: isDay);
-
-  @override
-  Spy high(int? high) => this(high: high);
-
-  @override
-  Spy low(int? low) => this(low: low);
-
-  @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Spy(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
-  ///
-  /// Usage
-  /// ```dart
-  /// Spy(...).copyWith(id: 12, name: "My name")
-  /// ````
-  Spy call({
-    Object? isDay = const $CopyWithPlaceholder(),
-    Object? high = const $CopyWithPlaceholder(),
-    Object? low = const $CopyWithPlaceholder(),
-  }) {
-    return Spy(
-      isDay: isDay == const $CopyWithPlaceholder() || isDay == null
-          ? _value.isDay
-          // ignore: cast_nullable_to_non_nullable
-          : isDay as bool,
-      high: high == const $CopyWithPlaceholder()
-          ? _value.high
-          // ignore: cast_nullable_to_non_nullable
-          : high as int?,
-      low: low == const $CopyWithPlaceholder()
-          ? _value.low
-          // ignore: cast_nullable_to_non_nullable
-          : low as int?,
-    );
-  }
-}
-
-extension $SpyCopyWith on Spy {
-  /// Returns a callable class that can be used as follows: `instanceOfSpy.copyWith(...)` or like so:`instanceOfSpy.copyWith.fieldName(...)`.
-  // ignore: library_private_types_in_public_api
-  _$SpyCWProxy get copyWith => _$SpyCWProxyImpl(this);
 }
 
 abstract class _$SensitivitySpaceCWProxy {
@@ -647,8 +554,6 @@ MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
       spyExpand: json['spyExpand'] as bool? ?? true,
       sensitivitySpaceExpand: json['sensitivitySpaceExpand'] as bool? ?? true,
       keyValuesExpand: json['keyValuesExpand'] as bool? ?? true,
-      daySpy: Spy.fromJson(json['daySpy'] as Map<String, dynamic>),
-      nightSpy: Spy.fromJson(json['nightSpy'] as Map<String, dynamic>),
       sensitivitySpaceWidgetIndex:
           (json['sensitivitySpaceWidgetIndex'] as List<dynamic>?)
                   ?.map((e) => $enumDecode(_$SensitivitySpaceTypeEnumMap, e))
@@ -691,8 +596,6 @@ Map<String, dynamic> _$MainStateToJson(MainState instance) => <String, dynamic>{
       'spyExpand': instance.spyExpand,
       'sensitivitySpaceExpand': instance.sensitivitySpaceExpand,
       'keyValuesExpand': instance.keyValuesExpand,
-      'daySpy': instance.daySpy.toJson(),
-      'nightSpy': instance.nightSpy.toJson(),
       'sensitivitySpaceWidgetIndex': instance.sensitivitySpaceWidgetIndex
           .map((e) => _$SensitivitySpaceTypeEnumMap[e]!)
           .toList(),
@@ -720,18 +623,6 @@ const _$SensitivitySpaceTypeEnumMap = {
   SensitivitySpaceType.customize: 'customize',
   SensitivitySpaceType.value: 'value',
 };
-
-Spy _$SpyFromJson(Map<String, dynamic> json) => Spy(
-      isDay: json['isDay'] as bool,
-      high: json['high'] as int?,
-      low: json['low'] as int?,
-    );
-
-Map<String, dynamic> _$SpyToJson(Spy instance) => <String, dynamic>{
-      'isDay': instance.isDay,
-      'high': instance.high,
-      'low': instance.low,
-    };
 
 SensitivitySpace _$SensitivitySpaceFromJson(Map<String, dynamic> json) =>
     SensitivitySpace(

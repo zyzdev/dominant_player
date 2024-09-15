@@ -8,15 +8,15 @@ import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:dominant_player/provider/current_price_provider.dart';
 import 'package:dominant_player/provider/current_tick_provider.dart';
 import 'package:dominant_player/service/holiday_info.dart';
-import 'package:dominant_player/service/notification.dart';
-import 'package:dominant_player/service/spy_info.dart';
 import 'package:dominant_player/widgets/notification_wall/notification_wall_provider.dart';
+import 'package:dominant_player/widgets/spy/spy_state_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'model/main_state.dart';
+import 'model/spy_state.dart';
 import 'provider/current_month_provider.dart';
 
 SharedPreferences? _prefs;
@@ -63,17 +63,16 @@ final mainProvider = StateNotifierProvider<MainNotifier, MainState>((ref) {
 
 class MainNotifier extends StateNotifier<MainState> {
   MainNotifier(MainState state, StateNotifierProviderRef ref) : super(state) {
+    _spyState = ref.read(spyStateNotificationProvider);
+    _notificationStateNotifier = ref.read(notificationWallStateProvider.notifier);
+
     if (!kIsWeb) _initFetch(ref);
     currentController.text = state.current?.toString() ?? '';
-    daySpyHighController.text = state.daySpy.high?.toString() ?? '';
-    daySpyLowController.text = state.daySpy.low?.toString() ?? '';
-    nightSpyHighController.text = state.nightSpy.high?.toString() ?? '';
-    nightSpyLowController.text = state.nightSpy.low?.toString() ?? '';
     noticeDisController.text = state.noticeDis.toString();
     updateKeyValues();
-    _notificationStateNotifier = ref.read(notificationWallStateProvider.notifier);
   }
 
+  late final SpyState _spyState;
   late final NotificationWallStateNotifier _notificationStateNotifier;
 
   void setAutoNotice(bool enable) {
@@ -172,65 +171,10 @@ class MainNotifier extends StateNotifier<MainState> {
       state = state.copyWith(current: currentPrice);
     });
 
-    Future.wait([_fetchSpyPrice(), fetchCurrentMonth(ref)]);
+    await fetchCurrentMonth(ref);
 
     loading = false;
     state = state.copyWith();
-  }
-
-  Future<void> _fetchSpyPrice() async {
-    // 判斷是否需要夜盤資訊
-    // 日盤和週末需要日盤和夜盤資訊
-    bool needNightSPY = isDay || isWeekend;
-    await Future.wait([
-      fetchSpyPrice(),
-      if (needNightSPY) fetchSpyPrice(false),
-    ]).then((value) {
-      String dayHigh = value[0][0];
-      String dayLow = value[0][1];
-      // 日盤SPY
-      state = state.copyWith(
-          daySpy: state.daySpy.copyWith(
-              high: int.tryParse(dayHigh), low: int.tryParse(dayLow)));
-      daySpyHighController.text = dayHigh;
-      daySpyLowController.text = dayLow;
-      // 夜盤SPY
-      if (needNightSPY) {
-        String nightHigh = value[1][0];
-        String nightLow = value[1][1];
-        state = state.copyWith(
-            nightSpy: state.nightSpy.copyWith(
-                high: int.tryParse(nightHigh), low: int.tryParse(nightLow)));
-        nightSpyHighController.text = nightHigh;
-        nightSpyLowController.text = nightLow;
-      }
-    });
-    // 計算下一次更新SPY的時間
-    DateTime now = DateTime.now().toUtc().add(const Duration(hours: 8));
-    late Duration delay;
-    if (isDay) {
-      // 日盤等收盤就可以更新
-      delay = DateTime(now.year, now.month, now.day, 13, 45).difference(now);
-    } else {
-      // 夜盤等收盤就可以更新
-      late DateTime dis;
-      if (now.hour >= 15 && now.hour <= 23) {
-        dis = DateTime.fromMillisecondsSinceEpoch(
-            DateTime(now.year, now.month, now.day + 1, 5, 0)
-                    .millisecondsSinceEpoch -
-                now.millisecondsSinceEpoch);
-      } else {
-        dis = DateTime.fromMillisecondsSinceEpoch(
-            DateTime(now.year, now.month, now.day, 5, 0)
-                    .millisecondsSinceEpoch -
-                now.millisecondsSinceEpoch);
-      }
-      delay =
-          Duration(hours: dis.hour, minutes: dis.minute, seconds: dis.second);
-    }
-    Future.delayed(delay, () {
-      _fetchSpyPrice();
-    });
   }
 
   bool get isWeekend {
@@ -272,29 +216,6 @@ class MainNotifier extends StateNotifier<MainState> {
   /// 推播牆，是否展開
   void notificationWallExpand(bool expand) {
     state = state.copyWith(notificationWallExpand: expand);
-  }
-
-  final TextEditingController daySpyHighController = TextEditingController();
-  final TextEditingController daySpyLowController = TextEditingController();
-  final TextEditingController nightSpyHighController = TextEditingController();
-  final TextEditingController nightSpyLowController = TextEditingController();
-
-  /// 設定Spy高點
-  void setSpyHigh(Spy spy, String value) {
-    if (spy.isDay) {
-      state = state.copyWith(daySpy: spy.copyWith(high: int.tryParse(value)));
-    } else {
-      state = state.copyWith(nightSpy: spy.copyWith(high: int.tryParse(value)));
-    }
-  }
-
-  /// 設定Spy低點
-  void setSpyLow(Spy spy, String value) {
-    if (spy.isDay) {
-      state = state.copyWith(daySpy: spy.copyWith(low: int.tryParse(value)));
-    } else {
-      state = state.copyWith(nightSpy: spy.copyWith(low: int.tryParse(value)));
-    }
   }
 
   void exchangeSensitivitySpaceWidgetIndex(int oldIndex, int newIndex) {
@@ -642,7 +563,7 @@ class MainNotifier extends StateNotifier<MainState> {
         .toList();
     // 加入Spy
     keyValues.addAll(
-      [state.daySpy, state.nightSpy]
+      [_spyState.daySpy, _spyState.nightSpy]
           .expand((spy) {
             // 標題加入日夜盤
             return spyValues(spy)
