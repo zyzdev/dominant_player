@@ -9,7 +9,7 @@ import 'package:dominant_player/service/spy_info.dart';
 
 const String _statsKey = 'spy_stats_key';
 
-final spyStateNotificationProvider =
+final spyStateNotifierProvider =
     StateNotifierProvider<SpyMainNotifier, SpyState>((ref) {
 
       String? json = prefs.getString(_statsKey);

@@ -1,6 +1,4 @@
-import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/key_value.dart';
-import 'package:dominant_player/model/main_state.dart';
 import 'package:dominant_player/model/spy_state.dart';
 import 'package:dominant_player/widgets/spy/spy_state_provider.dart';
 import 'package:dominant_player/widgets/style.dart';
@@ -16,14 +14,14 @@ class SpyWidget extends ConsumerStatefulWidget {
 }
 
 class _SpyWidgetState extends ConsumerState {
-  SpyState get _state => ref.read(spyStateNotificationProvider);
+  SpyState get _state => ref.read(spyStateNotifierProvider);
 
   SpyMainNotifier get _notifier =>
-      ref.read(spyStateNotificationProvider.notifier);
+      ref.read(spyStateNotifierProvider.notifier);
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(spyStateNotificationProvider);
+    ref.watch(spyStateNotifierProvider);
     return _spy;
   }
 

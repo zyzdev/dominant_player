@@ -20,26 +20,12 @@ part 'main_state.g.dart';
 @CopyWith()
 class MainState {
   MainState({
-    this.autoNotice = true,
-    this.noticeDis = 10,
-    this.current,
     this.spyExpand = true,
     this.sensitivitySpaceExpand = true,
     this.keyValuesExpand = true,
     this.keyChartNoticeExpand = true,
     this.notificationWallExpand = true,
   });
-
-  /// 接近關鍵價，自動提醒
-  @JsonKey(defaultValue: true)
-  final bool autoNotice;
-
-  /// 接近關鍵價[noticeDis]，自動提醒
-  @JsonKey(defaultValue: 10)
-  final int noticeDis;
-
-  /// 目前點數
-  final int? current;
 
   /// SPY是否展開
   @JsonKey(defaultValue: true)

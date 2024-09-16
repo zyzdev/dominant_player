@@ -7,12 +7,6 @@ part of 'main_state.dart';
 // **************************************************************************
 
 abstract class _$MainStateCWProxy {
-  MainState autoNotice(bool autoNotice);
-
-  MainState noticeDis(int noticeDis);
-
-  MainState current(int? current);
-
   MainState spyExpand(bool spyExpand);
 
   MainState sensitivitySpaceExpand(bool sensitivitySpaceExpand);
@@ -30,9 +24,6 @@ abstract class _$MainStateCWProxy {
   /// MainState(...).copyWith(id: 12, name: "My name")
   /// ````
   MainState call({
-    bool? autoNotice,
-    int? noticeDis,
-    int? current,
     bool? spyExpand,
     bool? sensitivitySpaceExpand,
     bool? keyValuesExpand,
@@ -46,15 +37,6 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
   const _$MainStateCWProxyImpl(this._value);
 
   final MainState _value;
-
-  @override
-  MainState autoNotice(bool autoNotice) => this(autoNotice: autoNotice);
-
-  @override
-  MainState noticeDis(int noticeDis) => this(noticeDis: noticeDis);
-
-  @override
-  MainState current(int? current) => this(current: current);
 
   @override
   MainState spyExpand(bool spyExpand) => this(spyExpand: spyExpand);
@@ -84,9 +66,6 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
   /// MainState(...).copyWith(id: 12, name: "My name")
   /// ````
   MainState call({
-    Object? autoNotice = const $CopyWithPlaceholder(),
-    Object? noticeDis = const $CopyWithPlaceholder(),
-    Object? current = const $CopyWithPlaceholder(),
     Object? spyExpand = const $CopyWithPlaceholder(),
     Object? sensitivitySpaceExpand = const $CopyWithPlaceholder(),
     Object? keyValuesExpand = const $CopyWithPlaceholder(),
@@ -94,19 +73,6 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
     Object? notificationWallExpand = const $CopyWithPlaceholder(),
   }) {
     return MainState(
-      autoNotice:
-          autoNotice == const $CopyWithPlaceholder() || autoNotice == null
-              ? _value.autoNotice
-              // ignore: cast_nullable_to_non_nullable
-              : autoNotice as bool,
-      noticeDis: noticeDis == const $CopyWithPlaceholder() || noticeDis == null
-          ? _value.noticeDis
-          // ignore: cast_nullable_to_non_nullable
-          : noticeDis as int,
-      current: current == const $CopyWithPlaceholder()
-          ? _value.current
-          // ignore: cast_nullable_to_non_nullable
-          : current as int?,
       spyExpand: spyExpand == const $CopyWithPlaceholder() || spyExpand == null
           ? _value.spyExpand
           // ignore: cast_nullable_to_non_nullable
@@ -149,9 +115,6 @@ extension $MainStateCopyWith on MainState {
 // **************************************************************************
 
 MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
-      autoNotice: json['autoNotice'] as bool? ?? true,
-      noticeDis: json['noticeDis'] as int? ?? 10,
-      current: json['current'] as int?,
       spyExpand: json['spyExpand'] as bool? ?? true,
       sensitivitySpaceExpand: json['sensitivitySpaceExpand'] as bool? ?? true,
       keyValuesExpand: json['keyValuesExpand'] as bool? ?? true,
@@ -160,9 +123,6 @@ MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
     );
 
 Map<String, dynamic> _$MainStateToJson(MainState instance) => <String, dynamic>{
-      'autoNotice': instance.autoNotice,
-      'noticeDis': instance.noticeDis,
-      'current': instance.current,
       'spyExpand': instance.spyExpand,
       'sensitivitySpaceExpand': instance.sensitivitySpaceExpand,
       'keyValuesExpand': instance.keyValuesExpand,

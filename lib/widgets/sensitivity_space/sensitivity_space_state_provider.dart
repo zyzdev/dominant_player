@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const String _statsKey = 'sensitivity_space_stats_key';
 
-final sensitivitySpaceStateNotificationProvider =
+final sensitivitySpaceStateNotifierProvider =
     StateNotifierProvider<SensitivitySpaceMainNotifier, SensitivitySpaceState>((ref) {
 
       String? json = prefs.getString(_statsKey);

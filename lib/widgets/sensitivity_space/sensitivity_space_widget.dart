@@ -1,10 +1,6 @@
-import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/key_value.dart';
-import 'package:dominant_player/model/main_state.dart';
 import 'package:dominant_player/model/sensitivity_space_state.dart';
-import 'package:dominant_player/model/spy_state.dart';
 import 'package:dominant_player/widgets/sensitivity_space/sensitivity_space_state_provider.dart';
-import 'package:dominant_player/widgets/spy/spy_state_provider.dart';
 import 'package:dominant_player/widgets/style.dart';
 import 'package:dominant_player/widgets/widget.dart';
 import 'package:flutter/material.dart';
@@ -22,16 +18,16 @@ class SensitivitySpaceWidget extends ConsumerStatefulWidget {
 
 class _SensitivitySpaceWidgetState extends ConsumerState {
   SensitivitySpaceState get _state =>
-      ref.read(sensitivitySpaceStateNotificationProvider);
+      ref.read(sensitivitySpaceStateNotifierProvider);
 
   SensitivitySpaceMainNotifier get _notifier =>
-      ref.read(sensitivitySpaceStateNotificationProvider.notifier);
+      ref.read(sensitivitySpaceStateNotifierProvider.notifier);
 
   final ValueNotifier<double> _sensitivitySpaceWidth = ValueNotifier(0);
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(sensitivitySpaceStateNotificationProvider);
+    ref.watch(sensitivitySpaceStateNotifierProvider);
 
     Widget content = ValueListenableBuilder<double>(
       valueListenable: _sensitivitySpaceWidth,
