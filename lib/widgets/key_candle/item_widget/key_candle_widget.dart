@@ -4,15 +4,15 @@ import 'package:dominant_player/model/candle_info.dart';
 import 'package:dominant_player/model/real_time_chart_info.dart';
 import 'package:dominant_player/provider/real_time_chart_info_provider.dart';
 import 'package:dominant_player/provider/is_add_new_tick_provider.dart';
-import 'package:dominant_player/widgets/keyCandle/item_widget/key_candle_controller.dart';
-import 'package:dominant_player/widgets/keyCandle/key_candle_main_provider.dart';
+import 'package:dominant_player/widgets/key_candle/item_widget/key_candle_controller.dart';
+import 'package:dominant_player/widgets/key_candle/key_candle_main_provider.dart';
 import 'package:dominant_player/widgets/style.dart';
 import 'package:dominant_player/widgets/widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'key_candle_state.dart';
+import '../../../model/key_candle_state.dart';
 
 class KeyCandleWidget extends ConsumerStatefulWidget {
   final int index;
@@ -54,6 +54,11 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
   Widget build(BuildContext context) {
     if (_state.kPeriod != null) {
       ref.watch(realTimeChartInfoProvider(_state.kPeriod!));
+      _state.shouldNotice(
+        _realTimeChartInfo,
+        context,
+        ref,
+      );
     }
     ref.listen(isAddNewTickProvider, (previous, next) {
       if (_state.notice) {
@@ -165,10 +170,11 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   considerVolume,
-                  considerATurn,
-                  considerValley,
+                  considerCloseWithLongUpperShadow,
+                  considerCloseWithLongLowerShadow,
                 ],
               ),
+              const SizedBox(height: 8),
               Wrap(
                 spacing: 16,
                 runAlignment: WrapAlignment.center,
@@ -176,8 +182,16 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
                 children: [
                   considerLongAttack,
                   considerShortAttack,
-                  considerCloseWithLongUpperShadow,
-                  considerCloseWithLongLowerShadow,
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 16,
+                runAlignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  considerATurn,
+                  considerVTurn,
                 ],
               ),
             ],
@@ -393,6 +407,13 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
             _notifier.setVolume(notice, _state);
           },
         ),
+        _actionChip(
+          _state.volumeRequired,
+          () {
+            _notifier.setVolumeRequired(!_state.volumeRequired, _state);
+          },
+        ),
+        const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
             _notifier.setVolume(!_state.considerVolume, _state);
@@ -425,6 +446,14 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
             _notifier.setCloseWithLongUpperShadow(notice, _state);
           },
         ),
+        _actionChip(
+          _state.closeWithLongUpperShadowRequired,
+          () {
+            _notifier.setCloseWithLongUpperShadowRequired(
+                !_state.closeWithLongUpperShadowRequired, _state);
+          },
+        ),
+        const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
             _notifier.setCloseWithLongUpperShadow(
@@ -450,6 +479,14 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
             _notifier.setCloseWithLongLowerShadow(notice, _state);
           },
         ),
+        _actionChip(
+          _state.closeWithLongLowerShadowRequired,
+          () {
+            _notifier.setCloseWithLongLowerShadowRequired(
+                !_state.closeWithLongLowerShadowRequired, _state);
+          },
+        ),
+        const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
             _notifier.setCloseWithLongLowerShadow(
@@ -475,6 +512,13 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
             _notifier.setATurn(notice, _state);
           },
         ),
+        _actionChip(
+          _state.aTurnRequired,
+          () {
+            _notifier.setATurnRequired(!_state.aTurnRequired, _state);
+          },
+        ),
+        const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
             _notifier.setATurn(!_state.aTurn, _state);
@@ -497,7 +541,7 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
     );
   }
 
-  Widget get considerValley {
+  Widget get considerVTurn {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -508,6 +552,13 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
             _notifier.setVTurn(notice, _state);
           },
         ),
+        _actionChip(
+          _state.vTurnRequired,
+          () {
+            _notifier.setVTurnRequired(!_state.vTurnRequired, _state);
+          },
+        ),
+        const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
             _notifier.setVTurn(!_state.vTurn, _state);
@@ -541,6 +592,13 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
             _notifier.setLongAttack(notice, _state);
           },
         ),
+        _actionChip(
+          _state.longAttackRequired,
+          () {
+            _notifier.setLongAttackRequired(!_state.longAttackRequired, _state);
+          },
+        ),
+        const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
             _notifier.setLongAttack(!_state.longAttack, _state);
@@ -575,6 +633,14 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
             _notifier.setShortAttack(notice, _state);
           },
         ),
+        _actionChip(
+          _state.shortAttackRequired,
+          () {
+            _notifier.setShortAttackRequired(
+                !_state.shortAttackRequired, _state);
+          },
+        ),
+        const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
             _notifier.setShortAttack(!_state.shortAttack, _state);
@@ -609,5 +675,30 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
       onChanged: onChanged,
     );
     return Transform.scale(scale: 0.7, child: content);
+  }
+
+  Widget _actionChip(bool enable, VoidCallback onPressed) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        backgroundColor: enable
+            ? Colors.blueAccent.withOpacity(0.2)
+            : Colors.grey[200], // 启用/禁用状态背景颜色
+        side: BorderSide(
+          width: enable ? 1 :  0.5,
+            color: enable
+            ? Colors.blueAccent
+            : Colors.grey[500]!), // 边框颜色
+      ),
+      child: Text(
+        "必要條件",
+        style: TextStyle(
+          color: enable
+              ? Colors.blueAccent
+              : Colors.grey[500], // 启用/禁用状态文字颜色
+        ),
+      ),
+    );
   }
 }

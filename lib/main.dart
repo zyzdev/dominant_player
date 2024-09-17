@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/main_state.dart';
 import 'package:dominant_player/service/notification.dart';
-import 'package:dominant_player/widgets/keyCandle/key_candle_main_widget.dart';
+import 'package:dominant_player/widgets/key_candle/key_candle_main_widget.dart';
 import 'package:dominant_player/widgets/key_value_list/key_value_list_widget.dart';
 import 'package:dominant_player/widgets/notification_wall/notification_wall_widgat.dart';
 import 'package:dominant_player/widgets/sensitivity_space/sensitivity_space_widget.dart';

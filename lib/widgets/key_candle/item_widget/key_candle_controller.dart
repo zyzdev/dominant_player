@@ -1,13 +1,9 @@
 import 'package:dominant_player/model/candle_info.dart';
+import 'package:dominant_player/model/key_candle_state.dart';
 import 'package:dominant_player/model/real_time_chart_info.dart';
-import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/widgets/notification_wall/notification_wall_provider.dart';
-import 'package:dominant_player/widgets/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-
-import 'key_candle_state.dart';
 
 /// [KeyChartState]是一個model
 /// [KeyChartStateController]主要是加入一些[KeyChartState]相關的業務邏輯
@@ -15,33 +11,40 @@ extension KeyChartStateController on KeyCandleState {
   void shouldNotice(
     RealTimeChartInfo realTimeChartInfo,
     BuildContext context,
-      WidgetRef ref,
+    WidgetRef ref,
   ) {
     CandleInfo? candleInfo = realTimeChartInfo.getLastFinishCandleInfo();
     if (candleInfo == null) return;
-    String msg = '';
+    List<String> messages = [];
     if (considerVolume && keyVolume != null) {
       if (candleInfo.volume > keyVolume!) {
-        print('成交量：${candleInfo.volume}, $keyVolume');
-        msg = '成交量：${candleInfo.volume}';
-      } else {
+        debugPrint('成交量：${candleInfo.volume}, $keyVolume');
+        String info = '成交量：${candleInfo.volume}';
+        messages.add(info);
+      } else if (volumeRequired) {
         return;
       }
     }
     if (closeWithLongUpperShadow) {
       if (candleInfo.isCloseWithLongUpperShadow) {
-        print(
+        debugPrint(
             '收長上影：upperShadow:${candleInfo.upperShadowDis}, dis/2:${candleInfo.distance / 2}, ${candleInfo.close}');
-        print(candleInfo);
-        msg += '${msg.isNotEmpty ? ', ' : ''}長上影';
+        debugPrint(candleInfo.toString());
+        String info = '長上影';
+        messages.add(info);
+      } else if (closeWithLongUpperShadowRequired) {
+        return;
       }
     }
     if (closeWithLongLowerShadow) {
       if (candleInfo.isCloseWithLongLowerShadow) {
-        print(
+        debugPrint(
             '收長下影：lowerShadow:${candleInfo.lowerShadowDis}, dis/2:${candleInfo.distance / 2},  ${candleInfo.close}');
-        print(candleInfo);
-        msg += '${msg.isNotEmpty ? ', ' : ''}長下影';
+        debugPrint(candleInfo.toString());
+        String info = '長下影';
+        messages.add(info);
+      } else if (closeWithLongLowerShadowRequired) {
+        return;
       }
     }
 
@@ -59,15 +62,18 @@ extension KeyChartStateController on KeyCandleState {
             .sublist(0, uphill.length)
             .any((element) => element.close > peakClose);
         if (isHighest && candleInfo.close < uphill.last.close) {
-          print('A轉:${candleInfo.startTime}');
-          print('======');
-          uphill.forEach((element) {
-            print(element);
-          });
-          print('\n');
-          print(candleInfo);
-          print('======');
-          msg += '${msg.isNotEmpty ? ', ' : ''}A轉';
+          debugPrint('A轉:${candleInfo.startTime}');
+          debugPrint('======');
+          for (var element in uphill) {
+            debugPrint(element.toString());
+          }
+          debugPrint('\n');
+          debugPrint(candleInfo.toString());
+          debugPrint('======');
+          String info = 'A轉';
+          messages.add(info);
+        } else if (aTurnRequired) {
+          return;
         }
       }
     }
@@ -85,15 +91,18 @@ extension KeyChartStateController on KeyCandleState {
             .sublist(0, downhill.length)
             .any((element) => element.close < valleyLow);
         if (isLowest && candleInfo.close > downhill.last.close) {
-          print('V轉:${candleInfo.startTime}');
-          print('======');
-          downhill.forEach((element) {
-            print(element);
-          });
-          print('\n');
-          print(candleInfo);
-          print('======');
-          msg += '${msg.isNotEmpty ? ', ' : ''}V轉';
+          debugPrint('V轉:${candleInfo.startTime}');
+          debugPrint('======');
+          for (var element in downhill) {
+            debugPrint(element.toString());
+          }
+          debugPrint('\n');
+          debugPrint(candleInfo.toString());
+          debugPrint('======');
+          String info = 'V轉';
+          messages.add(info);
+        } else if (vTurnRequired) {
+          return;
         }
       }
     }
@@ -103,11 +112,14 @@ extension KeyChartStateController on KeyCandleState {
         CandleInfo preCandleInfo = realTimeChartInfo
             .allCandleInfo[realTimeChartInfo.allCandleInfo.length - 3];
         if (candleInfo.close - preCandleInfo.close >= longAttackPoint!) {
-          print('======多方攻擊');
-          print(preCandleInfo);
-          print(candleInfo);
-          print('======');
-          msg += '${msg.isNotEmpty ? ', ' : ''}多方攻擊';
+          debugPrint('======多方攻擊');
+          debugPrint(preCandleInfo.toString());
+          debugPrint(candleInfo.toString());
+          debugPrint('======');
+          String info = '多方攻擊';
+          messages.add(info);
+        } else if (longAttackRequired) {
+          return;
         }
       }
     }
@@ -118,31 +130,23 @@ extension KeyChartStateController on KeyCandleState {
             .allCandleInfo[realTimeChartInfo.allCandleInfo.length - 3];
         if (preCandleInfo.close - candleInfo.close - preCandleInfo.close >=
             shortAttackPoint!) {
-          msg += '${msg.isNotEmpty ? ', ' : ''}空方攻擊';
-          print('======空方攻擊');
-          print(preCandleInfo);
-          print(candleInfo);
-          print('======');
+          debugPrint('======空方攻擊');
+          debugPrint(preCandleInfo.toString());
+          debugPrint(candleInfo.toString());
+          debugPrint('======');
+          String info = '空方攻擊';
+          messages.add(info);
+        } else if (shortAttackRequired) {
+          return;
         }
       }
     }
-    if (msg.isNotEmpty) {
-      String time = DateFormat('HH:mm')
-          .format(DateTime.now().toUtc().add(const Duration(hours: 8)));
-      //ref.read(notificationStateProvider.notifier).pushNotification('關鍵K棒提醒！', msg);
-      final snackBar = SnackBar(
-        duration: const Duration(minutes: 3),
-        showCloseIcon: true,
-        content: Row(
-          children: [
-            Text('$time：', style: infoST),
-            Text(msg, style: titleST),
-          ],
-        ),
-      );
-      ScaffoldMessenger.of(context)
-          .removeCurrentSnackBar(reason: SnackBarClosedReason.remove);
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    if (messages.isNotEmpty) {
+      messages.insert(0,
+          '開：${candleInfo.open} 高：${candleInfo.high} 中：${candleInfo.middle} 低：${candleInfo.low} 收：${candleInfo.close} 量：${candleInfo.volume} ${'${candleInfo.closeToOpen > 0 ? '+' : ''}${candleInfo.closeToOpen}'}');
+      ref
+          .read(notificationWallStateProvider.notifier)
+          .pushNotification('接近關鍵價位！', messages);
     }
   }
 }

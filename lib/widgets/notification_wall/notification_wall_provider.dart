@@ -12,14 +12,14 @@ class NotificationWallStateNotifier
   NotificationWallStateNotifier(super.state);
 
   Future<void> pushNotification(
-      String subtitle, Map<String, String> msgEntry) async {
-    String message = msgEntry.keys.fold('', (previousValue, element) {
-      previousValue += '$element: ${msgEntry[element]}';
+      String subtitle, List<String> messages) async {
+    String message = messages.fold('', (previousValue, element) {
+      previousValue += '$element\n';
       return previousValue;
     });
     sendNotification(subtitle, message);
     state = List.from(
-        [NotificationState(title: subtitle, msgEntry: msgEntry), ...state]);
+        [NotificationState(title: subtitle, messages: messages), ...state]);
   }
 }
 
@@ -27,11 +27,11 @@ class NotificationState {
   final String time = DateFormat('HH:mm:ss')
       .format(DateTime.now().toUtc().add(const Duration(hours: 8)));
   final String title;
-  final Map<String, String> msgEntry;
+  final List<String> messages;
 
   NotificationState({
     required this.title,
-    required this.msgEntry,
+    required this.messages,
     String? shortMsg,
   });
 }

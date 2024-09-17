@@ -17,35 +17,41 @@ abstract class _$KeyCandleStateCWProxy {
 
   KeyCandleState considerVolume(bool considerVolume);
 
+  KeyCandleState volumeRequired(bool volumeRequired);
+
   KeyCandleState closeWithLongUpperShadow(bool closeWithLongUpperShadow);
 
-  KeyCandleState andOrCloseWithLongLowerShadow(
-      bool andOrCloseWithLongLowerShadow);
+  KeyCandleState closeWithLongUpperShadowRequired(
+      bool closeWithLongUpperShadowRequired);
 
   KeyCandleState closeWithLongLowerShadow(bool closeWithLongLowerShadow);
 
-  KeyCandleState andOrCloseWithLongUpperShadow(
-      bool andOrCloseWithLongUpperShadow);
+  KeyCandleState closeWithLongLowerShadowRequired(
+      bool closeWithLongLowerShadowRequired);
 
   KeyCandleState aTurnInPeriod(int? aTurnInPeriod);
 
   KeyCandleState aTurn(bool aTurn);
 
-  KeyCandleState andOrATurn(bool andOrATurn);
+  KeyCandleState aTurnRequired(bool aTurnRequired);
 
   KeyCandleState vTurnInPeriod(int? vTurnInPeriod);
 
   KeyCandleState vTurn(bool vTurn);
 
-  KeyCandleState andOrVTurn(bool andOrVTurn);
+  KeyCandleState vTurnRequired(bool vTurnRequired);
 
   KeyCandleState longAttack(bool longAttack);
 
   KeyCandleState longAttackPoint(int? longAttackPoint);
 
+  KeyCandleState longAttackRequired(bool longAttackRequired);
+
   KeyCandleState shortAttack(bool shortAttack);
 
   KeyCandleState shortAttackPoint(int? shortAttackPoint);
+
+  KeyCandleState shortAttackRequired(bool shortAttackRequired);
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `KeyCandleState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -59,20 +65,23 @@ abstract class _$KeyCandleStateCWProxy {
     bool? notice,
     int? keyVolume,
     bool? considerVolume,
+    bool? volumeRequired,
     bool? closeWithLongUpperShadow,
-    bool? andOrCloseWithLongLowerShadow,
+    bool? closeWithLongUpperShadowRequired,
     bool? closeWithLongLowerShadow,
-    bool? andOrCloseWithLongUpperShadow,
+    bool? closeWithLongLowerShadowRequired,
     int? aTurnInPeriod,
     bool? aTurn,
-    bool? andOrATurn,
+    bool? aTurnRequired,
     int? vTurnInPeriod,
     bool? vTurn,
-    bool? andOrVTurn,
+    bool? vTurnRequired,
     bool? longAttack,
     int? longAttackPoint,
+    bool? longAttackRequired,
     bool? shortAttack,
     int? shortAttackPoint,
+    bool? shortAttackRequired,
   });
 }
 
@@ -99,22 +108,26 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
       this(considerVolume: considerVolume);
 
   @override
+  KeyCandleState volumeRequired(bool volumeRequired) =>
+      this(volumeRequired: volumeRequired);
+
+  @override
   KeyCandleState closeWithLongUpperShadow(bool closeWithLongUpperShadow) =>
       this(closeWithLongUpperShadow: closeWithLongUpperShadow);
 
   @override
-  KeyCandleState andOrCloseWithLongLowerShadow(
-          bool andOrCloseWithLongLowerShadow) =>
-      this(andOrCloseWithLongLowerShadow: andOrCloseWithLongLowerShadow);
+  KeyCandleState closeWithLongUpperShadowRequired(
+          bool closeWithLongUpperShadowRequired) =>
+      this(closeWithLongUpperShadowRequired: closeWithLongUpperShadowRequired);
 
   @override
   KeyCandleState closeWithLongLowerShadow(bool closeWithLongLowerShadow) =>
       this(closeWithLongLowerShadow: closeWithLongLowerShadow);
 
   @override
-  KeyCandleState andOrCloseWithLongUpperShadow(
-          bool andOrCloseWithLongUpperShadow) =>
-      this(andOrCloseWithLongUpperShadow: andOrCloseWithLongUpperShadow);
+  KeyCandleState closeWithLongLowerShadowRequired(
+          bool closeWithLongLowerShadowRequired) =>
+      this(closeWithLongLowerShadowRequired: closeWithLongLowerShadowRequired);
 
   @override
   KeyCandleState aTurnInPeriod(int? aTurnInPeriod) =>
@@ -124,7 +137,8 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
   KeyCandleState aTurn(bool aTurn) => this(aTurn: aTurn);
 
   @override
-  KeyCandleState andOrATurn(bool andOrATurn) => this(andOrATurn: andOrATurn);
+  KeyCandleState aTurnRequired(bool aTurnRequired) =>
+      this(aTurnRequired: aTurnRequired);
 
   @override
   KeyCandleState vTurnInPeriod(int? vTurnInPeriod) =>
@@ -134,7 +148,8 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
   KeyCandleState vTurn(bool vTurn) => this(vTurn: vTurn);
 
   @override
-  KeyCandleState andOrVTurn(bool andOrVTurn) => this(andOrVTurn: andOrVTurn);
+  KeyCandleState vTurnRequired(bool vTurnRequired) =>
+      this(vTurnRequired: vTurnRequired);
 
   @override
   KeyCandleState longAttack(bool longAttack) => this(longAttack: longAttack);
@@ -144,12 +159,20 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
       this(longAttackPoint: longAttackPoint);
 
   @override
+  KeyCandleState longAttackRequired(bool longAttackRequired) =>
+      this(longAttackRequired: longAttackRequired);
+
+  @override
   KeyCandleState shortAttack(bool shortAttack) =>
       this(shortAttack: shortAttack);
 
   @override
   KeyCandleState shortAttackPoint(int? shortAttackPoint) =>
       this(shortAttackPoint: shortAttackPoint);
+
+  @override
+  KeyCandleState shortAttackRequired(bool shortAttackRequired) =>
+      this(shortAttackRequired: shortAttackRequired);
 
   @override
 
@@ -165,20 +188,23 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
     Object? notice = const $CopyWithPlaceholder(),
     Object? keyVolume = const $CopyWithPlaceholder(),
     Object? considerVolume = const $CopyWithPlaceholder(),
+    Object? volumeRequired = const $CopyWithPlaceholder(),
     Object? closeWithLongUpperShadow = const $CopyWithPlaceholder(),
-    Object? andOrCloseWithLongLowerShadow = const $CopyWithPlaceholder(),
+    Object? closeWithLongUpperShadowRequired = const $CopyWithPlaceholder(),
     Object? closeWithLongLowerShadow = const $CopyWithPlaceholder(),
-    Object? andOrCloseWithLongUpperShadow = const $CopyWithPlaceholder(),
+    Object? closeWithLongLowerShadowRequired = const $CopyWithPlaceholder(),
     Object? aTurnInPeriod = const $CopyWithPlaceholder(),
     Object? aTurn = const $CopyWithPlaceholder(),
-    Object? andOrATurn = const $CopyWithPlaceholder(),
+    Object? aTurnRequired = const $CopyWithPlaceholder(),
     Object? vTurnInPeriod = const $CopyWithPlaceholder(),
     Object? vTurn = const $CopyWithPlaceholder(),
-    Object? andOrVTurn = const $CopyWithPlaceholder(),
+    Object? vTurnRequired = const $CopyWithPlaceholder(),
     Object? longAttack = const $CopyWithPlaceholder(),
     Object? longAttackPoint = const $CopyWithPlaceholder(),
+    Object? longAttackRequired = const $CopyWithPlaceholder(),
     Object? shortAttack = const $CopyWithPlaceholder(),
     Object? shortAttackPoint = const $CopyWithPlaceholder(),
+    Object? shortAttackRequired = const $CopyWithPlaceholder(),
   }) {
     return KeyCandleState(
       title: title == const $CopyWithPlaceholder() || title == null
@@ -202,30 +228,35 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
           ? _value.considerVolume
           // ignore: cast_nullable_to_non_nullable
           : considerVolume as bool,
+      volumeRequired: volumeRequired == const $CopyWithPlaceholder() ||
+              volumeRequired == null
+          ? _value.volumeRequired
+          // ignore: cast_nullable_to_non_nullable
+          : volumeRequired as bool,
       closeWithLongUpperShadow:
           closeWithLongUpperShadow == const $CopyWithPlaceholder() ||
                   closeWithLongUpperShadow == null
               ? _value.closeWithLongUpperShadow
               // ignore: cast_nullable_to_non_nullable
               : closeWithLongUpperShadow as bool,
-      andOrCloseWithLongLowerShadow:
-          andOrCloseWithLongLowerShadow == const $CopyWithPlaceholder() ||
-                  andOrCloseWithLongLowerShadow == null
-              ? _value.andOrCloseWithLongLowerShadow
+      closeWithLongUpperShadowRequired:
+          closeWithLongUpperShadowRequired == const $CopyWithPlaceholder() ||
+                  closeWithLongUpperShadowRequired == null
+              ? _value.closeWithLongUpperShadowRequired
               // ignore: cast_nullable_to_non_nullable
-              : andOrCloseWithLongLowerShadow as bool,
+              : closeWithLongUpperShadowRequired as bool,
       closeWithLongLowerShadow:
           closeWithLongLowerShadow == const $CopyWithPlaceholder() ||
                   closeWithLongLowerShadow == null
               ? _value.closeWithLongLowerShadow
               // ignore: cast_nullable_to_non_nullable
               : closeWithLongLowerShadow as bool,
-      andOrCloseWithLongUpperShadow:
-          andOrCloseWithLongUpperShadow == const $CopyWithPlaceholder() ||
-                  andOrCloseWithLongUpperShadow == null
-              ? _value.andOrCloseWithLongUpperShadow
+      closeWithLongLowerShadowRequired:
+          closeWithLongLowerShadowRequired == const $CopyWithPlaceholder() ||
+                  closeWithLongLowerShadowRequired == null
+              ? _value.closeWithLongLowerShadowRequired
               // ignore: cast_nullable_to_non_nullable
-              : andOrCloseWithLongUpperShadow as bool,
+              : closeWithLongLowerShadowRequired as bool,
       aTurnInPeriod: aTurnInPeriod == const $CopyWithPlaceholder()
           ? _value.aTurnInPeriod
           // ignore: cast_nullable_to_non_nullable
@@ -234,11 +265,11 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
           ? _value.aTurn
           // ignore: cast_nullable_to_non_nullable
           : aTurn as bool,
-      andOrATurn:
-          andOrATurn == const $CopyWithPlaceholder() || andOrATurn == null
-              ? _value.andOrATurn
+      aTurnRequired:
+          aTurnRequired == const $CopyWithPlaceholder() || aTurnRequired == null
+              ? _value.aTurnRequired
               // ignore: cast_nullable_to_non_nullable
-              : andOrATurn as bool,
+              : aTurnRequired as bool,
       vTurnInPeriod: vTurnInPeriod == const $CopyWithPlaceholder()
           ? _value.vTurnInPeriod
           // ignore: cast_nullable_to_non_nullable
@@ -247,11 +278,11 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
           ? _value.vTurn
           // ignore: cast_nullable_to_non_nullable
           : vTurn as bool,
-      andOrVTurn:
-          andOrVTurn == const $CopyWithPlaceholder() || andOrVTurn == null
-              ? _value.andOrVTurn
+      vTurnRequired:
+          vTurnRequired == const $CopyWithPlaceholder() || vTurnRequired == null
+              ? _value.vTurnRequired
               // ignore: cast_nullable_to_non_nullable
-              : andOrVTurn as bool,
+              : vTurnRequired as bool,
       longAttack:
           longAttack == const $CopyWithPlaceholder() || longAttack == null
               ? _value.longAttack
@@ -261,6 +292,11 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
           ? _value.longAttackPoint
           // ignore: cast_nullable_to_non_nullable
           : longAttackPoint as int?,
+      longAttackRequired: longAttackRequired == const $CopyWithPlaceholder() ||
+              longAttackRequired == null
+          ? _value.longAttackRequired
+          // ignore: cast_nullable_to_non_nullable
+          : longAttackRequired as bool,
       shortAttack:
           shortAttack == const $CopyWithPlaceholder() || shortAttack == null
               ? _value.shortAttack
@@ -270,6 +306,12 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
           ? _value.shortAttackPoint
           // ignore: cast_nullable_to_non_nullable
           : shortAttackPoint as int?,
+      shortAttackRequired:
+          shortAttackRequired == const $CopyWithPlaceholder() ||
+                  shortAttackRequired == null
+              ? _value.shortAttackRequired
+              // ignore: cast_nullable_to_non_nullable
+              : shortAttackRequired as bool,
     );
   }
 }
@@ -291,24 +333,27 @@ KeyCandleState _$KeyCandleStateFromJson(Map<String, dynamic> json) =>
       notice: json['notice'] as bool? ?? true,
       keyVolume: json['keyVolume'] as int?,
       considerVolume: json['considerVolume'] as bool? ?? false,
+      volumeRequired: json['volumeRequired'] as bool? ?? false,
       closeWithLongUpperShadow:
           json['closeWithLongUpperShadow'] as bool? ?? false,
-      andOrCloseWithLongLowerShadow:
-          json['andOrCloseWithLongLowerShadow'] as bool? ?? false,
+      closeWithLongUpperShadowRequired:
+          json['closeWithLongUpperShadowRequired'] as bool? ?? false,
       closeWithLongLowerShadow:
           json['closeWithLongLowerShadow'] as bool? ?? false,
-      andOrCloseWithLongUpperShadow:
-          json['andOrCloseWithLongUpperShadow'] as bool? ?? false,
+      closeWithLongLowerShadowRequired:
+          json['closeWithLongLowerShadowRequired'] as bool? ?? false,
       aTurnInPeriod: json['aTurnInPeriod'] as int? ?? 10,
       aTurn: json['aTurn'] as bool? ?? false,
-      andOrATurn: json['andOrATurn'] as bool? ?? false,
+      aTurnRequired: json['aTurnRequired'] as bool? ?? false,
       vTurnInPeriod: json['vTurnInPeriod'] as int? ?? 10,
       vTurn: json['vTurn'] as bool? ?? false,
-      andOrVTurn: json['andOrVTurn'] as bool? ?? false,
+      vTurnRequired: json['vTurnRequired'] as bool? ?? false,
       longAttack: json['longAttack'] as bool? ?? false,
       longAttackPoint: json['longAttackPoint'] as int? ?? 20,
+      longAttackRequired: json['longAttackRequired'] as bool? ?? false,
       shortAttack: json['shortAttack'] as bool? ?? false,
       shortAttackPoint: json['shortAttackPoint'] as int? ?? 20,
+      shortAttackRequired: json['shortAttackRequired'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$KeyCandleStateToJson(KeyCandleState instance) =>
@@ -318,18 +363,23 @@ Map<String, dynamic> _$KeyCandleStateToJson(KeyCandleState instance) =>
       'notice': instance.notice,
       'keyVolume': instance.keyVolume,
       'considerVolume': instance.considerVolume,
-      'andOrCloseWithLongUpperShadow': instance.andOrCloseWithLongUpperShadow,
+      'volumeRequired': instance.volumeRequired,
       'closeWithLongUpperShadow': instance.closeWithLongUpperShadow,
-      'andOrCloseWithLongLowerShadow': instance.andOrCloseWithLongLowerShadow,
+      'closeWithLongUpperShadowRequired':
+          instance.closeWithLongUpperShadowRequired,
       'closeWithLongLowerShadow': instance.closeWithLongLowerShadow,
-      'andOrATurn': instance.andOrATurn,
+      'closeWithLongLowerShadowRequired':
+          instance.closeWithLongLowerShadowRequired,
       'aTurnInPeriod': instance.aTurnInPeriod,
       'aTurn': instance.aTurn,
-      'andOrVTurn': instance.andOrVTurn,
+      'aTurnRequired': instance.aTurnRequired,
       'vTurnInPeriod': instance.vTurnInPeriod,
       'vTurn': instance.vTurn,
+      'vTurnRequired': instance.vTurnRequired,
       'longAttack': instance.longAttack,
       'longAttackPoint': instance.longAttackPoint,
+      'longAttackRequired': instance.longAttackRequired,
       'shortAttack': instance.shortAttack,
       'shortAttackPoint': instance.shortAttackPoint,
+      'shortAttackRequired': instance.shortAttackRequired,
     };

@@ -256,11 +256,12 @@ class KeyValueListMainNotifier extends StateNotifier<KeyValueListState> {
         MapEntry<String, num> data = disEntry[dis]!;
         msgEntry[data.key] = '${data.value.toInt().toString()} ${dis > 0 ? '+' : ''}$dis';
       }
-      msgEntry = {
-        '現價': '${state.current}',
-        ...msgEntry,
-      };
-      _notificationStateNotifier.pushNotification('接近關鍵價位！', msgEntry);
+
+      List<String> messages = ['現價：${state.current}'];
+      msgEntry.forEach((key, value) {
+        messages.add('$key：$value');
+      });
+      _notificationStateNotifier.pushNotification('接近關鍵價位！', messages);
     }
     // 移除剛推播過，但已離現價較遠的關鍵價
     keyValues
