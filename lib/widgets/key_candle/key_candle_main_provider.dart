@@ -6,7 +6,7 @@ import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'item_widget/key_candle_state.dart';
+import '../../model/key_candle_state.dart';
 
 const String _statsKey = 'key_char_stats_key';
 
@@ -78,6 +78,13 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     this.state = List.of(this.state);
   }
 
+  /// 成交量是否為必要條件
+  void setVolumeRequired(bool required, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(volumeRequired: required);
+    this.state = List.of(this.state);
+  }
+
   /// 是否考慮收長上影
   void setCloseWithLongUpperShadow(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
@@ -85,10 +92,24 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     this.state = List.of(this.state);
   }
 
+  /// 收長下影是否為必要條件
+  void setCloseWithLongUpperShadowRequired(bool required, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(closeWithLongUpperShadowRequired: required);
+    this.state = List.of(this.state);
+  }
+
   /// 是否考慮收長下影
   void setCloseWithLongLowerShadow(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(closeWithLongLowerShadow: notice);
+    this.state = List.of(this.state);
+  }
+
+  /// 收長下影是否為必要條件
+  void setCloseWithLongLowerShadowRequired(bool required, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(closeWithLongLowerShadowRequired: required);
     this.state = List.of(this.state);
   }
 
@@ -108,6 +129,13 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     this.state = List.of(this.state);
   }
 
+  /// A轉是否為必要條件
+  void setATurnRequired(bool required, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(aTurnRequired: required);
+    this.state = List.of(this.state);
+  }
+
   /// 是否考慮V轉
   void setVTurn(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
@@ -121,6 +149,13 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
   void setVTurnInPeriod(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(vTurnInPeriod: period);
+    this.state = List.of(this.state);
+  }
+
+  /// A轉是否為必要條件
+  void setVTurnRequired(bool required, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(vTurnRequired: required);
     this.state = List.of(this.state);
   }
 
@@ -138,6 +173,13 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     this.state = List.of(this.state);
   }
 
+  /// 多方攻擊是否為必要條件
+  void setLongAttackRequired(bool required, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(longAttackRequired: required);
+    this.state = List.of(this.state);
+  }
+
   /// 是否考慮空方攻擊
   void setShortAttack(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
@@ -149,6 +191,13 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
   void setShortAttackPoint(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(shortAttackPoint: period);
+    this.state = List.of(this.state);
+  }
+
+  /// 空方攻擊是否為必要條件
+  void setShortAttackRequired(bool required, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(shortAttackRequired: required);
     this.state = List.of(this.state);
   }
 

@@ -71,7 +71,7 @@ class _NotificationWallWidgetState extends ConsumerState {
   }
 
   Widget _notificationInfo(NotificationState notificationState, bool last) {
-    Widget info(MapEntry<String, String> msgEntry) {
+    Widget info(String message) {
       return Container(
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
@@ -80,7 +80,7 @@ class _NotificationWallWidgetState extends ConsumerState {
         ),
         padding: const EdgeInsets.all(4),
         child: Text(
-          '${msgEntry.key}：${msgEntry.value}',
+          message,
           style: infoST.copyWith(fontSize: 14),
         ),
       );
@@ -105,7 +105,7 @@ class _NotificationWallWidgetState extends ConsumerState {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: notificationState.msgEntry.entries
+              children: notificationState.messages
                   .map((e) => info(e))
                   .toList(),
             )
