@@ -54,11 +54,6 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
   Widget build(BuildContext context) {
     if (_state.kPeriod != null) {
       ref.watch(realTimeChartInfoProvider(_state.kPeriod!));
-      _state.shouldNotice(
-        _realTimeChartInfo,
-        context,
-        ref,
-      );
     }
     ref.listen(isAddNewTickProvider, (previous, next) {
       if (_state.notice) {
@@ -74,38 +69,96 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
     Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ClipOval(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                confirmDialog(_state.title, context).then((remove) {
-                  if (remove == true) {
-                    _notifier.removeKeyChart(_state);
-                  }
-                });
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(8),
-                child: Icon(
-                  Icons.delete_forever,
-                  size: 20,
-                  color: Colors.redAccent,
-                ),
-              ),
-            ),
-          ),
-        ),
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
+        SizedBox(height: textH * 1.2),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.fastOutSlowIn,
+          child: SizedBox(
+              height: _state.expand ? null : 0,
+              child: Column(
                 children: [
-                  Stack(
+                  if (_dataIsReady) ...[
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: valuesInfo(_realTimeChartInfo.allCandleInfo.last),
+                    ),
+                    const SizedBox(height: 16),
+                    //chart(_realTimeChartInfo.allChartInfo.last),
+                    //charts,
+                    //const SizedBox(height: 16),
+/*              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: valuesInfo(_realTimeChartInfo
+                    .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),
+              ),
+              chart(_realTimeChartInfo
+                  .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),*/
+                    Wrap(
+                      spacing: 16,
+                      runAlignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        considerVolume,
+                        considerCloseWithLongUpperShadow,
+                        considerCloseWithLongLowerShadow,
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 16,
+                      runAlignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        considerLongAttack,
+                        considerShortAttack,
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 16,
+                      runAlignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        considerATurn,
+                        considerVTurn,
+                      ],
+                    ),
+                    const SizedBox(height: 16)
+                  ],
+                ],
+              )),
+        ),
+      ],
+    );
+    content = Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16),
+      child: content,
+    );
+    content = Stack(
+      children: [
+        // 標題的底色
+        Positioned(
+            left: 0,
+            right: 0,
+            child: ColoredBox(
+              color: Colors.amber.shade100,
+              child: SizedBox(
+                height: textH * 1.2,
+                width: double.infinity,
+              ),
+            )),
+        Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  constraints: BoxConstraints(minWidth: infoW),
+                  child: Stack(
                     children: [
-                      // 留下最小寬度
-                      SizedBox(width: infoW),
                       // 用Text把widget的寬度長出來
                       // 以讓textField可以到最寬
                       Padding(
@@ -127,94 +180,72 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
                       )
                     ],
                   ),
-                  const SizedBox(width: 12),
-                  textField(
-                    init: _state.kPeriod,
-                    hint: '請輸入分鐘',
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    onChanged: (value) {
-                      _notifier.setPeriod(value, _state);
-                    },
-                    keyboardType: TextInputType.number,
+                ),
+                const SizedBox(width: 12),
+                textField(
+                  init: _state.kPeriod,
+                  hint: '請輸入分鐘',
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onChanged: (value) {
+                    _notifier.setPeriod(value, _state);
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    '分K',
+                    style: infoST.copyWith(fontSize: 16),
                   ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Text(
-                      '分K',
-                      style: infoST.copyWith(fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (_dataIsReady) ...[
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: valuesInfo(_realTimeChartInfo.allCandleInfo.last),
-              ),
-              const SizedBox(height: 16),
-              //chart(_realTimeChartInfo.allChartInfo.last),
-              //charts,
-              //const SizedBox(height: 16),
-/*              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: valuesInfo(_realTimeChartInfo
-                    .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),
-              ),
-              chart(_realTimeChartInfo
-                  .allChartInfo[_realTimeChartInfo.allChartInfo.length - 2]),*/
-              Wrap(
-                spacing: 16,
-                runAlignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  considerVolume,
-                  considerCloseWithLongUpperShadow,
-                  considerCloseWithLongLowerShadow,
-                ],
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 16,
-                runAlignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  considerLongAttack,
-                  considerShortAttack,
-                ],
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 16,
-                runAlignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  considerATurn,
-                  considerVTurn,
-                ],
-              ),
-            ],
-          ],
-        ),
-      ],
-    );
-
-    content = Stack(
-      children: [
+                ),
+              ],
+            )),
         Positioned(
             right: 0,
-            child: Switch(
-              value: _state.notice,
-              onChanged: (notice) {
-                _notifier.setNotice(notice, _state);
-              },
+            child: Row(
+              children: [
+                ClipOval(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        confirmDialog(_state.title, context).then((remove) {
+                          if (remove == true) {
+                            _notifier.removeKeyChart(_state);
+                          }
+                        });
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.delete_forever,
+                          size: 20,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Switch(
+                  value: _state.notice,
+                  onChanged: (notice) {
+                    _notifier.setNotice(notice, _state);
+                  },
+                ),
+                IconButton(
+                  onPressed: () {
+                    _notifier.setExpand(!_state.expand, _state);
+                  },
+                  icon: Icon(!_state.expand
+                      ? Icons.arrow_drop_down
+                      : Icons.arrow_drop_up),
+                )
+              ],
             )),
-        content
+        content,
       ],
     );
     return Container(
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
             border: Border(
           bottom: BorderSide(color: Colors.grey.shade300, width: 1),
@@ -513,11 +544,15 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
           },
         ),
         _actionChip(
-          _state.aTurnRequired,
+          _state.aTurnAtHigh,
           () {
-            _notifier.setATurnRequired(!_state.aTurnRequired, _state);
+            _notifier.setATurnAtHigh(!_state.aTurnAtHigh, _state);
           },
         ),
+        const SizedBox(width: 8),
+        _actionChip(_state.aTurnRequired, () {
+          _notifier.setATurnRequired(!_state.aTurnRequired, _state);
+        }, "今高"),
         const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
@@ -553,11 +588,15 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
           },
         ),
         _actionChip(
-          _state.vTurnRequired,
+          _state.vTurnAtLow,
           () {
-            _notifier.setVTurnRequired(!_state.vTurnRequired, _state);
+            _notifier.setVTurnAtLow(!_state.vTurnAtLow, _state);
           },
         ),
+        const SizedBox(width: 8),
+        _actionChip(_state.vTurnRequired, () {
+          _notifier.setVTurnRequired(!_state.vTurnRequired, _state);
+        }, "今低"),
         const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
@@ -677,7 +716,8 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
     return Transform.scale(scale: 0.7, child: content);
   }
 
-  Widget _actionChip(bool enable, VoidCallback onPressed) {
+  Widget _actionChip(bool enable, VoidCallback onPressed,
+      [String text = "必要條件"]) {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
@@ -686,17 +726,13 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
             ? Colors.blueAccent.withOpacity(0.2)
             : Colors.grey[200], // 启用/禁用状态背景颜色
         side: BorderSide(
-          width: enable ? 1 :  0.5,
-            color: enable
-            ? Colors.blueAccent
-            : Colors.grey[500]!), // 边框颜色
+            width: enable ? 1 : 0.5,
+            color: enable ? Colors.blueAccent : Colors.grey[500]!), // 边框颜色
       ),
       child: Text(
-        "必要條件",
+        text,
         style: TextStyle(
-          color: enable
-              ? Colors.blueAccent
-              : Colors.grey[500], // 启用/禁用状态文字颜色
+          color: enable ? Colors.blueAccent : Colors.grey[500], // 启用/禁用状态文字颜色
         ),
       ),
     );

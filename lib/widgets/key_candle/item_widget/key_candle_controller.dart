@@ -62,16 +62,19 @@ extension KeyChartStateController on KeyCandleState {
             .sublist(0, uphill.length)
             .any((element) => element.close > peakClose);
         if (isHighest && candleInfo.close < uphill.last.close) {
-          debugPrint('A轉:${candleInfo.startTime}');
-          debugPrint('======');
-          for (var element in uphill) {
-            debugPrint(element.toString());
+          if ((aTurnAtHigh && realTimeChartInfo.high == candleInfo.high) ||
+              !aTurnAtHigh) {
+            debugPrint('A轉:${candleInfo.startTime}');
+            debugPrint('======');
+            for (var element in uphill) {
+              debugPrint(element.toString());
+            }
+            debugPrint('\n');
+            debugPrint(candleInfo.toString());
+            debugPrint('======');
+            String info = 'A轉${aTurnAtHigh ? '(今高)' : ''}';
+            messages.add(info);
           }
-          debugPrint('\n');
-          debugPrint(candleInfo.toString());
-          debugPrint('======');
-          String info = 'A轉';
-          messages.add(info);
         } else if (aTurnRequired) {
           return;
         }
@@ -91,16 +94,19 @@ extension KeyChartStateController on KeyCandleState {
             .sublist(0, downhill.length)
             .any((element) => element.close < valleyLow);
         if (isLowest && candleInfo.close > downhill.last.close) {
-          debugPrint('V轉:${candleInfo.startTime}');
-          debugPrint('======');
-          for (var element in downhill) {
-            debugPrint(element.toString());
+          if ((vTurnAtLow && realTimeChartInfo.low == candleInfo.low) ||
+              !vTurnAtLow) {
+            debugPrint('V轉:${candleInfo.startTime}');
+            debugPrint('======');
+            for (var element in downhill) {
+              debugPrint(element.toString());
+            }
+            debugPrint('\n');
+            debugPrint(candleInfo.toString());
+            debugPrint('======');
+            String info = 'V轉${vTurnAtLow ? '(今低)' : ''}';
+            messages.add(info);
           }
-          debugPrint('\n');
-          debugPrint(candleInfo.toString());
-          debugPrint('======');
-          String info = 'V轉';
-          messages.add(info);
         } else if (vTurnRequired) {
           return;
         }
@@ -115,6 +121,7 @@ extension KeyChartStateController on KeyCandleState {
           debugPrint('======多方攻擊');
           debugPrint(preCandleInfo.toString());
           debugPrint(candleInfo.toString());
+          debugPrint('longAttackPoint:$longAttackPoint');
           debugPrint('======');
           String info = '多方攻擊';
           messages.add(info);
@@ -135,6 +142,7 @@ extension KeyChartStateController on KeyCandleState {
           debugPrint(candleInfo.toString());
           debugPrint('======');
           String info = '空方攻擊';
+          debugPrint('shortAttackPoint:$shortAttackPoint');
           messages.add(info);
         } else if (shortAttackRequired) {
           return;
@@ -143,10 +151,10 @@ extension KeyChartStateController on KeyCandleState {
     }
     if (messages.isNotEmpty) {
       messages.insert(0,
-          '開：${candleInfo.open} 高：${candleInfo.high} 中：${candleInfo.middle} 低：${candleInfo.low} 收：${candleInfo.close} 量：${candleInfo.volume} ${'${candleInfo.closeToOpen > 0 ? '+' : ''}${candleInfo.closeToOpen}'}');
+          '開：${candleInfo.open} 高：${candleInfo.high} 中：${candleInfo.middle} 低：${candleInfo.low} 量：${candleInfo.volume} 收：${candleInfo.close} ${'${candleInfo.closeToOpen > 0 ? '+' : ''}${candleInfo.closeToOpen}'}');
       ref
           .read(notificationWallStateProvider.notifier)
-          .pushNotification('接近關鍵價位！', messages);
+          .pushNotification('關鍵K棒提醒！', messages);
     }
   }
 }

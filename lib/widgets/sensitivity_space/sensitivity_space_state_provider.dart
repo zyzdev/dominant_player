@@ -34,18 +34,7 @@ final sensitivitySpaceStateNotifierProvider =
 
 class SensitivitySpaceMainNotifier extends StateNotifier<SensitivitySpaceState> {
 
-  SensitivitySpaceMainNotifier(super.state, StateNotifierProviderRef ref) {
-
-  }
-
-
-  void exchangeSensitivitySpaceWidgetIndex(int oldIndex, int newIndex) {
-    final SensitivitySpaceType item =
-    state.sensitivitySpaceWidgetIndex.removeAt(oldIndex);
-    state.sensitivitySpaceWidgetIndex.insert(newIndex, item);
-    state = state.copyWith(
-        sensitivitySpaceWidgetIndex: state.sensitivitySpaceWidgetIndex);
-  }
+  SensitivitySpaceMainNotifier(super.state, StateNotifierProviderRef ref);
 
   /// 日盤靈敏度空間，是否展開
   void daySensitivitySpaceExpand(bool expand) {

@@ -11,6 +11,8 @@ abstract class _$KeyCandleStateCWProxy {
 
   KeyCandleState kPeriod(int? kPeriod);
 
+  KeyCandleState expand(bool expand);
+
   KeyCandleState notice(bool notice);
 
   KeyCandleState keyVolume(int? keyVolume);
@@ -35,11 +37,15 @@ abstract class _$KeyCandleStateCWProxy {
 
   KeyCandleState aTurnRequired(bool aTurnRequired);
 
+  KeyCandleState aTurnAtHigh(bool aTurnAtHigh);
+
   KeyCandleState vTurnInPeriod(int? vTurnInPeriod);
 
   KeyCandleState vTurn(bool vTurn);
 
   KeyCandleState vTurnRequired(bool vTurnRequired);
+
+  KeyCandleState vTurnAtLow(bool vTurnAtLow);
 
   KeyCandleState longAttack(bool longAttack);
 
@@ -62,6 +68,7 @@ abstract class _$KeyCandleStateCWProxy {
   KeyCandleState call({
     String? title,
     int? kPeriod,
+    bool? expand,
     bool? notice,
     int? keyVolume,
     bool? considerVolume,
@@ -73,9 +80,11 @@ abstract class _$KeyCandleStateCWProxy {
     int? aTurnInPeriod,
     bool? aTurn,
     bool? aTurnRequired,
+    bool? aTurnAtHigh,
     int? vTurnInPeriod,
     bool? vTurn,
     bool? vTurnRequired,
+    bool? vTurnAtLow,
     bool? longAttack,
     int? longAttackPoint,
     bool? longAttackRequired,
@@ -96,6 +105,9 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
 
   @override
   KeyCandleState kPeriod(int? kPeriod) => this(kPeriod: kPeriod);
+
+  @override
+  KeyCandleState expand(bool expand) => this(expand: expand);
 
   @override
   KeyCandleState notice(bool notice) => this(notice: notice);
@@ -141,6 +153,10 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
       this(aTurnRequired: aTurnRequired);
 
   @override
+  KeyCandleState aTurnAtHigh(bool aTurnAtHigh) =>
+      this(aTurnAtHigh: aTurnAtHigh);
+
+  @override
   KeyCandleState vTurnInPeriod(int? vTurnInPeriod) =>
       this(vTurnInPeriod: vTurnInPeriod);
 
@@ -150,6 +166,9 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
   @override
   KeyCandleState vTurnRequired(bool vTurnRequired) =>
       this(vTurnRequired: vTurnRequired);
+
+  @override
+  KeyCandleState vTurnAtLow(bool vTurnAtLow) => this(vTurnAtLow: vTurnAtLow);
 
   @override
   KeyCandleState longAttack(bool longAttack) => this(longAttack: longAttack);
@@ -185,6 +204,7 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
   KeyCandleState call({
     Object? title = const $CopyWithPlaceholder(),
     Object? kPeriod = const $CopyWithPlaceholder(),
+    Object? expand = const $CopyWithPlaceholder(),
     Object? notice = const $CopyWithPlaceholder(),
     Object? keyVolume = const $CopyWithPlaceholder(),
     Object? considerVolume = const $CopyWithPlaceholder(),
@@ -196,9 +216,11 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
     Object? aTurnInPeriod = const $CopyWithPlaceholder(),
     Object? aTurn = const $CopyWithPlaceholder(),
     Object? aTurnRequired = const $CopyWithPlaceholder(),
+    Object? aTurnAtHigh = const $CopyWithPlaceholder(),
     Object? vTurnInPeriod = const $CopyWithPlaceholder(),
     Object? vTurn = const $CopyWithPlaceholder(),
     Object? vTurnRequired = const $CopyWithPlaceholder(),
+    Object? vTurnAtLow = const $CopyWithPlaceholder(),
     Object? longAttack = const $CopyWithPlaceholder(),
     Object? longAttackPoint = const $CopyWithPlaceholder(),
     Object? longAttackRequired = const $CopyWithPlaceholder(),
@@ -215,6 +237,10 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
           ? _value.kPeriod
           // ignore: cast_nullable_to_non_nullable
           : kPeriod as int?,
+      expand: expand == const $CopyWithPlaceholder() || expand == null
+          ? _value.expand
+          // ignore: cast_nullable_to_non_nullable
+          : expand as bool,
       notice: notice == const $CopyWithPlaceholder() || notice == null
           ? _value.notice
           // ignore: cast_nullable_to_non_nullable
@@ -270,6 +296,11 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
               ? _value.aTurnRequired
               // ignore: cast_nullable_to_non_nullable
               : aTurnRequired as bool,
+      aTurnAtHigh:
+          aTurnAtHigh == const $CopyWithPlaceholder() || aTurnAtHigh == null
+              ? _value.aTurnAtHigh
+              // ignore: cast_nullable_to_non_nullable
+              : aTurnAtHigh as bool,
       vTurnInPeriod: vTurnInPeriod == const $CopyWithPlaceholder()
           ? _value.vTurnInPeriod
           // ignore: cast_nullable_to_non_nullable
@@ -283,6 +314,11 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
               ? _value.vTurnRequired
               // ignore: cast_nullable_to_non_nullable
               : vTurnRequired as bool,
+      vTurnAtLow:
+          vTurnAtLow == const $CopyWithPlaceholder() || vTurnAtLow == null
+              ? _value.vTurnAtLow
+              // ignore: cast_nullable_to_non_nullable
+              : vTurnAtLow as bool,
       longAttack:
           longAttack == const $CopyWithPlaceholder() || longAttack == null
               ? _value.longAttack
@@ -330,6 +366,7 @@ KeyCandleState _$KeyCandleStateFromJson(Map<String, dynamic> json) =>
     KeyCandleState(
       title: json['title'] as String,
       kPeriod: json['kPeriod'] as int?,
+      expand: json['expand'] as bool? ?? true,
       notice: json['notice'] as bool? ?? true,
       keyVolume: json['keyVolume'] as int?,
       considerVolume: json['considerVolume'] as bool? ?? false,
@@ -345,9 +382,11 @@ KeyCandleState _$KeyCandleStateFromJson(Map<String, dynamic> json) =>
       aTurnInPeriod: json['aTurnInPeriod'] as int? ?? 10,
       aTurn: json['aTurn'] as bool? ?? false,
       aTurnRequired: json['aTurnRequired'] as bool? ?? false,
+      aTurnAtHigh: json['aTurnAtHigh'] as bool? ?? true,
       vTurnInPeriod: json['vTurnInPeriod'] as int? ?? 10,
       vTurn: json['vTurn'] as bool? ?? false,
       vTurnRequired: json['vTurnRequired'] as bool? ?? false,
+      vTurnAtLow: json['vTurnAtLow'] as bool? ?? true,
       longAttack: json['longAttack'] as bool? ?? false,
       longAttackPoint: json['longAttackPoint'] as int? ?? 20,
       longAttackRequired: json['longAttackRequired'] as bool? ?? false,
@@ -360,6 +399,7 @@ Map<String, dynamic> _$KeyCandleStateToJson(KeyCandleState instance) =>
     <String, dynamic>{
       'title': instance.title,
       'kPeriod': instance.kPeriod,
+      'expand': instance.expand,
       'notice': instance.notice,
       'keyVolume': instance.keyVolume,
       'considerVolume': instance.considerVolume,
@@ -373,9 +413,11 @@ Map<String, dynamic> _$KeyCandleStateToJson(KeyCandleState instance) =>
       'aTurnInPeriod': instance.aTurnInPeriod,
       'aTurn': instance.aTurn,
       'aTurnRequired': instance.aTurnRequired,
+      'aTurnAtHigh': instance.aTurnAtHigh,
       'vTurnInPeriod': instance.vTurnInPeriod,
       'vTurn': instance.vTurn,
       'vTurnRequired': instance.vTurnRequired,
+      'vTurnAtLow': instance.vTurnAtLow,
       'longAttack': instance.longAttack,
       'longAttackPoint': instance.longAttackPoint,
       'longAttackRequired': instance.longAttackRequired,

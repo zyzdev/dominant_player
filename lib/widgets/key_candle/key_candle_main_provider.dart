@@ -40,6 +40,13 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     });
   }
 
+  /// 是否展開
+  void setExpand(bool expand, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(expand: expand);
+    this.state = List.of(this.state);
+  }
+
   /// 是否提醒
   void setNotice(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
@@ -136,6 +143,13 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     this.state = List.of(this.state);
   }
 
+  /// A轉是否發生在今高
+  void setATurnAtHigh(bool atHigh, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(aTurnAtHigh: atHigh);
+    this.state = List.of(this.state);
+  }
+
   /// 是否考慮V轉
   void setVTurn(bool notice, KeyCandleState state) {
     int index = this.state.indexOf(state);
@@ -152,10 +166,17 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     this.state = List.of(this.state);
   }
 
-  /// A轉是否為必要條件
+  /// V轉是否為必要條件
   void setVTurnRequired(bool required, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(vTurnRequired: required);
+    this.state = List.of(this.state);
+  }
+
+  /// V轉是否發生在今低
+  void setVTurnAtLow(bool atLow, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(vTurnAtLow: atLow);
     this.state = List.of(this.state);
   }
 

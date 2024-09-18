@@ -243,7 +243,7 @@ class KeyValueListMainNotifier extends StateNotifier<KeyValueListState> {
         .where((element) => element.key != KeyValue.current.title)
         .where((element) => !_justNotificationKeyValues.contains(element.key))
         .forEach((element) {
-      int dis = (element.value - state.current!).toInt();
+      int dis = (state.current! - element.value).toInt();
       if (dis.abs() <= state.noticeDis) {
         disEntry[dis] = element;
         _justNotificationKeyValues.add(element.key);

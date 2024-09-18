@@ -42,9 +42,9 @@ class CandleInfo {
   late int lowerShadowDis = close - low;
 
   /// 是否收長上影
-  late bool isCloseWithLongUpperShadow = upperShadowDis > bodyLength * 2;
+  late bool isCloseWithLongUpperShadow = upperShadowDis > bodyLength * 2 && upperShadowDis > lowerShadowDis;
   /// 是否收長下影
-  late bool isCloseWithLongLowerShadow = lowerShadowDis > bodyLength * 2;
+  late bool isCloseWithLongLowerShadow = lowerShadowDis > bodyLength * 2 && lowerShadowDis > upperShadowDis;
 
   CandleInfo({
     required this.period,

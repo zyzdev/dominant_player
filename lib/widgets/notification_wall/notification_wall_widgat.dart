@@ -74,10 +74,9 @@ class _NotificationWallWidgetState extends ConsumerState {
     Widget info(String message) {
       return Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8),
-          color: Colors.grey.shade100
-        ),
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey.shade100),
         padding: const EdgeInsets.all(4),
         child: Text(
           message,
@@ -86,7 +85,7 @@ class _NotificationWallWidgetState extends ConsumerState {
       );
     }
 
-    return Card(
+    Widget content = Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: !last ? const EdgeInsets.symmetric(vertical: 8) : EdgeInsets.zero,
       child: Container(
@@ -105,13 +104,25 @@ class _NotificationWallWidgetState extends ConsumerState {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: notificationState.messages
-                  .map((e) => info(e))
-                  .toList(),
+              children: notificationState.messages.map((e) => info(e)).toList(),
             )
           ],
         ),
       ),
     );
+    bool showHint = true;
+    return StatefulBuilder(builder: (context, setState) {
+      Future.delayed(const Duration(seconds: 60), () {
+        setState(() {
+          showHint = false;
+        });
+      });
+      return Badge(
+        label: const Text('New!'),
+        isLabelVisible: showHint,
+        backgroundColor: Colors.lightBlueAccent,
+        child: content,
+      );
+    });
   }
 }

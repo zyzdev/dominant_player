@@ -12,6 +12,10 @@ class KeyCandleState {
   /// 關鍵K棒的週期
   final int? kPeriod;
 
+  /// 是否展開
+  final bool expand;
+
+  /// 是否開啟推播
   final bool notice;
 
   /// 關鍵量
@@ -35,12 +39,16 @@ class KeyCandleState {
   final bool aTurn;
   /// A轉是否為必要條件
   final bool aTurnRequired;
+  /// A轉是否在今高
+  final bool aTurnAtHigh;
 
   /// 在[vTurnInPeriod]K棒裡面的V轉
   final int? vTurnInPeriod;
   final bool vTurn;
   /// V轉是否為必要條件
   final bool vTurnRequired;
+  /// V轉是否在今低
+  final bool vTurnAtLow;
 
   /// 多方攻擊
   final bool longAttack;
@@ -57,6 +65,7 @@ class KeyCandleState {
   KeyCandleState({
     required this.title,
     this.kPeriod,
+    this.expand = true,
     this.notice = true,
     this.keyVolume,
     this.considerVolume = false,
@@ -68,9 +77,11 @@ class KeyCandleState {
     this.aTurnInPeriod = 10,
     this.aTurn = false,
     this.aTurnRequired = false,
+    this.aTurnAtHigh = true,
     this.vTurnInPeriod = 10,
     this.vTurn = false,
     this.vTurnRequired = false,
+    this.vTurnAtLow = true,
     this.longAttack = false,
     this.longAttackPoint = 20,
     this.longAttackRequired = false,
