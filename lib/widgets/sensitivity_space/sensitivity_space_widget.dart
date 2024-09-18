@@ -5,7 +5,6 @@ import 'package:dominant_player/widgets/style.dart';
 import 'package:dominant_player/widgets/widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reorderables/reorderables.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class SensitivitySpaceWidget extends ConsumerStatefulWidget {
@@ -32,10 +31,7 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
     Widget content = ValueListenableBuilder<double>(
       valueListenable: _sensitivitySpaceWidth,
       builder: (context, width, child) {
-        Widget content = ReorderableWrap(
-          scrollPhysics: const NeverScrollableScrollPhysics(),
-          direction: Axis.vertical,
-          onReorder: _notifier.exchangeSensitivitySpaceWidgetIndex,
+        Widget content = Column(
           children: _state.sensitivitySpaceWidgetIndex
               .map((e) => _sensitivitySpaceWidget(e))
               .toList(),
@@ -185,14 +181,6 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
               )),
           content,
           Positioned(
-            left: 0,
-            top: 0,
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.drag_handle),
-            ),
-          ),
-          Positioned(
             right: 0,
             top: 0,
             child: IconButton(
@@ -293,14 +281,6 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
                 ),
               )),
           content,
-          Positioned(
-            left: 0,
-            top: 0,
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.drag_handle),
-            ),
-          ),
           Positioned(
             right: 0,
             top: 0,
@@ -415,14 +395,6 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
                 ),
               )),
           content,
-          Positioned(
-            left: 0,
-            top: 0,
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.drag_handle),
-            ),
-          ),
           Positioned(
             right: 0,
             top: 0,
@@ -588,14 +560,6 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
                 ),
               )),
           content,
-          Positioned(
-            left: 0,
-            top: 0,
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.drag_handle),
-            ),
-          ),
           Positioned(
             right: 0,
             top: 0,

@@ -1,6 +1,7 @@
 import 'package:dominant_player/widgets/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reorderables/reorderables.dart';
 
 import 'item_widget/key_candle_widget.dart';
 import 'key_candle_main_provider.dart';
@@ -28,7 +29,7 @@ class _KeyCandleMainWidgetState extends ConsumerState {
               style: titleST,
             ),
           ),
-        ...[for(int i = 0; i < state.length; i++) KeyCandleWidget(index: i)],
+        for (int i = 0; i < state.length; i++) KeyCandleWidget(index: i),
         const SizedBox(height: 16),
         OutlinedButton.icon(
           icon: const Icon(
@@ -49,8 +50,8 @@ class _KeyCandleMainWidgetState extends ConsumerState {
 
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300, width: 1)
-      ),
-      child: content,);
+          border: Border.all(color: Colors.grey.shade300, width: 1)),
+      child: content,
+    );
   }
 }

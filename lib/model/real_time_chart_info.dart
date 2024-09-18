@@ -24,6 +24,15 @@ class RealTimeChartInfo with ChartUtil {
   int curDistance = 0;
   int closeToOpenDis = 0;
 
+  late int low = allCandleInfo
+      .map((e) => e.low)
+      .reduce((value, element) => value < element ? value : element);
+
+
+  late int high = allCandleInfo
+      .map((e) => e.high)
+      .reduce((value, element) => value > element ? value : element);
+
   void _updateAllCandleInfo() {
     CandleInfo getCandleInfo(List<List<String>> considerTicks) {
       int open = double.parse(tickOpen(considerTicks.first)).toInt();
@@ -79,7 +88,8 @@ class RealTimeChartInfo with ChartUtil {
   }
 
   CandleInfo? getLastFinishCandleInfo() {
-    if (allCandleInfo.length > 1) return allCandleInfo[allCandleInfo.length - 2];
+    if (allCandleInfo.length > 1)
+      return allCandleInfo[allCandleInfo.length - 2];
     return null;
   }
 
