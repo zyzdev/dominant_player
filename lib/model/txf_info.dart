@@ -217,9 +217,14 @@ class TxfRequest {
   factory TxfRequest.current([String month = '']) {
     // 判斷使用日盤還是夜盤，時區必須一致
     final now = DateTime.now().toUtc().add(const Duration(hours: 8));
-    DateTime dayStartTime = DateTime(now.year, now.month, now.day, 8, 45).toUtc().add(const Duration(hours: 8)); // 8:45
-    DateTime dayEndTime = DateTime(now.year, now.month, now.day, 15, 0).toUtc().add(const Duration(hours: 8)); //  15:00
-    bool useDay = now.isAfter(dayStartTime) && now.isBefore(dayEndTime);
+    final nowYMD = DateTime(now.year, now.month, now.day).toUtc().add(const Duration(hours: 8));
+    DateTime dayStartTime = nowYMD.add(const Duration(hours: 8, minutes: 44,seconds: 59));  // 8:45
+    DateTime dayEndTime = nowYMD.add(const Duration(hours: 13, minutes: 45, seconds: 1));   // 13:45
+
+    DateTime nightStartTime = nowYMD.add(const Duration(hours: 14, minutes: 59, seconds: 59));  // 15:00
+    DateTime nightEndTime = nowYMD.add(const Duration(days: 1, hours: 5, seconds: 1));          // 隔天凌晨五點
+    // 日盤開盤到夜盤開盤前，都用日盤
+    bool useDay = now.isAfter(dayStartTime) && now.isBefore(nightStartTime);
     return useDay ? TxfRequest.dayExpireMonth(month) : TxfRequest.nightExpireMonth(month);
   }
 

@@ -1,5 +1,6 @@
 import 'package:dominant_player/model/txf_info.dart';
 import 'package:dominant_player/service/rest_client.dart';
+import 'package:dominant_player/util/util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,7 +25,7 @@ Future<void> fetchCurrentMonthSymbolID(StateNotifierProviderRef ref) async {
     // 計算下一次更新近月的時間
     DateTime now = DateTime.now().toUtc().add(const Duration(hours: 8));
     late Duration delay;
-    if (isDay) {
+    if (inDayTrade()) {
       // 日盤等收盤就可以更新
       delay = DateTime(now.year, now.month, now.day, 13, 45).toUtc().add(const Duration(hours: 8)).difference(now);
     } else {

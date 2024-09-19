@@ -1,5 +1,6 @@
 import 'package:dominant_player/model/txf_info.dart';
 import 'package:dominant_player/service/rest_client.dart';
+import 'package:dominant_player/util/util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,11 +37,10 @@ Future<void> fetchCurrentMonth(StateNotifierProviderRef ref) async {
     if(oldMonth != currentMonth) {
       ref.read(currentMonthProvider.notifier).update((state) => currentMonth);
     }
-    ref.read(currentMonthProvider.notifier).update((state) => currentMonth);
     // 計算下一次更新近月的時間
     DateTime now = DateTime.now().toUtc().add(const Duration(hours: 8));
     late Duration delay;
-    if (isDay) {
+    if (inDayTrade()) {
       // 日盤等收盤就可以更新
       delay = DateTime(now.year, now.month, now.day, 13, 45).difference(now);
     } else {
@@ -68,15 +68,4 @@ Future<void> fetchCurrentMonth(StateNotifierProviderRef ref) async {
     debugPrint(e.toString());
     debugPrint(stack.toString());
   }
-}
-
-bool get isDay {
-  // 判斷現在是日盤還是夜盤
-  final now = DateTime.now().toUtc().add(const Duration(hours: 8));
-  final nowYMD = DateTime(now.year, now.month, now.day);
-  DateTime dayStartTime =
-  nowYMD.add(const Duration(hours: 5, minutes: 00)); // 8:45
-  DateTime dayEndTime =
-  nowYMD.add(const Duration(hours: 13, minutes: 45)); // 15:00
-  return now.isAfter(dayStartTime) && now.isBefore(dayEndTime);
 }
