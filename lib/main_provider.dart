@@ -78,17 +78,6 @@ class MainNotifier extends StateNotifier<MainState> {
     return now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
   }
 
-  bool get isDay {
-    // 判斷現在是日盤還是夜盤
-    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
-    final nowYMD = DateTime(now.year, now.month, now.day);
-    DateTime dayStartTime =
-        nowYMD.add(const Duration(hours: 5, minutes: 00)); // 8:45
-    DateTime dayEndTime =
-        nowYMD.add(const Duration(hours: 13, minutes: 45)); // 15:00
-    return now.isAfter(dayStartTime) && now.isBefore(dayEndTime);
-  }
-
   /// Spy，是否展開
   void spyExpand(bool expand) {
     state = state.copyWith(spyExpand: expand);

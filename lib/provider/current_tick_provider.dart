@@ -16,7 +16,7 @@ final RestClient _restClient = RestClient.instance;
 Future<void> fetchCurrentTick(StateNotifierProviderRef ref) async {
   String currentMonthSymbolID = ref.read(currentMonthSymbolIdProvider);
   final response = await _restClient.getCurrentPrice(currentMonthSymbolID);
-  if (!isHoliday(DateTime.now().toUtc().add(const Duration(hours: 8)))) {
+  if (!isHoliday()) {
     Future.delayed(const Duration(seconds: 1), () {
       fetchCurrentTick(ref);
     });

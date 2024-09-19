@@ -60,8 +60,11 @@ Future<void> fetchTaiwanHoliday() async {
   removeExpiredData();
 }
 
-bool isHoliday(DateTime dateTime) =>
-    _holidays.contains(DateFormat('y-MM-dd').format(dateTime));
+bool isHoliday([DateTime? dateTime]) {
+  dateTime ??= DateTime.now().toUtc().add(const Duration(hours: 8));
+  return _holidays.contains(DateFormat('y-MM-dd').format(dateTime));
+}
+
 
 bool inTrade(DateTime dateTime, {bool isFuture = false}) {
   if (isHoliday(dateTime)) return false;
