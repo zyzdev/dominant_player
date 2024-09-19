@@ -15,6 +15,7 @@ class NotificationWallWidget extends ConsumerStatefulWidget {
 class _NotificationWallWidgetState extends ConsumerState {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
 
+  Map<NotificationState, bool> _showHint = {};
   @override
   Widget build(BuildContext context) {
     ref.listen<List<NotificationState>>(notificationWallStateProvider,
@@ -25,7 +26,9 @@ class _NotificationWallWidgetState extends ConsumerState {
       }
     });
     final state = ref.watch(notificationWallStateProvider);
-
+    for (var element in state) {
+      _showHint[element] ??= true;
+    }
     Widget content = state.isEmpty
         ? Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -110,13 +113,16 @@ class _NotificationWallWidgetState extends ConsumerState {
         ),
       ),
     );
-    bool showHint = true;
+    bool showHint = _showHint[notificationState] ?? true;
     return StatefulBuilder(builder: (context, setState) {
-      Future.delayed(const Duration(seconds: 60), () {
-        setState(() {
-          showHint = false;
+      if(showHint) {
+        Future.delayed(const Duration(seconds: 60), () {
+          setState(() {
+            _showHint[notificationState] = false;
+            showHint = false;
+          });
         });
-      });
+      }
       return Badge(
         label: const Text('New!'),
         isLabelVisible: showHint,
