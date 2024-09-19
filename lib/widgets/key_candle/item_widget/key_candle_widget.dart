@@ -79,10 +79,7 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
                 children: [
                   if (_dataIsReady) ...[
                     const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: valuesInfo(_realTimeChartInfo.allCandleInfo.last),
-                    ),
+                    valuesInfo(_realTimeChartInfo.allCandleInfo.last),
                     const SizedBox(height: 16),
                     //chart(_realTimeChartInfo.allChartInfo.last),
                     //charts,
@@ -201,6 +198,17 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
               ],
             )),
         Positioned(
+          left: 0,
+          top: 0,
+          child: ReorderableDragStartListener(
+            index: widget.index,
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.drag_handle),
+            ),
+          ),
+        ),
+        Positioned(
             right: 0,
             child: Row(
               children: [
@@ -283,9 +291,8 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
       );
     }
 
-    return Wrap(
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 12,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         tile('開', candleInfo.open.toString()),
         tile('高', candleInfo.high.toString()),
@@ -294,6 +301,7 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
         tile('收', candleInfo.close.toString()),
         tile('量', candleInfo.volume.toString()),
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             candleInfo.closeToOpen < 0
                 ? Icon(
@@ -737,4 +745,7 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
