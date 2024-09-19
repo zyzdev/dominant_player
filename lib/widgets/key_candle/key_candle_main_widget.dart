@@ -17,6 +17,7 @@ class KeyCandleMainWidget extends ConsumerStatefulWidget {
 class _KeyCandleMainWidgetState extends ConsumerState {
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     final state = ref.watch(keyCandleMainWidgetProvider);
     Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -29,7 +30,24 @@ class _KeyCandleMainWidgetState extends ConsumerState {
               style: titleST,
             ),
           ),
-        for (int i = 0; i < state.length; i++) KeyCandleWidget(index: i),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+              maxWidth: 700, maxHeight: height),
+          child: ReorderableListView(
+            shrinkWrap: true,
+            buildDefaultDragHandles: false,
+            onReorder: ref
+                .read(keyCandleMainWidgetProvider.notifier)
+                .exchangeWidgetIndex,
+            children: [
+              for (int i = 0; i < state.length; i++)
+                KeyCandleWidget(
+                  index: i,
+                  key: ValueKey(state[i]),
+                )
+            ],
+          ),
+        ),
         const SizedBox(height: 16),
         OutlinedButton.icon(
           icon: const Icon(

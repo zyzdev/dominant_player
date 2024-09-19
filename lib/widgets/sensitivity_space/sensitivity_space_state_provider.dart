@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/key_value.dart';
@@ -9,22 +10,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 const String _statsKey = 'sensitivity_space_stats_key';
 
 final sensitivitySpaceStateNotifierProvider =
-    StateNotifierProvider<SensitivitySpaceMainNotifier, SensitivitySpaceState>((ref) {
+    StateNotifierProvider<SensitivitySpaceMainNotifier, SensitivitySpaceState>(
+        (ref) {
+  String? json = prefs.getString(_statsKey);
+  late SensitivitySpaceState state;
+  try {
+    if (json != null) {
+      state = SensitivitySpaceState.fromJson(jsonDecode(json));
+    } else {
+      state = SensitivitySpaceState.init();
+    }
+  } catch (e, stack) {
+    state = SensitivitySpaceState.init();
 
-      String? json = prefs.getString(_statsKey);
-      late SensitivitySpaceState state;
-      try {
-        if (json != null) {
-          state = SensitivitySpaceState.fromJson(jsonDecode(json));
-        } else {
-          state = SensitivitySpaceState.init();
-        }
-      } catch (e, stack) {
-        state = SensitivitySpaceState.init();
-
-        debugPrint(e.toString());
-        debugPrint(stack.toString());
-      }
+    debugPrint(e.toString());
+    debugPrint(stack.toString());
+  }
 
   return SensitivitySpaceMainNotifier(
     state,
@@ -32,9 +33,21 @@ final sensitivitySpaceStateNotifierProvider =
   );
 });
 
-class SensitivitySpaceMainNotifier extends StateNotifier<SensitivitySpaceState> {
-
+class SensitivitySpaceMainNotifier
+    extends StateNotifier<SensitivitySpaceState> {
   SensitivitySpaceMainNotifier(super.state, StateNotifierProviderRef ref);
+
+  void exchangeSensitivitySpaceWidgetIndex(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final newOrder = List.of(state.sensitivitySpaceWidgetIndex, growable: true);
+
+    final SensitivitySpaceType item = newOrder.removeAt(oldIndex);
+    newOrder.insert(newIndex, item);
+
+    state = state.copyWith(sensitivitySpaceWidgetIndex: newOrder);
+  }
 
   /// 日盤靈敏度空間，是否展開
   void daySensitivitySpaceExpand(bool expand) {
@@ -52,7 +65,7 @@ class SensitivitySpaceMainNotifier extends StateNotifier<SensitivitySpaceState> 
   void daySensitivitySpaceLongLow15(String value) {
     state = state.copyWith(
         daySensitivitySpace15:
-        state.daySensitivitySpace15.copyWith(longLow: int.tryParse(value)));
+            state.daySensitivitySpace15.copyWith(longLow: int.tryParse(value)));
   }
 
   /// 設定日盤30分最大多方邏輯高點
@@ -66,7 +79,7 @@ class SensitivitySpaceMainNotifier extends StateNotifier<SensitivitySpaceState> 
   void daySensitivitySpaceLongLow30(String value) {
     state = state.copyWith(
         daySensitivitySpace30:
-        state.daySensitivitySpace30.copyWith(longLow: int.tryParse(value)));
+            state.daySensitivitySpace30.copyWith(longLow: int.tryParse(value)));
   }
 
   /// 設定日盤15分最大空方邏輯高點

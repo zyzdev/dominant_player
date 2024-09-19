@@ -33,9 +33,6 @@ Future<List<String>> fetchSpyPrice([bool isDay = true]) async {
     return DateFormat('yyyy/MM/dd').format(spyDate);
   }
 
-  print(spyDate(true));
-  print(spyDate(false));
-
   final response =
       await Client().post(Uri.parse('https://www.taifex.com.tw/cht/3/futDailyMarketReport'), body: {
     'queryType': '2',

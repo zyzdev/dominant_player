@@ -40,6 +40,19 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     });
   }
 
+  void exchangeWidgetIndex(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final newOrder = List.of(state, growable: true);
+
+    final KeyCandleState item = newOrder.removeAt(oldIndex);
+    newOrder.insert(newIndex, item);
+
+    state = newOrder;
+  }
+
+
   /// 是否展開
   void setExpand(bool expand, KeyCandleState state) {
     int index = this.state.indexOf(state);
@@ -58,7 +71,7 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
   void setTitle(String title, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(title: title);
-    this.state = List.of(this.state);
+    _saveState();
   }
 
   /// K棒週期
@@ -68,7 +81,12 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     if (p == null) return;
     if (p <= 0) return;
     this.state[index] = state.copyWith(kPeriod: p);
-    this.state = List.of(this.state);
+    if(state.kPeriod == null) {
+      this.state = List.of(this.state);
+    } else {
+      _saveState();
+    }
+
   }
 
   /// 是否考慮成交量
@@ -82,7 +100,7 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
   void setVolumeValue(int? volume, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(keyVolume: volume);
-    this.state = List.of(this.state);
+    _saveState();
   }
 
   /// 成交量是否為必要條件
@@ -133,7 +151,7 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
   void setATurnInPeriod(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(aTurnInPeriod: period);
-    this.state = List.of(this.state);
+    _saveState();
   }
 
   /// A轉是否為必要條件
@@ -163,7 +181,7 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
   void setVTurnInPeriod(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(vTurnInPeriod: period);
-    this.state = List.of(this.state);
+    _saveState();
   }
 
   /// V轉是否為必要條件
@@ -191,7 +209,7 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
   void setLongAttackPoint(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(longAttackPoint: period);
-    this.state = List.of(this.state);
+    _saveState();
   }
 
   /// 多方攻擊是否為必要條件
@@ -212,7 +230,7 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
   void setShortAttackPoint(int? period, KeyCandleState state) {
     int index = this.state.indexOf(state);
     this.state[index] = state.copyWith(shortAttackPoint: period);
-    this.state = List.of(this.state);
+    _saveState();
   }
 
   /// 空方攻擊是否為必要條件
@@ -243,7 +261,7 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
 
   void removeKeyChart(KeyCandleState state) {
     this.state.remove(state);
-    this.state = List.of(this.state);
+    this.state = this.state.toList();
   }
 
   /// 自定義關鍵K棒名稱，是否重複
@@ -258,6 +276,10 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
   @override
   set state(List<KeyCandleState> state) {
     super.state = state;
+    prefs.setString(_statsKey, jsonEncode(state));
+  }
+
+  void _saveState() {
     prefs.setString(_statsKey, jsonEncode(state));
   }
 }

@@ -27,16 +27,36 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
   @override
   Widget build(BuildContext context) {
     ref.watch(sensitivitySpaceStateNotifierProvider);
-
+    double height = MediaQuery.of(context).size.height;
     Widget content = ValueListenableBuilder<double>(
       valueListenable: _sensitivitySpaceWidth,
       builder: (context, width, child) {
-        Widget content = Column(
-          children: _state.sensitivitySpaceWidgetIndex
-              .map((e) => _sensitivitySpaceWidget(e))
-              .toList(),
-        );
-
+        Widget content = _sensitivitySpaceWidth.value == 0
+            ? Column(
+                children: [
+                  for (int i = 0;
+                      i < _state.sensitivitySpaceWidgetIndex.length;
+                      i++)
+                    _sensitivitySpaceWidget(
+                        i, _state.sensitivitySpaceWidgetIndex[i])
+                ],
+              )
+            : ConstrainedBox(
+                constraints: BoxConstraints(
+                    maxWidth: _sensitivitySpaceWidth.value, maxHeight: height),
+                child: ReorderableListView(
+                  shrinkWrap: true,
+                  buildDefaultDragHandles: false,
+                  onReorder: _notifier.exchangeSensitivitySpaceWidgetIndex,
+                  children: [
+                    for (int i = 0;
+                        i < _state.sensitivitySpaceWidgetIndex.length;
+                        i++)
+                      _sensitivitySpaceWidget(
+                          i, _state.sensitivitySpaceWidgetIndex[i])
+                  ],
+                ),
+              );
         if (width == 0) {
           return MeasureSize(
             child: content,
@@ -77,20 +97,21 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
     return content;
   }
 
-  Widget _sensitivitySpaceWidget(SensitivitySpaceType sensitivitySpaceType) {
+  Widget _sensitivitySpaceWidget(
+      int index, SensitivitySpaceType sensitivitySpaceType) {
     Widget content;
     switch (sensitivitySpaceType) {
       case SensitivitySpaceType.day:
-        content = _daySensitivitySpace();
+        content = _daySensitivitySpace(index);
         break;
       case SensitivitySpaceType.night:
-        content = _nightSensitivitySpace();
+        content = _nightSensitivitySpace(index);
         break;
       case SensitivitySpaceType.customize:
-        content = _customizeSensitivitySpace();
+        content = _customizeSensitivitySpace(index);
         break;
       case SensitivitySpaceType.value:
-        content = _customizeValues();
+        content = _customizeValues(index);
         break;
     }
     content = SizedBox(
@@ -100,7 +121,7 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
     return content;
   }
 
-  Widget _daySensitivitySpace() {
+  Widget _daySensitivitySpace(int index) {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -181,6 +202,17 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
               )),
           content,
           Positioned(
+            left: 0,
+            top: 0,
+            child: ReorderableDragStartListener(
+              index: index,
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.drag_handle),
+              ),
+            ),
+          ),
+          Positioned(
             right: 0,
             top: 0,
             child: IconButton(
@@ -198,7 +230,7 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
     );
   }
 
-  Widget _nightSensitivitySpace() {
+  Widget _nightSensitivitySpace(int index) {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -282,6 +314,17 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
               )),
           content,
           Positioned(
+            left: 0,
+            top: 0,
+            child: ReorderableDragStartListener(
+              index: index,
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.drag_handle),
+              ),
+            ),
+          ),
+          Positioned(
             right: 0,
             top: 0,
             child: IconButton(
@@ -299,7 +342,7 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
     );
   }
 
-  Widget _customizeSensitivitySpace() {
+  Widget _customizeSensitivitySpace(int index) {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -396,6 +439,17 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
               )),
           content,
           Positioned(
+            left: 0,
+            top: 0,
+            child: ReorderableDragStartListener(
+              index: index,
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.drag_handle),
+              ),
+            ),
+          ),
+          Positioned(
             right: 0,
             top: 0,
             child: IconButton(
@@ -413,7 +467,7 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
     );
   }
 
-  Widget _customizeValues() {
+  Widget _customizeValues(int index) {
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
@@ -560,6 +614,17 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
                 ),
               )),
           content,
+          Positioned(
+            left: 0,
+            top: 0,
+            child: ReorderableDragStartListener(
+              index: index,
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.drag_handle),
+              ),
+            ),
+          ),
           Positioned(
             right: 0,
             top: 0,
