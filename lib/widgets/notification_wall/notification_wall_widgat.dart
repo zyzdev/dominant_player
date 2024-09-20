@@ -40,6 +40,7 @@ class _NotificationWallWidgetState extends ConsumerState {
         : AnimatedList(
             key: _listKey,
             initialItemCount: state.length,
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             padding: const EdgeInsets.all(16),
             itemBuilder: (context, index, animation) {

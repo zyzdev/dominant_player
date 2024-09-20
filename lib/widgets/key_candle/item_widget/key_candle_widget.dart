@@ -552,14 +552,14 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
           },
         ),
         _actionChip(
-          _state.aTurnAtHigh,
+          _state.aTurnRequired,
           () {
-            _notifier.setATurnAtHigh(!_state.aTurnAtHigh, _state);
+            _notifier.setATurnRequired(!_state.aTurnRequired, _state);
           },
         ),
         const SizedBox(width: 8),
-        _actionChip(_state.aTurnRequired, () {
-          _notifier.setATurnRequired(!_state.aTurnRequired, _state);
+        _actionChip(_state.aTurnAtHigh, () {
+          _notifier.setATurnAtHigh(!_state.aTurnAtHigh, _state);
         }, "今高"),
         const SizedBox(width: 8),
         GestureDetector(
@@ -595,16 +595,17 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
             _notifier.setVTurn(notice, _state);
           },
         ),
-        _actionChip(
-          _state.vTurnAtLow,
-          () {
-            _notifier.setVTurnAtLow(!_state.vTurnAtLow, _state);
-          },
-        ),
-        const SizedBox(width: 8),
         _actionChip(_state.vTurnRequired, () {
           _notifier.setVTurnRequired(!_state.vTurnRequired, _state);
-        }, "今低"),
+        }),
+        const SizedBox(width: 8),
+        _actionChip(
+            _state.vTurnAtLow,
+                () {
+              _notifier.setVTurnAtLow(!_state.vTurnAtLow, _state);
+            },
+            "今低"
+        ),
         const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
