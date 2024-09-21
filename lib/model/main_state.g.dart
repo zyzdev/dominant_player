@@ -7,6 +7,8 @@ part of 'main_state.dart';
 // **************************************************************************
 
 abstract class _$MainStateCWProxy {
+  MainState marketPotentialExpand(bool marketPotentialExpand);
+
   MainState spyExpand(bool spyExpand);
 
   MainState sensitivitySpaceExpand(bool sensitivitySpaceExpand);
@@ -24,6 +26,7 @@ abstract class _$MainStateCWProxy {
   /// MainState(...).copyWith(id: 12, name: "My name")
   /// ````
   MainState call({
+    bool? marketPotentialExpand,
     bool? spyExpand,
     bool? sensitivitySpaceExpand,
     bool? keyValuesExpand,
@@ -37,6 +40,10 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
   const _$MainStateCWProxyImpl(this._value);
 
   final MainState _value;
+
+  @override
+  MainState marketPotentialExpand(bool marketPotentialExpand) =>
+      this(marketPotentialExpand: marketPotentialExpand);
 
   @override
   MainState spyExpand(bool spyExpand) => this(spyExpand: spyExpand);
@@ -66,6 +73,7 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
   /// MainState(...).copyWith(id: 12, name: "My name")
   /// ````
   MainState call({
+    Object? marketPotentialExpand = const $CopyWithPlaceholder(),
     Object? spyExpand = const $CopyWithPlaceholder(),
     Object? sensitivitySpaceExpand = const $CopyWithPlaceholder(),
     Object? keyValuesExpand = const $CopyWithPlaceholder(),
@@ -73,6 +81,12 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
     Object? notificationWallExpand = const $CopyWithPlaceholder(),
   }) {
     return MainState(
+      marketPotentialExpand:
+          marketPotentialExpand == const $CopyWithPlaceholder() ||
+                  marketPotentialExpand == null
+              ? _value.marketPotentialExpand
+              // ignore: cast_nullable_to_non_nullable
+              : marketPotentialExpand as bool,
       spyExpand: spyExpand == const $CopyWithPlaceholder() || spyExpand == null
           ? _value.spyExpand
           // ignore: cast_nullable_to_non_nullable
@@ -115,6 +129,7 @@ extension $MainStateCopyWith on MainState {
 // **************************************************************************
 
 MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
+      marketPotentialExpand: json['marketPotentialExpand'] as bool? ?? true,
       spyExpand: json['spyExpand'] as bool? ?? true,
       sensitivitySpaceExpand: json['sensitivitySpaceExpand'] as bool? ?? true,
       keyValuesExpand: json['keyValuesExpand'] as bool? ?? true,
@@ -123,6 +138,7 @@ MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
     );
 
 Map<String, dynamic> _$MainStateToJson(MainState instance) => <String, dynamic>{
+      'marketPotentialExpand': instance.marketPotentialExpand,
       'spyExpand': instance.spyExpand,
       'sensitivitySpaceExpand': instance.sensitivitySpaceExpand,
       'keyValuesExpand': instance.keyValuesExpand,

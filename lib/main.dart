@@ -5,6 +5,7 @@ import 'package:dominant_player/model/main_state.dart';
 import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/widgets/key_candle/key_candle_main_widget.dart';
 import 'package:dominant_player/widgets/key_value_list/key_value_list_widget.dart';
+import 'package:dominant_player/widgets/market_potential/market_potential_state_provider.dart';
 import 'package:dominant_player/widgets/notification_wall/notification_wall_widgat.dart';
 import 'package:dominant_player/widgets/sensitivity_space/sensitivity_space_widget.dart';
 import 'package:dominant_player/widgets/spy/spy_widget.dart';
@@ -14,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
+
+import 'widgets/market_potential/market_potential_widget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +55,20 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   MainState get _state => ref.read(mainProvider);
 
   MainNotifier get _mainNotifier => ref.read(mainProvider.notifier);
+
+  late final AnimationController _marketPotentialAnimationController =
+      AnimationController(
+    value: _state.marketPotentialExpand ? 1 : 0,
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+  late final ReverseAnimation _marketPotentialExpandAnimation =
+      ReverseAnimation(_marketPotentialCollapseAnimation);
+  late final Animation<double> _marketPotentialCollapseAnimation =
+      CurvedAnimation(
+    parent: _marketPotentialAnimationController,
+    curve: Curves.fastLinearToSlowEaseIn,
+  );
 
   late final AnimationController _spyAnimationController = AnimationController(
     value: _state.spyExpand ? 1 : 0,
@@ -127,6 +144,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _marketPotentialAnimationController.dispose();
     _spyAnimationController.dispose();
     _sensitivitySpaceAnimationController.dispose();
     _keyValuesAnimationController.dispose();
@@ -148,6 +166,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _collectedList,
+              _marketPotential,
               _spy,
               _sensitivitySpace,
               _keyValueList,
@@ -201,6 +220,57 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
 
     return Column(
       children: [
+        InkWell(
+          child: SizeTransition(
+            sizeFactor: _marketPotentialExpandAnimation,
+            axis: Axis.vertical,
+            child: SizeTransition(
+              sizeFactor: _marketPotentialExpandAnimation,
+              axis: Axis.horizontal,
+              child: ColoredBox(
+                color: Colors.yellowAccent.shade100,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      bottom: 8,
+                      left: 0,
+                      right: 0,
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          final state = ref.watch(marketPotentialStateProvider);
+                          final notifier =
+                              ref.read(marketPotentialStateProvider.notifier);
+                          final up = state.open > state.preHigh;
+                          return Tooltip(
+                            message:
+                                '今日較可能為${notifier.mayTrend ? '趨勢' : '盤整'}盤！',
+                            child: Icon(
+                              notifier.mayTrend
+                                  ? up
+                                      ? Icons.trending_up
+                                      : Icons.trending_down
+                                  : Icons.trending_flat,
+                              color: notifier.mayTrend
+                                  ? up
+                                      ? winColor
+                                      : loseColor
+                                  : null,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    verticalText('盤勢判斷'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          onTap: () {
+            _mainNotifier.marketPotentialExpand(!_state.marketPotentialExpand);
+            _marketPotentialAnimationController.forward();
+          },
+        ),
         InkWell(
           child: SizeTransition(
             sizeFactor: _spyExpandAnimation,
@@ -297,6 +367,33 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     );
   }
 
+  Widget get _marketPotential {
+    Widget content = Stack(
+      children: [
+        const MarketPotentialWidget(),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: IconButton(
+            onPressed: () {
+              _mainNotifier
+                  .marketPotentialExpand(!_state.marketPotentialExpand);
+              _marketPotentialAnimationController.reverse();
+            },
+            icon:
+                const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
+          ),
+        )
+      ],
+    );
+
+    return SizeTransition(
+      sizeFactor: _marketPotentialCollapseAnimation,
+      axis: Axis.horizontal,
+      child: content,
+    );
+  }
+
   Widget get _spy {
     Widget content = Stack(
       children: [
@@ -323,9 +420,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     );
   }
 
-
   Widget get _sensitivitySpace {
-
     Widget content = Stack(
       children: [
         const SensitivitySpaceWidget(),
@@ -339,7 +434,7 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
               _sensitivitySpaceAnimationController.reverse();
             },
             icon:
-            const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
+                const RotatedBox(quarterTurns: 1, child: Icon(Icons.compress)),
           ),
         )
       ],
@@ -475,5 +570,4 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       child: content,
     );
   }
-
 }

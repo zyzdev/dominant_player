@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:dominant_player/provider/current_tick_provider.dart';
+import 'package:dominant_player/provider/index_statistics_provider.dart';
+import 'package:dominant_player/provider/transaction_statistics_provider.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,7 +61,6 @@ class MainNotifier extends StateNotifier<MainState> {
     if (!kIsWeb) _initFetch(ref);
   }
 
-  /// 取得SPY價格
   Future<void> _initFetch(StateNotifierProviderRef ref) async {
     ref.listen(currentMonthProvider, (previous, currentMonth) {
       fetchCurrentMonthSymbolID(ref);
@@ -76,6 +77,11 @@ class MainNotifier extends StateNotifier<MainState> {
   bool get isWeekend {
     final now = DateTime.now().toUtc().add(const Duration(hours: 8));
     return now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
+  }
+
+  /// 盤勢判斷，是否展開
+  void marketPotentialExpand(bool expand) {
+    state = state.copyWith(marketPotentialExpand: expand);
   }
 
   /// Spy，是否展開

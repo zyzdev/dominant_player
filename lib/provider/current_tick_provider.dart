@@ -11,7 +11,7 @@ import 'current_price_provider.dart';
 
 final currentTickProvider = StateProvider<Tick>((ref) => Tick());
 
-final RestClient _restClient = RestClient.instance;
+final FutureClient _restClient = FutureClient.instance;
 
 /// 取得現價
 Future<void> fetchCurrentTick(StateNotifierProviderRef ref) async {

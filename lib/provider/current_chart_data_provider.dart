@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final currentChartProvider = StateProvider<Ticks>((ref) => Ticks());
 
-final RestClient _restClient = RestClient.instance;
+final FutureClient _restClient = FutureClient.instance;
 
 /// 取得走勢資料
 Future<void> fetchChartDate(StateNotifierProviderRef ref) async {

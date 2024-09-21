@@ -11,7 +11,7 @@ final currentMonthSymbolIdProvider = StateProvider<String>((ref) {
 });
 
 
-final RestClient _restClient = RestClient.instance;
+final FutureClient _restClient = FutureClient.instance;
 
 Future<void> fetchCurrentMonthSymbolID(StateNotifierProviderRef ref) async {
   String currentMonth = ref.read(currentMonthProvider);
