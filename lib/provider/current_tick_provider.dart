@@ -4,6 +4,7 @@ import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:dominant_player/provider/is_add_new_tick_provider.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:dominant_player/service/rest_client.dart';
+import 'package:dominant_player/util/util.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'current_price_provider.dart';
@@ -16,7 +17,9 @@ final RestClient _restClient = RestClient.instance;
 Future<void> fetchCurrentTick(StateNotifierProviderRef ref) async {
   String currentMonthSymbolID = ref.read(currentMonthSymbolIdProvider);
   final response = await _restClient.getCurrentPrice(currentMonthSymbolID);
-  if (!isHoliday()) {
+  final now = DateTime.now().toUtc().add(const Duration(hours: 8));
+  final myTime = DateTime(now.year, now.month, now.day + 2, 4, 0,0).toUtc().add(const Duration(hours: 8));
+  if (inTrade()) {
     Future.delayed(const Duration(seconds: 1), () {
       fetchCurrentTick(ref);
     });

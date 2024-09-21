@@ -65,20 +65,3 @@ bool isHoliday([DateTime? dateTime]) {
   return _holidays.contains(DateFormat('y-MM-dd').format(dateTime));
 }
 
-
-bool inTrade(DateTime dateTime, {bool isFuture = false}) {
-  if (isHoliday(dateTime)) return false;
-  final d = Duration(
-      hours: dateTime.hour, minutes: dateTime.minute, seconds: dateTime.second);
-  if (isFuture) {
-    const open = Duration(hours: 8, minutes: 45, seconds: 0);
-    const close = Duration(hours: 13, minutes: 45, seconds: 0);
-    if (d < open || d >= close) return false;
-  } else {
-    const open = Duration(hours: 9, minutes: 0, seconds: 0);
-    const close = Duration(hours: 13, minutes: 30, seconds: 0);
-    if (d < open || d >= close) return false;
-  }
-
-  return true;
-}
