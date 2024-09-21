@@ -54,16 +54,16 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
   Widget build(BuildContext context) {
     if (_state.kPeriod != null) {
       ref.watch(realTimeChartInfoProvider(_state.kPeriod!));
+      ref.listen(isAddNewTickProvider, (previous, next) {
+        if (_state.notice) {
+          _state.shouldNotice(
+            _realTimeChartInfo,
+            context,
+            ref,
+          );
+        }
+      });
     }
-    ref.listen(isAddNewTickProvider, (previous, next) {
-      if (_state.notice) {
-        _state.shouldNotice(
-          _realTimeChartInfo,
-          context,
-          ref,
-        );
-      }
-    });
 
     _kChartSizeFactor = 5 / (_state.kPeriod ?? 1);
     Widget content = Column(

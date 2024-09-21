@@ -20,12 +20,17 @@ part 'main_state.g.dart';
 @CopyWith()
 class MainState {
   MainState({
+    this.marketPotentialExpand = true,
     this.spyExpand = true,
     this.sensitivitySpaceExpand = true,
     this.keyValuesExpand = true,
     this.keyChartNoticeExpand = true,
     this.notificationWallExpand = true,
   });
+
+  /// 盤勢判斷是否展開
+  @JsonKey(defaultValue: true)
+  final bool marketPotentialExpand;
 
   /// SPY是否展開
   @JsonKey(defaultValue: true)

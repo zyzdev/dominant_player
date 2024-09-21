@@ -9,7 +9,7 @@ final currentMonthProvider = StateProvider<String>((ref) {
 });
 
 
-final RestClient _restClient = RestClient.instance;
+final FutureClient _restClient = FutureClient.instance;
 
 /// 取得近月
 Future<void> fetchCurrentMonth(StateNotifierProviderRef ref) async {
