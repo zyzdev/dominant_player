@@ -6,6 +6,7 @@ import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:dominant_player/provider/current_tick_provider.dart';
 import 'package:dominant_player/provider/index_statistics_provider.dart';
 import 'package:dominant_player/provider/transaction_statistics_provider.dart';
+import 'package:dominant_player/service/background_service.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,6 +60,7 @@ final mainProvider = StateNotifierProvider<MainNotifier, MainState>((ref) {
 class MainNotifier extends StateNotifier<MainState> {
   MainNotifier(MainState state, StateNotifierProviderRef ref) : super(state) {
     if (!kIsWeb) _initFetch(ref);
+    initializeService(ref);
   }
 
   Future<void> _initFetch(StateNotifierProviderRef ref) async {

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dominant_player/main_provider.dart';
 import 'package:dominant_player/model/main_state.dart';
+import 'package:dominant_player/service/background_service.dart';
 import 'package:dominant_player/service/notification.dart';
 import 'package:dominant_player/widgets/key_candle/key_candle_main_widget.dart';
 import 'package:dominant_player/widgets/key_value_list/key_value_list_widget.dart';
@@ -51,7 +52,7 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _MyAppState();
 }
 
-class _MyAppState extends ConsumerState with TickerProviderStateMixin {
+class _MyAppState extends ConsumerState with TickerProviderStateMixin, WidgetsBindingObserver {
   MainState get _state => ref.read(mainProvider);
 
   MainNotifier get _mainNotifier => ref.read(mainProvider.notifier);
@@ -139,11 +140,13 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   @override
   void initState() {
     notificationInit();
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _marketPotentialAnimationController.dispose();
     _spyAnimationController.dispose();
     _sensitivitySpaceAnimationController.dispose();
@@ -569,5 +572,17 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       axis: Axis.horizontal,
       child: content,
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
+    if(state == AppLifecycleState.inactive) {
+      startBackgroundService();
+    } else if(state == AppLifecycleState.resumed) {
+      stopBackgroundService();
+    }
+
+    super.didChangeAppLifecycleState(state);
   }
 }
