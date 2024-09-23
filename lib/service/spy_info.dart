@@ -10,38 +10,51 @@ import 'holiday_info.dart';
 Future<List<String>> fetchSpyPrice([bool isDay = true]) async {
   String spyDate(bool isDay) {
     DateTime spyDate = DateTime.now().toUtc().add(const Duration(hours: 8));
-    // 判斷使用日盤還是夜盤，時區必須一致
-    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
-    final nowYMD = DateTime(now.year, now.month, now.day).toUtc().add(const Duration(hours: 8));
-    DateTime dayStartTime = nowYMD.add(const Duration(hours: 8, minutes: 44, seconds: 59)); // 8:45
-    DateTime dayEndTime = nowYMD.add(const Duration(hours: 13, minutes: 45, seconds: 1)); // 13:45
-
-    DateTime nightStartTime =
-        nowYMD.add(const Duration(hours: 14, minutes: 59, seconds: 59)); // 15:00
-    DateTime nightEndTime = nowYMD.add(const Duration(days: 1, hours: 5, seconds: 1)); // 隔天凌晨五點
-
-    if (isDay) {
-      // 如果日盤已結束，用今天的，否則用上一次日盤的資料
-      if (spyDate.isBefore(dayEndTime)) spyDate = spyDate.subtract(const Duration(days: 1));
-    } else {
-      spyDate = spyDate.subtract(const Duration(days: 1));
-    }
     while (isHoliday(spyDate)) {
       spyDate = spyDate.subtract(const Duration(days: 1));
     }
+    // 判斷使用日盤還是夜盤，時區必須一致
+    final nowYMD = DateTime(spyDate.year, spyDate.month, spyDate.day)
+        .toUtc()
+        .add(const Duration(hours: 8));
+    DateTime dayStartTime = nowYMD
+        .add(const Duration(hours: 8, minutes: 44, seconds: 59))
+        .toUtc()
+        .add(const Duration(hours: 8)); // 8:45
+    DateTime dayEndTime = nowYMD
+        .add(const Duration(hours: 13, minutes: 45, seconds: 1))
+        .toUtc()
+        .add(const Duration(hours: 8)); // 13:45
 
+    DateTime nightStartTime = nowYMD
+        .add(const Duration(hours: 14, minutes: 59, seconds: 59))
+        .toUtc()
+        .add(const Duration(hours: 8)); // 15:00
+    DateTime nightEndTime = nowYMD
+        .add(const Duration(days: 1, hours: 5, seconds: 1))
+        .toUtc()
+        .add(const Duration(hours: 8)); // 隔天凌晨五點
+
+    if (isDay) {
+      // 如果日盤已結束，用今天的，否則用上一次日盤的資料
+      if (spyDate.isBefore(dayEndTime)) {
+        spyDate = spyDate.subtract(const Duration(days: 1));
+      }
+    }
+    print('isDay:$isDay, $spyDate');
     return DateFormat('yyyy/MM/dd').format(spyDate);
   }
 
-  final response =
-      await Client().post(Uri.parse('https://www.taifex.com.tw/cht/3/futDailyMarketReport'), body: {
-    'queryType': '2',
-    'marketCode': isDay ? '0' : '1',
-    'commodity_id': 'TX',
-    'queryDate': spyDate(isDay),
-    'MarketCode': '0',
-    'commodity_idt': 'TX'
-  });
+  final response = await Client().post(
+      Uri.parse('https://www.taifex.com.tw/cht/3/futDailyMarketReport'),
+      body: {
+        'queryType': '2',
+        'marketCode': isDay ? '0' : '1',
+        'commodity_id': 'TX',
+        'queryDate': spyDate(isDay),
+        'MarketCode': '0',
+        'commodity_idt': 'TX'
+      });
   String high = '';
   String low = '';
   if (response.statusCode == 200) {

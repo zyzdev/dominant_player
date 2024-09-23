@@ -66,10 +66,9 @@ class SpyMainNotifier extends StateNotifier<SpyState> {
   Future<void> _fetchSpyPrice() async {
     // 判斷是否需要夜盤資訊
     // 日盤和週末需要日盤和夜盤資訊
-    bool needNightSPY = isDay || isWeekend;
     await Future.wait([
       fetchSpyPrice(),
-      if (needNightSPY) fetchSpyPrice(false),
+      fetchSpyPrice(false),
     ]).then((value) {
       String dayHigh = value[0][0];
       String dayLow = value[0][1];
@@ -80,15 +79,13 @@ class SpyMainNotifier extends StateNotifier<SpyState> {
       daySpyHighController.text = dayHigh;
       daySpyLowController.text = dayLow;
       // 夜盤SPY
-      if (needNightSPY) {
-        String nightHigh = value[1][0];
-        String nightLow = value[1][1];
-        state = state.copyWith(
-            nightSpy: state.nightSpy.copyWith(
-                high: int.tryParse(nightHigh), low: int.tryParse(nightLow)));
-        nightSpyHighController.text = nightHigh;
-        nightSpyLowController.text = nightLow;
-      }
+      String nightHigh = value[1][0];
+      String nightLow = value[1][1];
+      state = state.copyWith(
+          nightSpy: state.nightSpy.copyWith(
+              high: int.tryParse(nightHigh), low: int.tryParse(nightLow)));
+      nightSpyHighController.text = nightHigh;
+      nightSpyLowController.text = nightLow;
     });
     // 計算下一次更新SPY的時間
     DateTime now = DateTime.now().toUtc().add(const Duration(hours: 8));

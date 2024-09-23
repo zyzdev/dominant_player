@@ -117,7 +117,7 @@ extension KeyChartStateController on KeyCandleState {
       if (realTimeChartInfo.allCandleInfo.length - 3 >= 0) {
         CandleInfo preCandleInfo = realTimeChartInfo
             .allCandleInfo[realTimeChartInfo.allCandleInfo.length - 3];
-        if (candleInfo.close - preCandleInfo.close >= longAttackPoint!) {
+        if (candleInfo.close - preCandleInfo.high >= longAttackPoint!) {
           debugPrint('======多方攻擊');
           debugPrint(preCandleInfo.toString());
           debugPrint(candleInfo.toString());
@@ -135,8 +135,7 @@ extension KeyChartStateController on KeyCandleState {
       if (realTimeChartInfo.allCandleInfo.length - 3 >= 0) {
         CandleInfo preCandleInfo = realTimeChartInfo
             .allCandleInfo[realTimeChartInfo.allCandleInfo.length - 3];
-        if (preCandleInfo.close - candleInfo.close - preCandleInfo.close >=
-            shortAttackPoint!) {
+        if (preCandleInfo.low - candleInfo.close >= shortAttackPoint!) {
           debugPrint('======空方攻擊');
           debugPrint(preCandleInfo.toString());
           debugPrint(candleInfo.toString());
