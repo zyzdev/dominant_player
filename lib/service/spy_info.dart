@@ -17,21 +17,18 @@ Future<List<String>> fetchSpyPrice([bool isDay = true]) async {
     final nowYMD = DateTime(spyDate.year, spyDate.month, spyDate.day)
         .toUtc()
         .add(const Duration(hours: 8));
-    DateTime dayStartTime = nowYMD
-        .add(const Duration(hours: 8, minutes: 44, seconds: 59))
+    DateTime dayStartTime = DateTime(spyDate.year, spyDate.month, spyDate.day, 8, 44, 59)
+
         .toUtc()
         .add(const Duration(hours: 8)); // 8:45
-    DateTime dayEndTime = nowYMD
-        .add(const Duration(hours: 13, minutes: 45, seconds: 1))
+    DateTime dayEndTime =  DateTime(spyDate.year, spyDate.month, spyDate.day, 13, 45, 1)
         .toUtc()
         .add(const Duration(hours: 8)); // 13:45
 
-    DateTime nightStartTime = nowYMD
-        .add(const Duration(hours: 14, minutes: 59, seconds: 59))
+    DateTime nightStartTime = DateTime(spyDate.year, spyDate.month, spyDate.day, 14, 59, 59)
         .toUtc()
         .add(const Duration(hours: 8)); // 15:00
-    DateTime nightEndTime = nowYMD
-        .add(const Duration(days: 1, hours: 5, seconds: 1))
+    DateTime nightEndTime = DateTime(spyDate.year, spyDate.month, spyDate.day+1, 5, 0, 1)
         .toUtc()
         .add(const Duration(hours: 8)); // 隔天凌晨五點
 
@@ -41,7 +38,6 @@ Future<List<String>> fetchSpyPrice([bool isDay = true]) async {
         spyDate = spyDate.subtract(const Duration(days: 1));
       }
     }
-    print('isDay:$isDay, $spyDate');
     return DateFormat('yyyy/MM/dd').format(spyDate);
   }
 
