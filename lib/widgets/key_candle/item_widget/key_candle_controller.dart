@@ -8,13 +8,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// [KeyChartState]是一個model
 /// [KeyChartStateController]主要是加入一些[KeyChartState]相關的業務邏輯
 extension KeyChartStateController on KeyCandleState {
-  void shouldNotice(
+  /// 回傳是否有推播
+  bool shouldNotice(
     RealTimeChartInfo realTimeChartInfo,
-    BuildContext context,
+    TriggerType triggerType,
     WidgetRef ref,
   ) {
-    CandleInfo? candleInfo = realTimeChartInfo.getLastFinishCandleInfo();
-    if (candleInfo == null) return;
+    CandleInfo? candleInfo = triggerType == TriggerType.onceInPeriod
+        ? realTimeChartInfo.currentCandleInfo
+        : realTimeChartInfo.getLastFinishCandleInfo();
+    if (candleInfo == null) return false;
     List<String> messages = [];
     if (considerVolume && keyVolume != null) {
       if (candleInfo.volume > keyVolume!) {
@@ -22,7 +25,7 @@ extension KeyChartStateController on KeyCandleState {
         String info = '成交量：${candleInfo.volume}';
         messages.add(info);
       } else if (volumeRequired) {
-        return;
+        return false;
       }
     }
     if (closeWithLongUpperShadow) {
@@ -33,7 +36,7 @@ extension KeyChartStateController on KeyCandleState {
         String info = '長上影';
         messages.add(info);
       } else if (closeWithLongUpperShadowRequired) {
-        return;
+        return false;
       }
     }
     if (closeWithLongLowerShadow) {
@@ -44,7 +47,7 @@ extension KeyChartStateController on KeyCandleState {
         String info = '長下影';
         messages.add(info);
       } else if (closeWithLongLowerShadowRequired) {
-        return;
+        return false;
       }
     }
 
@@ -76,7 +79,7 @@ extension KeyChartStateController on KeyCandleState {
             messages.add(info);
           }
         } else if (aTurnRequired) {
-          return;
+          return false;
         }
       }
     }
@@ -108,7 +111,7 @@ extension KeyChartStateController on KeyCandleState {
             messages.add(info);
           }
         } else if (vTurnRequired) {
-          return;
+          return false;
         }
       }
     }
@@ -126,7 +129,7 @@ extension KeyChartStateController on KeyCandleState {
           String info = '多方攻擊';
           messages.add(info);
         } else if (longAttackRequired) {
-          return;
+          return false;
         }
       }
     }
@@ -144,16 +147,17 @@ extension KeyChartStateController on KeyCandleState {
           debugPrint('shortAttackPoint:$shortAttackPoint');
           messages.add(info);
         } else if (shortAttackRequired) {
-          return;
+          return false;
         }
       }
     }
     if (messages.isNotEmpty) {
       messages.insert(0,
           '開：${candleInfo.open} 高：${candleInfo.high} 中：${candleInfo.middle} 低：${candleInfo.low} 量：${candleInfo.volume} 收：${candleInfo.close} ${'${candleInfo.closeToOpen > 0 ? '+' : ''}${candleInfo.closeToOpen}'}');
-      ref
-          .read(notificationWallStateProvider.notifier)
-          .pushNotification('關鍵K棒提醒！', messages);
+      ref.read(notificationWallStateProvider.notifier).pushNotification(
+          '${candleInfo.period}分K(${candleInfo.time}) ', messages);
+      return true;
     }
+    return false;
   }
 }

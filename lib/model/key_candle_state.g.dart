@@ -15,6 +15,8 @@ abstract class _$KeyCandleStateCWProxy {
 
   KeyCandleState notice(bool notice);
 
+  KeyCandleState triggerType(TriggerType triggerType);
+
   KeyCandleState keyVolume(int? keyVolume);
 
   KeyCandleState considerVolume(bool considerVolume);
@@ -70,6 +72,7 @@ abstract class _$KeyCandleStateCWProxy {
     int? kPeriod,
     bool? expand,
     bool? notice,
+    TriggerType? triggerType,
     int? keyVolume,
     bool? considerVolume,
     bool? volumeRequired,
@@ -111,6 +114,10 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
 
   @override
   KeyCandleState notice(bool notice) => this(notice: notice);
+
+  @override
+  KeyCandleState triggerType(TriggerType triggerType) =>
+      this(triggerType: triggerType);
 
   @override
   KeyCandleState keyVolume(int? keyVolume) => this(keyVolume: keyVolume);
@@ -206,6 +213,7 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
     Object? kPeriod = const $CopyWithPlaceholder(),
     Object? expand = const $CopyWithPlaceholder(),
     Object? notice = const $CopyWithPlaceholder(),
+    Object? triggerType = const $CopyWithPlaceholder(),
     Object? keyVolume = const $CopyWithPlaceholder(),
     Object? considerVolume = const $CopyWithPlaceholder(),
     Object? volumeRequired = const $CopyWithPlaceholder(),
@@ -245,6 +253,11 @@ class _$KeyCandleStateCWProxyImpl implements _$KeyCandleStateCWProxy {
           ? _value.notice
           // ignore: cast_nullable_to_non_nullable
           : notice as bool,
+      triggerType:
+          triggerType == const $CopyWithPlaceholder() || triggerType == null
+              ? _value.triggerType
+              // ignore: cast_nullable_to_non_nullable
+              : triggerType as TriggerType,
       keyVolume: keyVolume == const $CopyWithPlaceholder()
           ? _value.keyVolume
           // ignore: cast_nullable_to_non_nullable
@@ -368,6 +381,9 @@ KeyCandleState _$KeyCandleStateFromJson(Map<String, dynamic> json) =>
       kPeriod: json['kPeriod'] as int?,
       expand: json['expand'] as bool? ?? true,
       notice: json['notice'] as bool? ?? true,
+      triggerType:
+          $enumDecodeNullable(_$TriggerTypeEnumMap, json['triggerType']) ??
+              TriggerType.onClose,
       keyVolume: json['keyVolume'] as int?,
       considerVolume: json['considerVolume'] as bool? ?? false,
       volumeRequired: json['volumeRequired'] as bool? ?? false,
@@ -401,6 +417,7 @@ Map<String, dynamic> _$KeyCandleStateToJson(KeyCandleState instance) =>
       'kPeriod': instance.kPeriod,
       'expand': instance.expand,
       'notice': instance.notice,
+      'triggerType': _$TriggerTypeEnumMap[instance.triggerType]!,
       'keyVolume': instance.keyVolume,
       'considerVolume': instance.considerVolume,
       'volumeRequired': instance.volumeRequired,
@@ -425,3 +442,8 @@ Map<String, dynamic> _$KeyCandleStateToJson(KeyCandleState instance) =>
       'shortAttackPoint': instance.shortAttackPoint,
       'shortAttackRequired': instance.shortAttackRequired,
     };
+
+const _$TriggerTypeEnumMap = {
+  TriggerType.onClose: 'onClose',
+  TriggerType.onceInPeriod: 'onceInPeriod',
+};

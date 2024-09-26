@@ -86,7 +86,13 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     } else {
       _saveState();
     }
+  }
 
+  /// 觸發時機
+  void setTriggerType(TriggerType triggerType, KeyCandleState state) {
+    int index = this.state.indexOf(state);
+    this.state[index] = state.copyWith(triggerType: triggerType);
+    this.state = List.of(this.state);
   }
 
   /// 是否考慮成交量
