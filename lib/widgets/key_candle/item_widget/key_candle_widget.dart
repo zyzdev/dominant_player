@@ -50,15 +50,31 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
   late final TextEditingController shortAttackPointController =
       TextEditingController(text: _state.shortAttackPoint?.toString() ?? '');
 
+  bool _justNotification = false;
+
   @override
   Widget build(BuildContext context) {
     if (_state.kPeriod != null) {
       ref.watch(realTimeChartInfoProvider(_state.kPeriod!));
-      ref.listen(isAddNewTickProvider, (previous, next) {
-        if (_state.notice) {
-          _state.shouldNotice(
+      ref.listen(realTimeChartInfoProvider(_state.kPeriod!), (previous, next) {
+        if (_state.notice &&
+            _state.triggerType == TriggerType.onceInPeriod && !_justNotification) {
+          _justNotification = _state.shouldNotice(
             _realTimeChartInfo,
-            context,
+            _state.triggerType,
+            ref,
+          );
+        }
+      },);
+      ref.listen(isAddNewTickProvider, (previous, next) {
+        if(_realTimeChartInfo.periodJustFinish) {
+          // 重製推播過的狀態
+          _justNotification = false;
+        }
+        if (_state.notice && _state.triggerType == TriggerType.onClose) {
+          _justNotification = _state.shouldNotice(
+            _realTimeChartInfo,
+            _state.triggerType,
             ref,
           );
         }
@@ -76,10 +92,13 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
           child: SizedBox(
               height: _state.expand ? null : 0,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_dataIsReady) ...[
                     const SizedBox(height: 16),
-                    valuesInfo(_realTimeChartInfo.allCandleInfo.last),
+                    triggerSelector(_realTimeChartInfo.currentCandleInfo),
+                    const SizedBox(height: 16),
+                    valuesInfo(_realTimeChartInfo.currentCandleInfo),
                     const SizedBox(height: 16),
                     //chart(_realTimeChartInfo.allChartInfo.last),
                     //charts,
@@ -268,6 +287,31 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
   double _kChartSizeFactor = 0;
   static const double _kChartWidth = 30;
 
+  Widget triggerSelector(CandleInfo candleInfo) {
+    return Wrap(
+      spacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text('觸發時機:', style: captionST),
+        ...TriggerType.values.map((triggerType) {
+          bool selected = triggerType == _state.triggerType;
+          return ChoiceChip(
+            selectedColor: Colors.blueAccent.withOpacity(0.3),
+            backgroundColor: Colors.grey.shade300,
+            label: Text(
+              triggerType.title,
+              style: const TextStyle(color: Colors.black87),
+            ),
+            selected: selected,
+            onSelected: (bool selected) {
+              _notifier.setTriggerType(triggerType, _state);
+            },
+          );
+        }).toList()
+      ],
+    );
+  }
+
   Widget valuesInfo(CandleInfo candleInfo) {
     int closeToOpen = candleInfo.closeToOpen;
     Color valueColor = closeToOpen > 0
@@ -294,12 +338,20 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        Text(candleInfo.time, style: captionST),
+        const SizedBox(width: 8),
         tile('開', candleInfo.open.toString()),
+        const SizedBox(width: 8),
         tile('高', candleInfo.high.toString()),
+        const SizedBox(width: 8),
         tile('中', candleInfo.middle.toString()),
+        const SizedBox(width: 8),
         tile('低', candleInfo.low.toString()),
+        const SizedBox(width: 8),
         tile('收', candleInfo.close.toString()),
+        const SizedBox(width: 8),
         tile('量', candleInfo.volume.toString()),
+        const SizedBox(width: 8),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -599,13 +651,9 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
           _notifier.setVTurnRequired(!_state.vTurnRequired, _state);
         }),
         const SizedBox(width: 8),
-        _actionChip(
-            _state.vTurnAtLow,
-                () {
-              _notifier.setVTurnAtLow(!_state.vTurnAtLow, _state);
-            },
-            "今低"
-        ),
+        _actionChip(_state.vTurnAtLow, () {
+          _notifier.setVTurnAtLow(!_state.vTurnAtLow, _state);
+        }, "今低"),
         const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
@@ -746,7 +794,15 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
       ),
     );
   }
+}
 
-  @override
-  bool get wantKeepAlive => true;
+extension TriggerTypeName on TriggerType {
+  String get title {
+    switch (this) {
+      case TriggerType.onClose:
+        return '收盤';
+      case TriggerType.onceInPeriod:
+        return '每跟K棒一次';
+    }
+  }
 }

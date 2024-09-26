@@ -18,6 +18,9 @@ class KeyCandleState {
   /// 是否開啟推播
   final bool notice;
 
+  /// 觸發時機
+  TriggerType triggerType;
+
   /// 關鍵量
   final int? keyVolume;
   final bool considerVolume;
@@ -67,6 +70,7 @@ class KeyCandleState {
     this.kPeriod,
     this.expand = true,
     this.notice = true,
+    this.triggerType = TriggerType.onClose,
     this.keyVolume,
     this.considerVolume = false,
     this.volumeRequired = false,
@@ -95,4 +99,9 @@ class KeyCandleState {
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$KeyCandleStateToJson(this);
+}
+
+enum TriggerType {
+  onClose,      // 收盤才觸發
+  onceInPeriod  // 一個週期一次，有達標就觸發
 }

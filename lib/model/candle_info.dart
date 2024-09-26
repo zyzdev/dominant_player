@@ -46,6 +46,8 @@ class CandleInfo {
   /// 是否收長下影
   late bool isCloseWithLongLowerShadow = lowerShadowDis > bodyLength * 2 && lowerShadowDis > upperShadowDis;
 
+  late String time = '${startTime.substring(0, 2)}:${startTime.substring(2, 4)}';
+
   CandleInfo({
     required this.period,
     required this.open,

@@ -33,6 +33,11 @@ class RealTimeChartInfo with ChartUtil {
       .map((e) => e.high)
       .reduce((value, element) => value > element ? value : element);
 
+  /// 判斷是否剛完成一個K棒
+  bool get periodJustFinish {
+    return allTicks.length % xPeriod == 1 || xPeriod == 1;
+  }
+
   void _updateAllCandleInfo() {
     CandleInfo getCandleInfo(List<List<String>> considerTicks) {
       int open = double.parse(tickOpen(considerTicks.first)).toInt();
@@ -87,9 +92,12 @@ class RealTimeChartInfo with ChartUtil {
     closeToOpenDis = curClose - curOpen;
   }
 
+  CandleInfo get currentCandleInfo => allCandleInfo.last;
+
   CandleInfo? getLastFinishCandleInfo() {
-    if (allCandleInfo.length > 1)
+    if (allCandleInfo.length > 1) {
       return allCandleInfo[allCandleInfo.length - 2];
+    }
     return null;
   }
 
