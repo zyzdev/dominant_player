@@ -18,6 +18,10 @@ extension KeyChartStateController on KeyCandleState {
         ? realTimeChartInfo.currentCandleInfo
         : realTimeChartInfo.getLastFinishCandleInfo();
     if (candleInfo == null) return false;
+    CandleInfo preCandleInfo = triggerType == TriggerType.onceInPeriod
+        ? realTimeChartInfo.getLastFinishCandleInfo()!
+        : realTimeChartInfo
+        .allCandleInfo[realTimeChartInfo.allCandleInfo.length - 3];
     List<String> messages = [];
     if (considerVolume && keyVolume != null) {
       if (candleInfo.volume > keyVolume!) {
@@ -118,8 +122,6 @@ extension KeyChartStateController on KeyCandleState {
 
     if (longAttack && longAttackPoint != null) {
       if (realTimeChartInfo.allCandleInfo.length - 3 >= 0) {
-        CandleInfo preCandleInfo = realTimeChartInfo
-            .allCandleInfo[realTimeChartInfo.allCandleInfo.length - 3];
         if (candleInfo.close - preCandleInfo.high >= longAttackPoint!) {
           debugPrint('======多方攻擊');
           debugPrint(preCandleInfo.toString());
@@ -136,8 +138,6 @@ extension KeyChartStateController on KeyCandleState {
 
     if (shortAttack && shortAttackPoint != null) {
       if (realTimeChartInfo.allCandleInfo.length - 3 >= 0) {
-        CandleInfo preCandleInfo = realTimeChartInfo
-            .allCandleInfo[realTimeChartInfo.allCandleInfo.length - 3];
         if (preCandleInfo.low - candleInfo.close >= shortAttackPoint!) {
           debugPrint('======空方攻擊');
           debugPrint(preCandleInfo.toString());
@@ -155,7 +155,7 @@ extension KeyChartStateController on KeyCandleState {
       messages.insert(0,
           '開：${candleInfo.open} 高：${candleInfo.high} 中：${candleInfo.middle} 低：${candleInfo.low} 量：${candleInfo.volume} 收：${candleInfo.close} ${'${candleInfo.closeToOpen > 0 ? '+' : ''}${candleInfo.closeToOpen}'}');
       ref.read(notificationWallStateProvider.notifier).pushNotification(
-          '${candleInfo.period}分K(${candleInfo.time}) ', messages);
+          '$title - $kPeriod分K(${candleInfo.time}) ', messages);
       return true;
     }
     return false;
