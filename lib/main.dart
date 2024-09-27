@@ -23,12 +23,6 @@ Future<void> main() async {
   if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) {
     // Must add this line.
     await windowManager.ensureInitialized();
-    windowManager.waitUntilReadyToShow(
-      const WindowOptions(),
-      () {
-        windowManager.setTitle('絕對主力邏輯助手');
-      },
-    );
   }
   if (Platform.isAndroid || Platform.isIOS) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
@@ -51,7 +45,8 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _MyAppState();
 }
 
-class _MyAppState extends ConsumerState with TickerProviderStateMixin {
+class _MyAppState extends ConsumerState
+    with TickerProviderStateMixin, WindowListener {
   MainState get _state => ref.read(mainProvider);
 
   MainNotifier get _mainNotifier => ref.read(mainProvider.notifier);
@@ -139,6 +134,26 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
   @override
   void initState() {
     notificationInit();
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) {
+      windowManager.addListener(this);
+      windowManager.waitUntilReadyToShow(
+        WindowOptions(
+          fullScreen: _state.fullScreen,
+          size: _state.screenWidth != null && _state.screenHeight != null
+              ? Size(_state.screenWidth!, _state.screenHeight!)
+              : null,
+        ),
+        () {
+          windowManager.setTitle('絕對主力邏輯助手');
+          if (_state.screenX != null && _state.screenY != null) {
+            windowManager.setPosition(
+              Offset(_state.screenX!, _state.screenY!),
+              animate: true,
+            );
+          }
+        },
+      );
+    }
     super.initState();
   }
 
@@ -150,6 +165,9 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
     _keyValuesAnimationController.dispose();
     _keyChartNoticeAnimationController.dispose();
     _notificationWallAnimationController.dispose();
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) {
+      windowManager.removeListener(this);
+    }
     super.dispose();
   }
 
@@ -569,5 +587,29 @@ class _MyAppState extends ConsumerState with TickerProviderStateMixin {
       axis: Axis.horizontal,
       child: content,
     );
+  }
+
+  @override
+  void onWindowResized() {
+    windowManager.getSize().then(_mainNotifier.setScreenSize);
+    super.onWindowResized();
+  }
+
+  @override
+  void onWindowEnterFullScreen() {
+    _mainNotifier.setFullScreen(true);
+    super.onWindowEnterFullScreen();
+  }
+
+  @override
+  void onWindowLeaveFullScreen() {
+    _mainNotifier.setFullScreen(false);
+    super.onWindowLeaveFullScreen();
+  }
+
+  @override
+  void onWindowMoved() {
+    windowManager.getPosition().then(_mainNotifier.setScreenPosition);
+    super.onWindowMoved();
   }
 }

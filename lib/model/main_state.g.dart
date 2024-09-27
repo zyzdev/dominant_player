@@ -7,6 +7,16 @@ part of 'main_state.dart';
 // **************************************************************************
 
 abstract class _$MainStateCWProxy {
+  MainState fullScreen(bool fullScreen);
+
+  MainState screenWidth(double? screenWidth);
+
+  MainState screenHeight(double? screenHeight);
+
+  MainState screenX(double? screenX);
+
+  MainState screenY(double? screenY);
+
   MainState marketPotentialExpand(bool marketPotentialExpand);
 
   MainState spyExpand(bool spyExpand);
@@ -26,6 +36,11 @@ abstract class _$MainStateCWProxy {
   /// MainState(...).copyWith(id: 12, name: "My name")
   /// ````
   MainState call({
+    bool? fullScreen,
+    double? screenWidth,
+    double? screenHeight,
+    double? screenX,
+    double? screenY,
     bool? marketPotentialExpand,
     bool? spyExpand,
     bool? sensitivitySpaceExpand,
@@ -40,6 +55,22 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
   const _$MainStateCWProxyImpl(this._value);
 
   final MainState _value;
+
+  @override
+  MainState fullScreen(bool fullScreen) => this(fullScreen: fullScreen);
+
+  @override
+  MainState screenWidth(double? screenWidth) => this(screenWidth: screenWidth);
+
+  @override
+  MainState screenHeight(double? screenHeight) =>
+      this(screenHeight: screenHeight);
+
+  @override
+  MainState screenX(double? screenX) => this(screenX: screenX);
+
+  @override
+  MainState screenY(double? screenY) => this(screenY: screenY);
 
   @override
   MainState marketPotentialExpand(bool marketPotentialExpand) =>
@@ -73,6 +104,11 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
   /// MainState(...).copyWith(id: 12, name: "My name")
   /// ````
   MainState call({
+    Object? fullScreen = const $CopyWithPlaceholder(),
+    Object? screenWidth = const $CopyWithPlaceholder(),
+    Object? screenHeight = const $CopyWithPlaceholder(),
+    Object? screenX = const $CopyWithPlaceholder(),
+    Object? screenY = const $CopyWithPlaceholder(),
     Object? marketPotentialExpand = const $CopyWithPlaceholder(),
     Object? spyExpand = const $CopyWithPlaceholder(),
     Object? sensitivitySpaceExpand = const $CopyWithPlaceholder(),
@@ -81,6 +117,27 @@ class _$MainStateCWProxyImpl implements _$MainStateCWProxy {
     Object? notificationWallExpand = const $CopyWithPlaceholder(),
   }) {
     return MainState(
+      fullScreen:
+          fullScreen == const $CopyWithPlaceholder() || fullScreen == null
+              ? _value.fullScreen
+              // ignore: cast_nullable_to_non_nullable
+              : fullScreen as bool,
+      screenWidth: screenWidth == const $CopyWithPlaceholder()
+          ? _value.screenWidth
+          // ignore: cast_nullable_to_non_nullable
+          : screenWidth as double?,
+      screenHeight: screenHeight == const $CopyWithPlaceholder()
+          ? _value.screenHeight
+          // ignore: cast_nullable_to_non_nullable
+          : screenHeight as double?,
+      screenX: screenX == const $CopyWithPlaceholder()
+          ? _value.screenX
+          // ignore: cast_nullable_to_non_nullable
+          : screenX as double?,
+      screenY: screenY == const $CopyWithPlaceholder()
+          ? _value.screenY
+          // ignore: cast_nullable_to_non_nullable
+          : screenY as double?,
       marketPotentialExpand:
           marketPotentialExpand == const $CopyWithPlaceholder() ||
                   marketPotentialExpand == null
@@ -129,6 +186,11 @@ extension $MainStateCopyWith on MainState {
 // **************************************************************************
 
 MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
+      fullScreen: json['fullScreen'] as bool? ?? false,
+      screenWidth: (json['screenWidth'] as num?)?.toDouble(),
+      screenHeight: (json['screenHeight'] as num?)?.toDouble(),
+      screenX: (json['screenX'] as num?)?.toDouble(),
+      screenY: (json['screenY'] as num?)?.toDouble(),
       marketPotentialExpand: json['marketPotentialExpand'] as bool? ?? true,
       spyExpand: json['spyExpand'] as bool? ?? true,
       sensitivitySpaceExpand: json['sensitivitySpaceExpand'] as bool? ?? true,
@@ -138,6 +200,11 @@ MainState _$MainStateFromJson(Map<String, dynamic> json) => MainState(
     );
 
 Map<String, dynamic> _$MainStateToJson(MainState instance) => <String, dynamic>{
+      'fullScreen': instance.fullScreen,
+      'screenWidth': instance.screenWidth,
+      'screenHeight': instance.screenHeight,
+      'screenX': instance.screenX,
+      'screenY': instance.screenY,
       'marketPotentialExpand': instance.marketPotentialExpand,
       'spyExpand': instance.spyExpand,
       'sensitivitySpaceExpand': instance.sensitivitySpaceExpand,

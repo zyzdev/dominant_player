@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -20,6 +22,11 @@ part 'main_state.g.dart';
 @CopyWith()
 class MainState {
   MainState({
+    this.fullScreen = false,
+    this.screenWidth,
+    this.screenHeight,
+    this.screenX,
+    this.screenY,
     this.marketPotentialExpand = true,
     this.spyExpand = true,
     this.sensitivitySpaceExpand = true,
@@ -27,6 +34,22 @@ class MainState {
     this.keyChartNoticeExpand = true,
     this.notificationWallExpand = true,
   });
+
+  /// 是否全螢幕，desktop only
+  @JsonKey(defaultValue: false)
+  final bool fullScreen;
+  
+  /// 螢幕尺寸寬度，desktop only
+  final double? screenWidth;
+
+  /// 螢幕尺寸高度，desktop only
+  final double? screenHeight;
+
+  /// 螢幕位置x，desktop only
+  final double? screenX;
+
+  /// 螢幕位置y，desktop only
+  final double? screenY;
 
   /// 盤勢判斷是否展開
   @JsonKey(defaultValue: true)

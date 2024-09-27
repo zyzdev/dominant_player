@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:dominant_player/provider/current_month_symbol_id_provider.dart';
 import 'package:dominant_player/provider/current_tick_provider.dart';
-import 'package:dominant_player/provider/index_statistics_provider.dart';
-import 'package:dominant_player/provider/transaction_statistics_provider.dart';
 import 'package:dominant_player/service/holiday_info.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,6 +76,37 @@ class MainNotifier extends StateNotifier<MainState> {
   bool get isWeekend {
     final now = DateTime.now().toUtc().add(const Duration(hours: 8));
     return now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
+  }
+
+  /// 是否全螢幕
+  void setFullScreen(bool fullScreen) {
+    prefs.setString(
+        _statsKey, jsonEncode(state.copyWith(fullScreen: fullScreen).toJson()));
+  }
+
+  /// 螢幕尺寸
+  void setScreenSize(Size screenSize) {
+    prefs.setString(
+        _statsKey,
+        jsonEncode(state
+            .copyWith(
+              screenWidth: screenSize.width,
+              screenHeight: screenSize.height,
+            )
+            .toJson()));
+  }
+
+  /// 螢幕位置
+  void setScreenPosition(Offset position) {
+    print(position);
+    prefs.setString(
+        _statsKey,
+        jsonEncode(state
+            .copyWith(
+              screenX: position.dx,
+              screenY: position.dy,
+            )
+            .toJson()));
   }
 
   /// 盤勢判斷，是否展開
