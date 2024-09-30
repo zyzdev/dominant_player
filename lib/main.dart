@@ -184,7 +184,7 @@ class _MyAppState extends ConsumerState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _collectedList,
-              _marketPotential,
+              //_marketPotential,
               _spy,
               _sensitivitySpace,
               _keyValueList,
@@ -238,7 +238,7 @@ class _MyAppState extends ConsumerState
 
     return Column(
       children: [
-        InkWell(
+/*        InkWell(
           child: SizeTransition(
             sizeFactor: _marketPotentialExpandAnimation,
             axis: Axis.vertical,
@@ -288,7 +288,7 @@ class _MyAppState extends ConsumerState
             _mainNotifier.marketPotentialExpand(!_state.marketPotentialExpand);
             _marketPotentialAnimationController.forward();
           },
-        ),
+        ),*/
         InkWell(
           child: SizeTransition(
             sizeFactor: _spyExpandAnimation,

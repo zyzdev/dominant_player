@@ -81,11 +81,7 @@ class KeyCandleMainWidgetNotifier extends StateNotifier<List<KeyCandleState>> {
     if (p == null) return;
     if (p <= 0) return;
     this.state[index] = state.copyWith(kPeriod: p);
-    if(state.kPeriod == null) {
-      this.state = List.of(this.state);
-    } else {
-      _saveState();
-    }
+    _saveState();
   }
 
   /// 觸發時機
