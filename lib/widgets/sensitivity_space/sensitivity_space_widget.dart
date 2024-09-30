@@ -27,7 +27,6 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
   @override
   Widget build(BuildContext context) {
     ref.watch(sensitivitySpaceStateNotifierProvider);
-    double height = MediaQuery.of(context).size.height;
     Widget content = ValueListenableBuilder<double>(
       valueListenable: _sensitivitySpaceWidth,
       builder: (context, width, child) {
@@ -43,8 +42,9 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
               )
             : ConstrainedBox(
                 constraints: BoxConstraints(
-                    maxWidth: _sensitivitySpaceWidth.value, maxHeight: height),
+                    maxWidth: _sensitivitySpaceWidth.value),
                 child: ReorderableListView(
+                  physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   buildDefaultDragHandles: false,
                   onReorder: _notifier.exchangeSensitivitySpaceWidgetIndex,
@@ -364,6 +364,7 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
                     )),
             const SizedBox(height: 16),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 OutlinedButton.icon(
                   icon: Icon(

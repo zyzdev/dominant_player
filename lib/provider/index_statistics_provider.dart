@@ -24,7 +24,6 @@ Future<void> fetchIndexStatistics(StateNotifierProviderRef ref) async {
       });
     }
 
-    print(response.curTaiexIndex);
     // 更新
     ref
         .read(indexStatisticsResponseProvider.notifier)

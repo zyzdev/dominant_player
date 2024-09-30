@@ -10,8 +10,7 @@ class KeyCandleMainWidget extends ConsumerStatefulWidget {
   const KeyCandleMainWidget({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _KeyCandleMainWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _KeyCandleMainWidgetState();
 }
 
 class _KeyCandleMainWidgetState extends ConsumerState {
@@ -31,14 +30,12 @@ class _KeyCandleMainWidgetState extends ConsumerState {
             ),
           ),
         ConstrainedBox(
-          constraints: BoxConstraints(
-              maxWidth: 700, maxHeight: height),
+          constraints: BoxConstraints(maxWidth: 700),
           child: ReorderableListView(
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             buildDefaultDragHandles: false,
-            onReorder: ref
-                .read(keyCandleMainWidgetProvider.notifier)
-                .exchangeWidgetIndex,
+            onReorder: ref.read(keyCandleMainWidgetProvider.notifier).exchangeWidgetIndex,
             children: [
               for (int i = 0; i < state.length; i++)
                 KeyCandleWidget(
@@ -58,8 +55,7 @@ class _KeyCandleMainWidgetState extends ConsumerState {
             ref.read(keyCandleMainWidgetProvider.notifier).addKeyChart();
           },
           style: OutlinedButton.styleFrom(
-              backgroundColor: Colors.white,
-              side: const BorderSide(color: Colors.lightBlueAccent)),
+              backgroundColor: Colors.white, side: const BorderSide(color: Colors.lightBlueAccent)),
           label: const Text('新增自定義關鍵價'),
         ),
         const SizedBox(height: 16),
@@ -67,8 +63,7 @@ class _KeyCandleMainWidgetState extends ConsumerState {
     );
 
     return Container(
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300, width: 1)),
+      decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300, width: 1)),
       child: content,
     );
   }

@@ -98,7 +98,6 @@ class MainNotifier extends StateNotifier<MainState> {
 
   /// 螢幕位置
   void setScreenPosition(Offset position) {
-    print(position);
     prefs.setString(
         _statsKey,
         jsonEncode(state

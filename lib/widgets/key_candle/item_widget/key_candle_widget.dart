@@ -203,7 +203,9 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
                   hint: '請輸入分鐘',
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   onChanged: (value) {
-                    _notifier.setPeriod(value, _state);
+                    setState(() {
+                      _notifier.setPeriod(value, _state);
+                    });
                   },
                   keyboardType: TextInputType.number,
                 ),
