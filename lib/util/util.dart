@@ -32,7 +32,7 @@ bool inDayTrade({DateTime? dateTime, bool isFuture = false}) {
 bool inNightTrade({DateTime? dateTime}) {
   dateTime ??= DateTime.now().toUtc().add(const Duration(hours: 8));
   late DateTime refTime;
-  if (dateTime.weekday == DateTime.saturday) {
+  if (dateTime.weekday == DateTime.saturday || (dateTime.weekday != DateTime.saturday && dateTime.weekday != DateTime.saturday && isHoliday(dateTime))) {
     refTime = dateTime.subtract(const Duration(days: 1));
     if (isHoliday(refTime)) return false;
   } else {
