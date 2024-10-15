@@ -50,16 +50,6 @@ class RtData {
   String get curClose => ticks.length > 1 ?  ticks[1][4] : preClose;
   String get curVolume =>  ticks.length > 1 ? ticks[1][5] : preVolume;
   factory RtData.fromJson(Map<String, dynamic> json) {
-/*    int close = double.parse((json['Ticks'] as List<dynamic>)[1][4]).toInt();
-    int high = double.parse((json['Ticks'] as List<dynamic>)[1][2]).toInt();
-    int low = double.parse((json['Ticks'] as List<dynamic>)[1][3]).toInt();
-    close += 10;
-    // close += Random().nextInt(50) * (Random().nextBool() ? 1 : -1);
-    json['Ticks'][1][4] = close.toString();
-    if(close > high) json['Ticks'][1][2] = close.toString();
-    if(close < low) json['Ticks'][1][3] = close.toString();
-    DateTime now = DateTime.now();*/
-    //json['Ticks'][1][0] = DateFormat('hhmmss').format(now);
   return _$RtDataFromJson(json);
   }
 
