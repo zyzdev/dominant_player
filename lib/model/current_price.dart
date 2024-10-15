@@ -43,12 +43,12 @@ class RtData {
   String get preVolume => ticks[0][5];
 
 
-  String get curTime => ticks[1][0];
-  String get curOpen => ticks[1][1];
-  String get curHigh => ticks[1][2];
-  String get curLow => ticks[1][3];
-  String get curClose => ticks[1][4];
-  String get curVolume => ticks[1][5];
+  String get curTime => ticks.length > 1 ? ticks[1][0] : preTime;
+  String get curOpen =>  ticks.length > 1 ? ticks[1][1] : preOpen;
+  String get curHigh => ticks.length > 1 ?  ticks[1][2] : preHigh;
+  String get curLow =>  ticks.length > 1 ? ticks[1][3] : preLow;
+  String get curClose => ticks.length > 1 ?  ticks[1][4] : preClose;
+  String get curVolume =>  ticks.length > 1 ? ticks[1][5] : preVolume;
   factory RtData.fromJson(Map<String, dynamic> json) {
 /*    int close = double.parse((json['Ticks'] as List<dynamic>)[1][4]).toInt();
     int high = double.parse((json['Ticks'] as List<dynamic>)[1][2]).toInt();
