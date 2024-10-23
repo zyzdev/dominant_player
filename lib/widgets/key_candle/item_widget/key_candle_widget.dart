@@ -238,7 +238,7 @@ class _KeyCandleWidgetState extends ConsumerState<KeyCandleWidget> {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        confirmDialog(_state.title, context).then((remove) {
+                        deleteConfirmDialog(_state.title, context).then((remove) {
                           if (remove == true) {
                             _notifier.removeKeyChart(_state);
                           }

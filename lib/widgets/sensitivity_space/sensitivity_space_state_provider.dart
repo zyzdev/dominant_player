@@ -49,6 +49,25 @@ class SensitivitySpaceMainNotifier
     state = state.copyWith(sensitivitySpaceWidgetIndex: newOrder);
   }
 
+  /// 日盤靈敏度空間，是否可清除靈敏度空間
+  bool get daySensitivitySpaceCanBeCleared {
+    return state.daySensitivitySpace15.longHigh != null ||
+        state.daySensitivitySpace15.longLow != null ||
+        state.daySensitivitySpace15.shortHigh != null ||
+        state.daySensitivitySpace15.shortLow != null ||
+        state.daySensitivitySpace30.longHigh != null ||
+        state.daySensitivitySpace30.longLow != null ||
+        state.daySensitivitySpace30.shortHigh != null ||
+        state.daySensitivitySpace30.shortLow != null;
+  }
+  /// 日盤靈敏度空間，清除靈敏度空間
+  void daySensitivitySpaceClear() {
+    state = state.copyWith(
+      daySensitivitySpace15: SensitivitySpace(),
+      daySensitivitySpace30: SensitivitySpace(),
+    );
+  }
+
   /// 日盤靈敏度空間，是否展開
   void daySensitivitySpaceExpand(bool expand) {
     state = state.copyWith(daySensitivitySpaceExpand: expand);
@@ -110,6 +129,24 @@ class SensitivitySpaceMainNotifier
             .copyWith(shortLow: int.tryParse(value)));
   }
 
+  /// 夜盤靈敏度空間，是否可清除靈敏度空間
+  bool get nightSensitivitySpaceCanBeCleared {
+    return state.nightSensitivitySpace15.longHigh != null ||
+        state.nightSensitivitySpace15.longLow != null ||
+        state.nightSensitivitySpace15.shortHigh != null ||
+        state.nightSensitivitySpace15.shortLow != null ||
+        state.nightSensitivitySpace30.longHigh != null ||
+        state.nightSensitivitySpace30.longLow != null ||
+        state.nightSensitivitySpace30.shortHigh != null ||
+        state.nightSensitivitySpace30.shortLow != null;
+  }
+  /// 夜盤靈敏度空間，清除靈敏度空間
+  void nightSensitivitySpaceClear() {
+    state = state.copyWith(
+      nightSensitivitySpace15: SensitivitySpace(),
+      nightSensitivitySpace30: SensitivitySpace(),
+    );
+  }
   /// 夜盤靈敏度空間，是否展開
   void nightSensitivitySpaceExpand(bool expand) {
     state = state.copyWith(nightSensitivitySpaceExpand: expand);

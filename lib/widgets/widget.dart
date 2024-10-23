@@ -169,7 +169,7 @@ Widget textField({
 }
 
 
-Future<bool?> confirmDialog(String title,BuildContext context) async {
+Future<bool?> deleteConfirmDialog(String title,BuildContext context) async {
   return showDialog<bool>(
     context: context,
     barrierDismissible: false,
@@ -203,6 +203,52 @@ Future<bool?> confirmDialog(String title,BuildContext context) async {
           TextButton(
             child: Text(
               "刪除",
+              style: infoST.copyWith(color: Colors.red),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<bool?> clearConfirmDialog(String title,BuildContext context) async {
+  return showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(
+          "再次確認",
+          style: titleST,
+        ),
+        content: Text.rich(
+          TextSpan(style: infoST, children: [
+            const TextSpan(text: '您確定要清除"'),
+            TextSpan(
+                text: title,
+                style: infoST.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.lightBlue,
+                )),
+            const TextSpan(text: '"嗎？'),
+          ]),
+          style: infoST,
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text(
+              "取消",
+              style: infoST,
+            ),
+            onPressed: () => Navigator.of(context).pop(), // 关闭对话框
+          ),
+          TextButton(
+            child: Text(
+              "清除",
               style: infoST.copyWith(color: Colors.red),
             ),
             onPressed: () {

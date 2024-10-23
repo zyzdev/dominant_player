@@ -24,6 +24,10 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
 
   final ValueNotifier<double> _sensitivitySpaceWidth = ValueNotifier(0);
 
+  /// 用來清除數值
+  Key _daySensitivitySpaceKey = const Key('');
+  Key _nightSensitivitySpaceKey = const Key('');
+
   @override
   Widget build(BuildContext context) {
     ref.watch(sensitivitySpaceStateNotifierProvider);
@@ -41,8 +45,8 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
                 ],
               )
             : ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxWidth: _sensitivitySpaceWidth.value),
+                constraints:
+                    BoxConstraints(maxWidth: _sensitivitySpaceWidth.value),
                 child: ReorderableListView(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
@@ -122,12 +126,14 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
   }
 
   Widget _daySensitivitySpace(int index) {
+    if(!_notifier.daySensitivitySpaceCanBeCleared) _daySensitivitySpaceKey = UniqueKey();
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
       child: SizedBox(
         height: _state.daySensitivitySpaceExpand ? null : 0,
         child: Column(
+          key: _daySensitivitySpaceKey,
           children: [
             sensitivitySpace(
               direction: Direction.long15,
@@ -215,14 +221,28 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
           Positioned(
             right: 0,
             top: 0,
-            child: IconButton(
-              onPressed: () {
-                _notifier.daySensitivitySpaceExpand(
-                    !_state.daySensitivitySpaceExpand);
-              },
-              icon: Icon(!_state.daySensitivitySpaceExpand
-                  ? Icons.arrow_drop_down
-                  : Icons.arrow_drop_up),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: _notifier.daySensitivitySpaceCanBeCleared ? () {
+                    clearConfirmDialog('日盤靈敏度空間', context).then((yes) {
+                      if (yes == true) _notifier.daySensitivitySpaceClear();
+                    });
+                  } : null,
+                  iconSize: 20,
+                  disabledColor: Colors.grey,
+                  icon: const Icon(Icons.cleaning_services, color: Colors.redAccent),
+                ),
+                IconButton(
+                  onPressed: () {
+                    _notifier.daySensitivitySpaceExpand(
+                        !_state.daySensitivitySpaceExpand);
+                  },
+                  icon: Icon(!_state.daySensitivitySpaceExpand
+                      ? Icons.arrow_drop_down
+                      : Icons.arrow_drop_up),
+                )
+              ],
             ),
           ),
         ],
@@ -231,12 +251,14 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
   }
 
   Widget _nightSensitivitySpace(int index) {
+    if(!_notifier.nightSensitivitySpaceCanBeCleared) _nightSensitivitySpaceKey = UniqueKey();
     Widget content = AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
       child: SizedBox(
         height: _state.nightSensitivitySpaceExpand ? null : 0,
         child: Column(
+          key: _nightSensitivitySpaceKey,
           children: [
             sensitivitySpace(
               direction: Direction.long15,
@@ -327,14 +349,28 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
           Positioned(
             right: 0,
             top: 0,
-            child: IconButton(
-              onPressed: () {
-                _notifier.nightSensitivitySpaceExpand(
-                    !_state.nightSensitivitySpaceExpand);
-              },
-              icon: Icon(!_state.nightSensitivitySpaceExpand
-                  ? Icons.arrow_drop_down
-                  : Icons.arrow_drop_up),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: _notifier.nightSensitivitySpaceCanBeCleared ? () {
+                    clearConfirmDialog('夜盤靈敏度空間', context).then((yes) {
+                      if (yes == true) _notifier.nightSensitivitySpaceClear();
+                    });
+                  } : null,
+                  iconSize: 20,
+                  disabledColor: Colors.grey,
+                  icon: const Icon(Icons.cleaning_services, color: Colors.redAccent),
+                ),
+                IconButton(
+                  onPressed: () {
+                    _notifier.nightSensitivitySpaceExpand(
+                        !_state.nightSensitivitySpaceExpand);
+                  },
+                  icon: Icon(!_state.nightSensitivitySpaceExpand
+                      ? Icons.arrow_drop_down
+                      : Icons.arrow_drop_up),
+                )
+              ],
             ),
           ),
         ],
@@ -493,7 +529,8 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
-                                confirmDialog(e.title, context).then((remove) {
+                                deleteConfirmDialog(e.title, context)
+                                    .then((remove) {
                                   if (remove == true) {
                                     _notifier.removeCustomizeValue(e);
                                   }
@@ -1062,7 +1099,8 @@ class _SensitivitySpaceWidgetState extends ConsumerState {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        confirmDialog(customizeSensitivitySpace.title, context)
+                        deleteConfirmDialog(
+                                customizeSensitivitySpace.title, context)
                             .then((remove) {
                           if (remove == true) {
                             _notifier.removeCustomizeSensitivitySpace(
