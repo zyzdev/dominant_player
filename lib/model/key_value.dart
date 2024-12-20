@@ -9,11 +9,11 @@ enum KeyValue {
   low,
   range,
   rangeDiv4,
+  superPress,
+  absolutePress,
   highCost,
   middleCost,
   lowCost,
-  superPress,
-  absolutePress,
   nestPress,
   nestSupport,
   absoluteSupport,
@@ -54,21 +54,21 @@ extension KeyValueName on KeyValue {
       case KeyValue.low:
         return '低點';
       case KeyValue.range:
-        return '點差';
+        return '價差';
       case KeyValue.rangeDiv4:
-        return '點差/4';
-      case KeyValue.highCost:
-        return '高成本';
-      case KeyValue.middleCost:
-        return '中成本';
-      case KeyValue.lowCost:
-        return '低成本';
+        return '4分價差';
       case KeyValue.superPress:
         return '超漲';
       case KeyValue.absolutePress:
         return '壓二';
       case KeyValue.nestPress:
         return '壓一';
+      case KeyValue.highCost:
+        return '高成本';
+      case KeyValue.middleCost:
+        return '中關價';
+      case KeyValue.lowCost:
+        return '低成本';
       case KeyValue.nestSupport:
         return '撐一';
       case KeyValue.absoluteSupport:

@@ -26,12 +26,12 @@ class SpyState {
         MapEntry(KeyValue.low, spy.low),
         MapEntry(KeyValue.range, spy.range),
         MapEntry(KeyValue.rangeDiv4, spy.rangeDiv4),
-        MapEntry(KeyValue.highCost, spy.highCost),
-        MapEntry(KeyValue.middleCost, spy.middleCost),
-        MapEntry(KeyValue.lowCost, spy.lowCost),
         MapEntry(KeyValue.superPress, spy.superPress),
         MapEntry(KeyValue.absolutePress, spy.absolutePress),
         MapEntry(KeyValue.nestPress, spy.nestPress),
+        MapEntry(KeyValue.highCost, spy.highCost),
+        MapEntry(KeyValue.middleCost, spy.middleCost),
+        MapEntry(KeyValue.lowCost, spy.lowCost),
         MapEntry(KeyValue.nestSupport, spy.nestSupport),
         MapEntry(KeyValue.absoluteSupport, spy.absoluteSupport),
         MapEntry(KeyValue.superSupport, spy.superSupport),
@@ -82,6 +82,19 @@ class Spy {
     return DateFormat('MM/dd').format(spy_info.spyDate(isDay));
   }
 
+  /// 一股腦兒之SPY理論
+  /// 【當日高點+當日低點 ÷ 2】＝中關(範圍)
+  /// 【震幅÷4】＝4分價(4等分)
+  /// 【高點-低點】＝震幅
+  /// 【P(壓力超漲區)】＝高點-4等分+震幅
+  /// 【S(支撐超跌區)】＝低點+4等分-震幅
+  /// 高成本區＝當日高點-4等分
+  /// 低成本區＝當日低點+4等分
+  /// 壓二＝壓一+4等分
+  /// 壓一＝高點+(超漲-高點)/2
+  /// 撐一＝低點-(低點-超跌)/2
+  /// 撐二＝撐一-4等分
+
   /// 高點
   final int? high;
 
@@ -101,21 +114,21 @@ class Spy {
 
   /// 壓二
   num? get absolutePress =>
-      superPress != null && rangeDiv4 != null ? superPress! - rangeDiv4! : null;
+      nestPress != null && rangeDiv4 != null ? nestPress!  +rangeDiv4! : null;
 
   /// 壓一
-  num? get nestPress => absolutePress != null && rangeDiv4 != null
-      ? absolutePress! - rangeDiv4!
+  num? get nestPress => superPress != null && high != null
+      ? high! + (superPress! - high!) / 2
       : null;
 
   /// 撐一
-  double? get nestSupport => absoluteSupport != null && rangeDiv4 != null
-      ? absoluteSupport! + rangeDiv4!
+  double? get nestSupport => superSupport != null && low != null
+      ? low! - (low! - superSupport!) / 2
       : null;
 
   /// 撐二
-  double? get absoluteSupport => superSupport != null && rangeDiv4 != null
-      ? superSupport! + rangeDiv4!
+  double? get absoluteSupport => nestSupport != null && rangeDiv4 != null
+      ? nestSupport! - rangeDiv4!
       : null;
 
   /// 超跌
@@ -127,7 +140,7 @@ class Spy {
   double? get highCost =>
       high != null && rangeDiv4 != null ? high! - rangeDiv4! : null;
 
-  /// 中成本區
+  /// 中關價
   double? get middleCost =>
       high != null && low != null ? (high! + low!) / 2 : null;
 
